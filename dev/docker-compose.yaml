@@ -1,0 +1,39 @@
+#docker run \
+#-v /absolute/path/to/luxembourg.osm.pbf:/data/region.osm.pbf \
+#-v osm-data:/data/database/ \
+#overv/openstreetmap-tile-server \
+#import
+
+# http://localhost:9000/tile/14/8806/5375.png
+
+#version: '3'
+#services:
+#  tile-server:
+#    image: overv/openstreetmap-tile-server
+#    volumes:
+#      - ./berlin/berlin-latest.osm.pbf:/data/region.osm.pbf
+#      - ./berlin:/data/database
+#    ports:
+#      - 9000:80
+#    command:
+#      - run
+
+# Set up volume data for tile server
+# docker volume create osm-data
+# docker run -v /home/sss/Documents/dev/workspace/order-taxi-app/dev/berlin/berlin-latest.osm.pbf:/data/region.osm.pbf -v osm-data:/data/database/ overv/openstreetmap-tile-server     import
+
+version: '3'
+services:
+  map:
+    image: overv/openstreetmap-tile-server
+    volumes:
+      - osm-data:/data/database/
+    ports:
+      - "9001:80"
+    command: "run"
+volumes:
+  osm-data:
+    external: true
+
+# Startup order
+# https://docs.docker.com/compose/startup-order/
