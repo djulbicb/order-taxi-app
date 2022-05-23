@@ -37,3 +37,4 @@ volumes:
 
 # Startup order
 # https://docs.docker.com/compose/startup-order/
+# https://stackoverflow.com/questions/50387076/docker-compose-conditional-statements-e-g-add-volume-only-if-condition
