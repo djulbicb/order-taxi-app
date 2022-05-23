@@ -22,6 +22,8 @@
 # docker volume create osm-data
 # docker run -v /home/sss/Documents/dev/workspace/order-taxi-app/dev/berlin/berlin-latest.osm.pbf:/data/region.osm.pbf -v osm-data:/data/database/ overv/openstreetmap-tile-server     import
 
+# docker run -t -i -p 5000:5000 -v "${PWD}/berlin:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/berlin-latest.osrm
+
 version: '3'
 services:
   map:
@@ -38,3 +40,7 @@ volumes:
 # Startup order
 # https://docs.docker.com/compose/startup-order/
 # https://stackoverflow.com/questions/50387076/docker-compose-conditional-statements-e-g-add-volume-only-if-condition
+
+
+
+

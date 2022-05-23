@@ -8,6 +8,8 @@ import com.djulb.way.bojan.PathBuilder;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,8 +18,11 @@ import reactor.core.publisher.Mono;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class WaypointsController {
     @GetMapping("/test")
     public String test () throws IOException {
@@ -48,6 +53,19 @@ public class WaypointsController {
 
         return "sss";
     }
+
+    @Autowired
+    PathBank pathBank;
+    @GetMapping("/waypoints")
+    public List<Object[]> getWaypoints () throws IOException {
+        return pathBank.getPathArray();
+    }
+
+    @GetMapping("/point")
+    public List<Double> point () throws IOException {
+        return pathBank.getPoint().get();
+    }
+
 
     public void convertJsonToJavaClass(URL inputJsonUrl, File outputJavaClassDirectory, String packageName, String javaClassName)
             throws IOException {
