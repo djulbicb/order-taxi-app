@@ -1,5 +1,6 @@
 package com.djulb;
 
+import com.djulb.way.PathCalculator;
 import com.djulb.way.Step;
 import com.djulb.way.Waypoint;
 import com.djulb.way.bojan.Coordinate;
@@ -51,14 +52,30 @@ public class PathBank {
         this.path = path;
     }
 
-    double dist = 100;
-    @Scheduled(fixedDelay=1000)
+    double dist = 50;
+    @Scheduled(fixedDelay=500)
     public void test() {
+        List<Double> x = new ArrayList<>();
+        List<Double> y = new ArrayList<>();
+        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
+            double lat = step.getManeuver().getLat();
+            double lng = step.getManeuver().getLng();
+
+            x.add(lat);
+            y.add(lng);
+        }
+
+
         try {
-            Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
-            point.set(List.of(coordinateAtDistance.getLat(), coordinateAtDistance.getLng()));
-            dist+=100;
-            System.out.println(point);
+            dist+=50;
+            // Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
+            double[] t = new double[2];
+            boolean polygonPosition = PathCalculator.findPolygonPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), dist, t);
+
+//            point.set(List.of(coordinateAtDistance.getLat(), coordinateAtDistance.getLng()));
+            point.set(List.of(t[0], t[1]));
+
+            System.out.println(t[0] + " " + t[1]);
             System.out.println(dist);
         }
         catch (NullPointerException e) {
