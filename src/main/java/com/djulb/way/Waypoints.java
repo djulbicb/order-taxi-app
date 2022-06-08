@@ -33,6 +33,10 @@ public class Waypoints {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    @JsonIgnore
+    private Double latitude;
+    @JsonIgnore
+    private Double longitude;
     @JsonProperty("hint")
     public String getHint() {
         return hint;
@@ -41,6 +45,17 @@ public class Waypoints {
     @JsonProperty("hint")
     public void setHint(String hint) {
         this.hint = hint;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+    public String formattedCoordinates() {
+        return String.format("%s,%s", getLatitude(), getLongitude());
     }
 
     public Waypoints withHint(String hint) {
@@ -86,10 +101,14 @@ public class Waypoints {
     @JsonProperty("location")
     public void setLocation(List<Double> location) {
         this.location = location;
+        this.latitude = location.get(1);
+        this.longitude = location.get(0);
     }
 
     public Waypoints withLocation(List<Double> location) {
         this.location = location;
+        this.latitude = location.get(1);
+        this.longitude = location.get(0);
         return this;
     }
 

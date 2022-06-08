@@ -10,4 +10,8 @@ import lombok.ToString;
 public class Coordinate {
     private double lat;
     private double lng;
+
+    public String formatted() {
+        return String.format("%s,%s", lat, lng);
+    }
 }
