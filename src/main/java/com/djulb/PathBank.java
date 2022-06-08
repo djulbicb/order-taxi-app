@@ -53,6 +53,7 @@ public class PathBank {
     }
 
     double dist = 50;
+    ////
 //    @Scheduled(fixedDelay=500)
     public void test() {
         List<Double> x = new ArrayList<>();
