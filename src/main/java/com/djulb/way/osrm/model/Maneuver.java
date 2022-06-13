@@ -1,4 +1,4 @@
-package com.djulb.way;
+package com.djulb.way.osrm.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

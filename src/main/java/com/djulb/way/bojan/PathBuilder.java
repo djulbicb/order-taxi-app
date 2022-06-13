@@ -14,17 +14,13 @@ public class PathBuilder {
         coordinates.add(coordinate);
     }
 
-    public Path build() {
+    public DrivingPath build() {
         double totalDistance = 0d;
         List<Subpath> subpaths = new ArrayList<>();
         for (int i = 0; i < coordinates.size()-1; i++) {
             Coordinate i0 = coordinates.get(i);
             Coordinate i1 = coordinates.get(i+1);
 
-//            double x = i1.lat - i0.lat;
-//            double y = i1.lng - i0.lng;
-
-//            double distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
             double distance = distance(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
             System.out.println(String.format("A: %s; B: %s; Distance: %sm", i0.toString(), i1.toString(), distance));
             System.out.println();
@@ -32,7 +28,7 @@ public class PathBuilder {
             totalDistance += distance;
         }
         System.out.println("Total distance: " + totalDistance);
-        return Path.builder().subpaths(subpaths).distance(totalDistance).build();
+        return DrivingPath.builder().subpaths(subpaths).totalDistance(totalDistance).build();
     }
 
     public static double distance(double lat1, double lat2, double lon1,

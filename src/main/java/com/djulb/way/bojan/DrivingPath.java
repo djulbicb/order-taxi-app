@@ -8,9 +8,11 @@ import java.util.List;
 
 @Data
 @Builder
-public class Path {
+public class DrivingPath {
     private List<Subpath> subpaths;
-    private double distance;
+    private double totalDistance;
+    private Coordinate start;
+    private Coordinate end;
 
     public Coordinate getCoordinateAtDistance(double moveDistance) {
         ComparisonSubpath lastSubpath = getLastSubpath(moveDistance);

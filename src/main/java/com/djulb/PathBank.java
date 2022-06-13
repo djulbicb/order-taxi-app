@@ -1,10 +1,9 @@
 package com.djulb;
 
 import com.djulb.way.PathCalculator;
-import com.djulb.way.Step;
-import com.djulb.way.Waypoint;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.Path;
+import com.djulb.way.osrm.model.Step;
+import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.way.bojan.DrivingPath;
 import com.djulb.way.bojan.PathBuilder;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @EnableScheduling
 public class PathBank {
     private final Waypoint block;
-    private final Path path;
+    private final DrivingPath drivingPath;
 
     private AtomicReference<List<Double>> point = new AtomicReference();
 
@@ -48,13 +47,13 @@ public class PathBank {
             pathBuilder.addCoordinate(lat, lng);
         }
         pathBuilder.addCoordinate(52.50546582848033, 13.29547681726967);
-        Path path = pathBuilder.build();
-        this.path = path;
+        DrivingPath drivingPath = pathBuilder.build();
+        this.drivingPath = drivingPath;
     }
 
     double dist = 50;
     ////
-//    @Scheduled(fixedDelay=500)
+    @Scheduled(fixedDelay=500)
     public void test() {
         List<Double> x = new ArrayList<>();
         List<Double> y = new ArrayList<>();
@@ -72,12 +71,7 @@ public class PathBank {
             // Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
             double[] t = new double[2];
             boolean polygonPosition = PathCalculator.findPolygonPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), dist, t);
-
-//            point.set(List.of(coordinateAtDistance.getLat(), coordinateAtDistance.getLng()));
             point.set(List.of(t[0], t[1]));
-
-            System.out.println(t[0] + " " + t[1]);
-            System.out.println(dist);
         }
         catch (NullPointerException e) {
             System.out.println("Null");

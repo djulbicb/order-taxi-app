@@ -1,9 +1,9 @@
 package com.djulb.standalone;
 
 import com.djulb.utils.BBox;
-import com.djulb.utils.OsrmBackendApi;
-import com.djulb.way.Waypoint;
-import com.djulb.way.Waypoints;
+import com.djulb.way.osrm.OsrmBackendUrl;
+import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.way.osrm.model.Waypoints;
 import com.djulb.way.bojan.Coordinate;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -15,13 +15,13 @@ import java.util.Optional;
 
 import static com.djulb.utils.BBox.getBerlinBbox;
 
-public class NearestPosition {
+public class AppNearestPosition {
     public static void main(String[] args) throws IOException {
-        List<Coordinate> coordinateMatrix = getCoordinateMatrix(getBerlinBbox(), 15);
+        List<Coordinate> coordinateMatrix = getCoordinateMatrix(getBerlinBbox(), 50);
         List<Coordinate> nearest = getNearest(coordinateMatrix);
 
-        print(coordinateMatrix, "matrix.csv");
-        print(nearest, "fileName.csv");
+        print(coordinateMatrix, "matrix_50x50.csv");
+        print(nearest, "matrix_nearest_50x50.csv");
 
     }
 
@@ -86,7 +86,7 @@ public class NearestPosition {
         //        Latitude 52.4050, Longitude 13.5200
         //        String nearestServiceUrl = OsrmBackendApi.getNearestServiceUrl(52.4050, 13.5200);
         WebClient client = WebClient.create();
-        String nearestServiceUrl = OsrmBackendApi.getNearestServiceUrl(latitude, longitude);
+        String nearestServiceUrl = OsrmBackendUrl.getNearestServiceApiUrl(latitude, longitude);
 
         WebClient.ResponseSpec responseSpec = client.get()
                 .uri(nearestServiceUrl)

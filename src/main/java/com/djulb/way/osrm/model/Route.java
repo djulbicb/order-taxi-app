@@ -1,4 +1,4 @@
-package com.djulb.way;
+package com.djulb.way.osrm.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,20 +14,22 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "steps",
-    "summary",
+    "geometry",
+    "legs",
+    "weight_name",
     "weight",
     "duration",
     "distance"
 })
 @Generated("jsonschema2pojo")
-public class Leg {
+public class Route {
 
-    @JsonProperty("steps")
-//    private List<Object> steps = new ArrayList<Object>();
-    private List<Step> steps = new ArrayList<Step>();
-    @JsonProperty("summary")
-    private String summary;
+    @JsonProperty("geometry")
+    private String geometry;
+    @JsonProperty("legs")
+    private List<Leg> legs = new ArrayList<Leg>();
+    @JsonProperty("weight_name")
+    private String weightName;
     @JsonProperty("weight")
     private Integer weight;
     @JsonProperty("duration")
@@ -37,33 +39,48 @@ public class Leg {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("steps")
-    public List<Step> getSteps() {
-        return steps;
+    @JsonProperty("geometry")
+    public String getGeometry() {
+        return geometry;
     }
 
-    @JsonProperty("steps")
-    public void setSteps(List<Step> steps) {
-        this.steps = steps;
+    @JsonProperty("geometry")
+    public void setGeometry(String geometry) {
+        this.geometry = geometry;
     }
 
-    public Leg withSteps(List<Step> steps) {
-        this.steps = steps;
+    public Route withGeometry(String geometry) {
+        this.geometry = geometry;
         return this;
     }
 
-    @JsonProperty("summary")
-    public String getSummary() {
-        return summary;
+    @JsonProperty("legs")
+    public List<Leg> getLegs() {
+        return legs;
     }
 
-    @JsonProperty("summary")
-    public void setSummary(String summary) {
-        this.summary = summary;
+    @JsonProperty("legs")
+    public void setLegs(List<Leg> legs) {
+        this.legs = legs;
     }
 
-    public Leg withSummary(String summary) {
-        this.summary = summary;
+    public Route withLegs(List<Leg> legs) {
+        this.legs = legs;
+        return this;
+    }
+
+    @JsonProperty("weight_name")
+    public String getWeightName() {
+        return weightName;
+    }
+
+    @JsonProperty("weight_name")
+    public void setWeightName(String weightName) {
+        this.weightName = weightName;
+    }
+
+    public Route withWeightName(String weightName) {
+        this.weightName = weightName;
         return this;
     }
 
@@ -77,7 +94,7 @@ public class Leg {
         this.weight = weight;
     }
 
-    public Leg withWeight(Integer weight) {
+    public Route withWeight(Integer weight) {
         this.weight = weight;
         return this;
     }
@@ -92,7 +109,7 @@ public class Leg {
         this.duration = duration;
     }
 
-    public Leg withDuration(Integer duration) {
+    public Route withDuration(Integer duration) {
         this.duration = duration;
         return this;
     }
@@ -107,7 +124,7 @@ public class Leg {
         this.distance = distance;
     }
 
-    public Leg withDistance(Integer distance) {
+    public Route withDistance(Integer distance) {
         this.distance = distance;
         return this;
     }
@@ -122,7 +139,7 @@ public class Leg {
         this.additionalProperties.put(name, value);
     }
 
-    public Leg withAdditionalProperty(String name, Object value) {
+    public Route withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }
@@ -130,14 +147,18 @@ public class Leg {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Leg.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("steps");
+        sb.append(Route.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append("geometry");
         sb.append('=');
-        sb.append(((this.steps == null)?"<null>":this.steps));
+        sb.append(((this.geometry == null)?"<null>":this.geometry));
         sb.append(',');
-        sb.append("summary");
+        sb.append("legs");
         sb.append('=');
-        sb.append(((this.summary == null)?"<null>":this.summary));
+        sb.append(((this.legs == null)?"<null>":this.legs));
+        sb.append(',');
+        sb.append("weightName");
+        sb.append('=');
+        sb.append(((this.weightName == null)?"<null>":this.weightName));
         sb.append(',');
         sb.append("weight");
         sb.append('=');
@@ -166,12 +187,13 @@ public class Leg {
     @Override
     public int hashCode() {
         int result = 1;
-        result = ((result* 31)+((this.summary == null)? 0 :this.summary.hashCode()));
         result = ((result* 31)+((this.duration == null)? 0 :this.duration.hashCode()));
+        result = ((result* 31)+((this.weightName == null)? 0 :this.weightName.hashCode()));
         result = ((result* 31)+((this.distance == null)? 0 :this.distance.hashCode()));
+        result = ((result* 31)+((this.legs == null)? 0 :this.legs.hashCode()));
         result = ((result* 31)+((this.weight == null)? 0 :this.weight.hashCode()));
+        result = ((result* 31)+((this.geometry == null)? 0 :this.geometry.hashCode()));
         result = ((result* 31)+((this.additionalProperties == null)? 0 :this.additionalProperties.hashCode()));
-        result = ((result* 31)+((this.steps == null)? 0 :this.steps.hashCode()));
         return result;
     }
 
@@ -180,11 +202,11 @@ public class Leg {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Leg) == false) {
+        if ((other instanceof Route) == false) {
             return false;
         }
-        Leg rhs = ((Leg) other);
-        return (((((((this.summary == rhs.summary)||((this.summary!= null)&&this.summary.equals(rhs.summary)))&&((this.duration == rhs.duration)||((this.duration!= null)&&this.duration.equals(rhs.duration))))&&((this.distance == rhs.distance)||((this.distance!= null)&&this.distance.equals(rhs.distance))))&&((this.weight == rhs.weight)||((this.weight!= null)&&this.weight.equals(rhs.weight))))&&((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties))))&&((this.steps == rhs.steps)||((this.steps!= null)&&this.steps.equals(rhs.steps))));
+        Route rhs = ((Route) other);
+        return ((((((((this.duration == rhs.duration)||((this.duration!= null)&&this.duration.equals(rhs.duration)))&&((this.weightName == rhs.weightName)||((this.weightName!= null)&&this.weightName.equals(rhs.weightName))))&&((this.distance == rhs.distance)||((this.distance!= null)&&this.distance.equals(rhs.distance))))&&((this.legs == rhs.legs)||((this.legs!= null)&&this.legs.equals(rhs.legs))))&&((this.weight == rhs.weight)||((this.weight!= null)&&this.weight.equals(rhs.weight))))&&((this.geometry == rhs.geometry)||((this.geometry!= null)&&this.geometry.equals(rhs.geometry))))&&((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties))));
     }
 
 }

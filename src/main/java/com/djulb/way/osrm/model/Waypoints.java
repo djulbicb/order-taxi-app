@@ -1,4 +1,4 @@
-package com.djulb.way;
+package com.djulb.way.osrm.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -26,4 +26,8 @@ public class BBox {
                 .bottomRight(Coordinate.builder().lat(52.377695).lng(13.759003).build())    //
                 .build();
     }
+
+    public Coordinate getMiddlePoint() {
+        return GeoUtils.getMiddle(topLeft, bottomRight);
+    }
 }
