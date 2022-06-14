@@ -1,6 +1,6 @@
-package com.djulb.utils;
+package com.djulb.way.bojan;
 
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.utils.GeoUtils;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +18,9 @@ public class BBox {
     private Coordinate bottomLeft;
     private Coordinate bottomRight;
 
+    public Coordinate getMiddlePoint() {
+        return GeoUtils.getMiddle(topLeft, bottomRight);
+    }
     public static BBox getBerlinBbox() {
         return BBox.builder()
                 .topLeft(Coordinate.builder().lat(52.661392).lng(13.110809).build())        //
@@ -25,9 +28,5 @@ public class BBox {
                 .bottomLeft(Coordinate.builder().lat(52.377695).lng(13.110809).build())     //
                 .bottomRight(Coordinate.builder().lat(52.377695).lng(13.759003).build())    //
                 .build();
-    }
-
-    public Coordinate getMiddlePoint() {
-        return GeoUtils.getMiddle(topLeft, bottomRight);
     }
 }

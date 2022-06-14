@@ -1,23 +1,34 @@
 package com.djulb.way.bojan;
 
+import com.djulb.way.osrm.model.Route;
+import com.djulb.way.osrm.model.Step;
+import com.djulb.way.osrm.model.Waypoint;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.PackagePrivate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Builder
-public class DrivingPath {
+@PackagePrivate
+public class RoutePath {
     private List<Subpath> subpaths;
+    private Waypoint waypoint;
+    private double distanceSoFar;
     private double totalDistance;
     private Coordinate start;
     private Coordinate end;
 
+    public void increaseTraveledDistance(double distane) {
+        distanceSoFar += distane;
+    }
+
     public Coordinate getCoordinateAtDistance(double moveDistance) {
         ComparisonSubpath lastSubpath = getLastSubpath(moveDistance);
 
-        double remaining = moveDistance - lastSubpath.getDistanceSoFar();
+        double remaining = Math.abs(moveDistance - lastSubpath.getDistanceSoFar());
         var start = lastSubpath.getSubpath().getStart();
         var end = lastSubpath.getSubpath().getEnd();
         var distance = lastSubpath.getSubpath().getDistance();
@@ -43,6 +54,20 @@ public class DrivingPath {
         }
 
         return null;
+    }
+
+    public List<Object[]> getPathArray() {
+        List<Object[]> sss = new ArrayList<>();
+
+        for (Subpath subpath : subpaths) {
+            double lat = subpath.getStart().getLat();
+            double lng = subpath.getStart().getLng();
+            List<Double> q = new ArrayList<>();
+            q.add(lat);
+            q.add(lng);
+            sss.add(q.toArray());
+        }
+        return sss;
     }
 }
 @Data

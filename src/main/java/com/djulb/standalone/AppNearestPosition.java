@@ -1,11 +1,9 @@
 package com.djulb.standalone;
 
-import com.djulb.utils.BBox;
-import com.djulb.way.osrm.OsrmBackendUrl;
-import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.way.bojan.BBox;
+import com.djulb.way.osrm.OsrmBackendApi;
 import com.djulb.way.osrm.model.Waypoints;
 import com.djulb.way.bojan.Coordinate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.djulb.utils.BBox.getBerlinBbox;
+import static com.djulb.way.bojan.BBox.getBerlinBbox;
 
 public class AppNearestPosition {
     public static void main(String[] args) throws IOException {
-        List<Coordinate> coordinateMatrix = getCoordinateMatrix(getBerlinBbox(), 50);
+        List<Coordinate> coordinateMatrix = getCoordinateMatrix(getBerlinBbox(), 15);
         List<Coordinate> nearest = getNearest(coordinateMatrix);
 
-        print(coordinateMatrix, "matrix_50x50.csv");
-        print(nearest, "matrix_nearest_50x50.csv");
+        print(coordinateMatrix, "matrix_15x15.csv");
+        print(nearest, "matrix_nearest_15x15.csv");
 
     }
 
@@ -38,10 +36,11 @@ public class AppNearestPosition {
     }
 
     private static List<Coordinate> getNearest(List<Coordinate> coordinateMat) {
+        OsrmBackendApi api = new OsrmBackendApi();
         List<Coordinate> nearestCoordinates = new ArrayList<>();
 
         for (Coordinate coordinate : coordinateMat) {
-            Optional<Waypoints> nearest = nearest(coordinate.getLat(), coordinate.getLng());
+            Optional<Waypoints> nearest = api.getNearest(coordinate);
             if (nearest.isPresent()) {
                 Waypoints waypoints = nearest.get();
                 nearestCoordinates.add(Coordinate.builder().lat(waypoints.getLatitude()).lng(waypoints.getLongitude()).build());
@@ -80,23 +79,5 @@ public class AppNearestPosition {
             }
         }
         return coordinates;
-    }
-
-    private static Optional<Waypoints> nearest(double latitude, double longitude) {
-        //        Latitude 52.4050, Longitude 13.5200
-        //        String nearestServiceUrl = OsrmBackendApi.getNearestServiceUrl(52.4050, 13.5200);
-        WebClient client = WebClient.create();
-        String nearestServiceUrl = OsrmBackendUrl.getNearestServiceApiUrl(latitude, longitude);
-
-        WebClient.ResponseSpec responseSpec = client.get()
-                .uri(nearestServiceUrl)
-                .retrieve();
-        Waypoint block = responseSpec.bodyToMono(Waypoint.class).block();
-
-        if (block.getWaypoints().size() > 0) {
-            return Optional.of(block.getWaypoints().get(0));
-        }
-
-        return Optional.empty();
     }
 }

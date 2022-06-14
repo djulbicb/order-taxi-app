@@ -1,6 +1,6 @@
 package com.djulb;
 
-import com.djulb.utils.BBox;
+import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
 
 public class TestData {

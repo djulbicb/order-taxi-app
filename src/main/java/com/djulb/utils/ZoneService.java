@@ -1,5 +1,6 @@
 package com.djulb.utils;
 
+import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,31 +12,42 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class ZoneBank {
-    private final HashMap<String, HashSet<Coordinate>> coordinatesWithZones = new HashMap<>();
+public class ZoneService {
+    private final HashMap<String, List<Coordinate>> coordinatesWithZones = new HashMap<>();
 
     String MATRIX_FOLDER = "src/main/resources/matrix/";
     String MATRIX_50_FILEPATH = Paths.get(MATRIX_FOLDER, "matrix_nearest_50x50.csv").toString();
     NumberFormat formatter = new DecimalFormat("#0.00");
+    Random rnd = new Random();
 
-    public ZoneBank() {
+    public ZoneService() {
         List<Coordinate> coordinates = loadCoordinates(MATRIX_50_FILEPATH);
         for (Coordinate coordinate : coordinates) {
             String zone = getZone(coordinate);
             if (!coordinatesWithZones.containsKey(zone)) {
-                coordinatesWithZones.put(zone, new HashSet<>());
+                coordinatesWithZones.put(zone, new ArrayList<>());
             }
             coordinatesWithZones.get(zone).add(coordinate);
         }
       log.info("Loaded {} coordinates in {} zones", coordinates.size(), coordinatesWithZones.entrySet().size());
     }
-
-    public HashSet<Coordinate> getCoordinatesInZone(Coordinate coordinate) {
+    public List<Coordinate> getCoordinatesInZone(Coordinate coordinate) {
         String zone = getZone(coordinate);
         if (coordinatesWithZones.containsKey(zone)) {
             return coordinatesWithZones.get(zone);
         }
-        return new HashSet<>();
+        return new ArrayList<>();
+    }
+    public Optional<Coordinate> getCoordinateInSameZone(Coordinate coordinate) {
+        String zone = getZone(coordinate);
+        return getRandomCoordinateInZone(zone);
+    }
+    public Optional<Coordinate> getRandomCoordinateInZone(String zone) {
+        if (coordinatesWithZones.containsKey(zone)) {
+            List<Coordinate> zoneMap = coordinatesWithZones.get(zone);
+            return Optional.of(zoneMap.get(rnd.nextInt(zoneMap.size())));
+        }
+        return Optional.empty();
     }
     public String getZone(Coordinate coordinate) {
        return getZone(coordinate.getLat(), coordinate.getLng());

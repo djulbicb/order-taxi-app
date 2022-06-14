@@ -37,6 +37,7 @@ public class Leg {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+
     @JsonProperty("steps")
     public List<Step> getSteps() {
         return steps;

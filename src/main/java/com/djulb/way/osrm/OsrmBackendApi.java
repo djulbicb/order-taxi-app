@@ -1,34 +1,48 @@
 package com.djulb.way.osrm;
 
 import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.DrivingPath;
-import com.djulb.way.bojan.PathBuilder;
-import com.djulb.way.osrm.model.Step;
+import com.djulb.way.bojan.RoutePath;
+import com.djulb.way.bojan.RoutePathFactory;
 import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.way.osrm.model.Waypoints;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
+@Component
 public class OsrmBackendApi {
-    public void getRoute(Coordinate start, Coordinate end) {
-//        WebClient client = WebClient.create();
-//        String url = "http://localhost:5000/route/v1";
-//        url = "http://router.project-osrm.org/route/v1/driving/13.4050,52.5200;13.29547681726967,52.50546582848033?steps=true&overview=full";
-//        WebClient.ResponseSpec responseSpec = client.get()
-//                .uri(url)
-//                .retrieve();
-//        Mono<Waypoint> mono = responseSpec.bodyToMono(Waypoint.class);
-//        Waypoint block = mono.block();
-//
-//        this.block = block;
-//        // Fake car
-//        PathBuilder pathBuilder = new PathBuilder();
-//        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
-//            double lat = step.getManeuver().getLat();
-//            double lng = step.getManeuver().getLng();
-//
-//            pathBuilder.addCoordinate(lat, lng);
-//        }
-//        pathBuilder.addCoordinate(52.50546582848033, 13.29547681726967);
-//        DrivingPath drivingPath = pathBuilder.build();
+    WebClient client = WebClient.create();
+    public RoutePath getRoute(Coordinate start, Coordinate end) {
+        String url = OsrmBackendUrl.getRouteApiUrl(start, end);
+        WebClient.ResponseSpec responseSpec = client.get()
+                .uri(url)
+                .retrieve();
+        Mono<Waypoint> mono = responseSpec.bodyToMono(Waypoint.class);
+        String json = responseSpec.bodyToMono(String.class).block();
+        Waypoint block = mono.block();
+
+        RoutePathFactory builder = new RoutePathFactory();
+        RoutePath routePath = builder.buildFromWaypoint(block);
+        routePath.setStart(start);
+        routePath.setEnd(end);
+        return routePath;
+    }
+
+    public Optional<Waypoints> getNearest(Coordinate coordinate) {
+        WebClient client = WebClient.create();
+        String nearestServiceUrl = OsrmBackendUrl.getNearestServiceApiUrl(coordinate.getLat(), coordinate.getLng());
+
+        WebClient.ResponseSpec responseSpec = client.get()
+                .uri(nearestServiceUrl)
+                .retrieve();
+        Waypoint block = responseSpec.bodyToMono(Waypoint.class).block();
+
+        if (block.getWaypoints().size() > 0) {
+            return Optional.of(block.getWaypoints().get(0));
+        }
+
+        return Optional.empty();
     }
 }

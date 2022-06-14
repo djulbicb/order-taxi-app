@@ -1,21 +1,16 @@
 package com.djulb.utils;
 
-import com.djulb.settings.Settings;
 import com.djulb.way.bojan.Coordinate;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class ZoneBankTest {
+class ZoneServiceTest {
     @Autowired
-    ZoneBank zoneBank;
+    ZoneService zoneService;
 
     @Test
     void load() {
@@ -25,23 +20,23 @@ class ZoneBankTest {
     @Test
     void getZone() {
         Coordinate coordinate1 = Coordinate.builder().lat(52.472191).lng(13.32694).build();
-        String zone1 = zoneBank.getZone(coordinate1);
+        String zone1 = zoneService.getZone(coordinate1);
         assertEquals("52.50,13.30", zone1);
 
         Coordinate coordinate2 = Coordinate.builder().lat(52.434676).lng(13.32619).build();
-        String zone2 = zoneBank.getZone(coordinate2);
+        String zone2 = zoneService.getZone(coordinate2);
         assertEquals("52.45,13.30", zone2);
 
         Coordinate coordinate3 = Coordinate.builder().lat(52.434362).lng(13.715192).build();
-        String zone3 = zoneBank.getZone(coordinate3);
+        String zone3 = zoneService.getZone(coordinate3);
         assertEquals("52.45,13.70", zone3);
 
         Coordinate coordinate4 = Coordinate.builder().lat(52.629057).lng(13.528003).build();
-        String zone4 = zoneBank.getZone(coordinate4);
+        String zone4 = zoneService.getZone(coordinate4);
         assertEquals("52.65,13.50", zone4);
 
         Coordinate coordinate5 = Coordinate.builder().lat(52.661312).lng(13.283742).build();
-        String zone5 = zoneBank.getZone(coordinate5);
+        String zone5 = zoneService.getZone(coordinate5);
         assertEquals("52.70,13.20", zone5);
     }
 

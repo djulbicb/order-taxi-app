@@ -1,69 +1,50 @@
-package com.djulb;
+package com.djulb.service;
 
-import com.djulb.way.osrm.OsrmBackendUrl;
-import com.djulb.way.bojan.DrivingPath;
-import com.djulb.way.osrm.model.Step;
-import com.djulb.way.osrm.model.Waypoint;
-import com.djulb.way.bojan.PathBuilder;
+import com.djulb.PathBank;
+import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.elements.FakeCar;
 import com.sun.codemodel.JCodeModel;
+import lombok.RequiredArgsConstructor;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class WaypointsController {
+public class FakeCarController {
+    @Autowired
+    PathBank pathBank;
+    @Autowired
+    FakeCarManager fakeCarManager;
     @GetMapping("/test")
     public String test () throws IOException {
-
-        double longitudeStart = 13.4050;
-        double latitudeStart = 52.5200;
-        double longitudeEnd = 13.29547681726967;
-        double latitudeEnd = 52.50546582848033;
-
-        WebClient client = WebClient.create();
-        String url = OsrmBackendUrl.getRouteApiUrl(longitudeStart, latitudeStart, longitudeEnd, latitudeEnd);
-        WebClient.ResponseSpec responseSpec = client.get()
-                .uri(url)
-                .retrieve();
-        Mono<Waypoint> mono = responseSpec.bodyToMono(Waypoint.class);
-        Waypoint block = mono.block();
-
-        PathBuilder pathBuilder = new PathBuilder();
-        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
-            double lat = step.getManeuver().getLat();
-            double lng = step.getManeuver().getLng();
-
-            pathBuilder.addCoordinate(lat, lng);
-        }
-        pathBuilder.addCoordinate(52.50546582848033, 13.29547681726967);
-        DrivingPath drivingPath = pathBuilder.build();
-
         return "sss";
     }
 
-    @Autowired
-    PathBank pathBank;
+
     @GetMapping("/waypoints")
     public List<Object[]> getWaypoints () throws IOException {
-        return pathBank.getPathArray();
+        return fakeCarManager.getCarById("id").get().getCurrentRoutePath().get().getPathArray();
+        // return pathBank.getPathArray();
     }
 
     @GetMapping("/point")
     public List<Double> point () throws IOException {
-        return pathBank.getPoint().get();
-    }
+        Optional<FakeCar> id = fakeCarManager.getCarById("id");
+        Coordinate currentPosition = id.get().getCurrentPosition();
 
+        return List.of(currentPosition.getLat(),currentPosition.getLng());
+        // return pathBank.getPoint().get();
+    }
 
     public void convertJsonToJavaClass(URL inputJsonUrl, File outputJavaClassDirectory, String packageName, String javaClassName)
             throws IOException {

@@ -28,7 +28,7 @@ public class OsrmBackendUrl {
 
         return StrSubstitutor.replace(NEAREST_SERVICE_API, data);
     }
-    private static final String ROUTE_SERVICE_API = "http://${server}/route/v1/${profile}/${longitudeStart},${latitudeStart};${longitudeEnd},${latitudeEnd}?steps=true&overview=full";
+    private static final String ROUTE_SERVICE_API = "http://${server}/route/v1/${profile}/${longitudeStart},${latitudeStart};${longitudeEnd},${latitudeEnd}?steps=true&overview=full&geometries=polyline6";
     public static String getRouteApiUrl(Coordinate start, Coordinate end) {
         return getRouteApiUrl(start.getLng(), start.getLat(), end.getLng(), end.getLat());
     }

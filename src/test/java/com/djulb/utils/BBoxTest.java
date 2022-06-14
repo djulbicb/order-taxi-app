@@ -1,11 +1,11 @@
 package com.djulb.utils;
 
+import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static com.djulb.TestData.testBBox;
-import static org.junit.jupiter.api.Assertions.*;
 
 class BBoxTest {
 

@@ -17,7 +17,7 @@ public class CoordinatesBank {
 
     @GetMapping("/coordinates")
     public HashSet<String> coordinates () throws IOException {
-        String filename = "fileName.csv";
+        String filename = "/home/sss/Documents/dev/workspace/order-taxi-app/src/main/resources/matrix/matrix_nearest_15x15.csv";
         List<String> lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
         return new HashSet<String>(lines);
     }

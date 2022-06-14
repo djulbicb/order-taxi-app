@@ -1,25 +1,25 @@
 package com.djulb;
 
 import com.djulb.way.PathCalculator;
+import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.bojan.RoutePath;
+import com.djulb.way.osrm.OsrmBackendApi;
 import com.djulb.way.osrm.model.Step;
-import com.djulb.way.osrm.model.Waypoint;
-import com.djulb.way.bojan.DrivingPath;
-import com.djulb.way.bojan.PathBuilder;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-@EnableScheduling
+//@EnableScheduling
 public class PathBank {
-    private final Waypoint block;
-    private final DrivingPath drivingPath;
+
+    OsrmBackendApi osrmBackendApi;
+
+    private final RoutePath routePath;
 
     private AtomicReference<List<Double>> point = new AtomicReference();
 
@@ -27,37 +27,24 @@ public class PathBank {
         return point;
     }
 
-    public PathBank() {
-        WebClient client = WebClient.create();
-        String url = "http://localhost:5000/route/v1";
-        url = "http://router.project-osrm.org/route/v1/driving/13.4050,52.5200;13.29547681726967,52.50546582848033?steps=true&overview=full";
-        WebClient.ResponseSpec responseSpec = client.get()
-                .uri(url)
-                .retrieve();
-        Mono<Waypoint> mono = responseSpec.bodyToMono(Waypoint.class);
-        Waypoint block = mono.block();
+    public PathBank(OsrmBackendApi osrmBackendApi) {
+        this.osrmBackendApi = osrmBackendApi;
 
-        this.block = block;
-        // Fake car
-        PathBuilder pathBuilder = new PathBuilder();
-        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
-            double lat = step.getManeuver().getLat();
-            double lng = step.getManeuver().getLng();
+        Coordinate start = Coordinate.builder().lng(13.4050).lat(52.5200).build();
+        Coordinate end = Coordinate.builder().lng(13.29547681726967).lat(52.50546582848033).build();
 
-            pathBuilder.addCoordinate(lat, lng);
-        }
-        pathBuilder.addCoordinate(52.50546582848033, 13.29547681726967);
-        DrivingPath drivingPath = pathBuilder.build();
-        this.drivingPath = drivingPath;
+        RoutePath routePath = osrmBackendApi.getRoute(start, end);
+        this.routePath = routePath;
     }
 
     double dist = 50;
+    //    private final Waypoint block;
     ////
-    @Scheduled(fixedDelay=500)
+//    @Scheduled(fixedDelay=500)
     public void test() {
         List<Double> x = new ArrayList<>();
         List<Double> y = new ArrayList<>();
-        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
+        for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
             double lat = step.getManeuver().getLat();
             double lng = step.getManeuver().getLng();
 
@@ -81,7 +68,7 @@ public class PathBank {
     public List<Object[]> getPathArray() {
         List<Object[]> sss = new ArrayList<>();
 
-        for (Step step : block.getRoutes().get(0).getLegs().get(0).getSteps()) {
+        for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
             double lat = step.getManeuver().getLat();
             double lng = step.getManeuver().getLng();
             List<Double> q = new ArrayList<>();

@@ -23,4 +23,6 @@ public class Step {
     String mode;
     @JsonProperty("intersections")
     List<Intersection> intersections;
+
+
 }
