@@ -37,8 +37,17 @@ public class RoutePathFactory {
         return Math.sqrt(distance);
     }
 
-    public static double distanceFlat(double lat1, double lat2,
-                                  double lng1, double lng2){
+    /**
+     * Calculates GPS distance between two coordinates
+     * Good for short distances like 100m
+     * @param lat1
+     * @param lat2
+     * @param lng1
+     * @param lng2
+     * @return
+     */
+    public static double distanceFlatEarth(double lat1, double lat2,
+                                           double lng1, double lng2){
         double a = (lat1-lat2)*distPerLat(lat1);
         double b = (lng1-lng2)*distPerLng(lat1);
         return Math.sqrt(a*a+b*b);
@@ -79,7 +88,7 @@ public class RoutePathFactory {
             Coordinate i1 = coordinates1.get(i+1);
 
             double distance1 = distance(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
-            double distance = distanceFlat(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
+            double distance = distanceFlatEarth(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
             System.out.println(String.format("A: %s; B: %s; Distance: %sm", i0.toString(), i1.toString(), distance));
             subpaths.add(Subpath.builder().start(i0).end(i1).distance(distance).build());
         }

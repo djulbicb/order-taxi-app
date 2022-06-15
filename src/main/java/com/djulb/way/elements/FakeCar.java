@@ -10,6 +10,9 @@ import java.util.Optional;
 @Data
 @Builder
 public class FakeCar {
+    Coordinate currentPosition;
+    Status status;
+    Optional<RoutePath> currentRoutePath;
     public enum Status {
         IDLE, DRIVING_ROUTE, DRIVING_TO_PASSENGER
     }
@@ -42,8 +45,4 @@ public class FakeCar {
     public boolean hasPath() {
         return currentRoutePath.isPresent();
     }
-    
-    Coordinate currentPosition;
-    Status status;
-    Optional<RoutePath> currentRoutePath;
 }

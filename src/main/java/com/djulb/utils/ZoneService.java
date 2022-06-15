@@ -31,6 +31,11 @@ public class ZoneService {
         }
       log.info("Loaded {} coordinates in {} zones", coordinates.size(), coordinatesWithZones.entrySet().size());
     }
+
+    public HashMap<String, List<Coordinate>> getCoordinatesWithZones() {
+        return coordinatesWithZones;
+    }
+
     public List<Coordinate> getCoordinatesInZone(Coordinate coordinate) {
         String zone = getZone(coordinate);
         if (coordinatesWithZones.containsKey(zone)) {

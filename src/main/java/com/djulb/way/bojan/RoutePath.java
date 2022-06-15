@@ -28,9 +28,10 @@ public class RoutePath {
     public Coordinate getCoordinateAtDistance(double moveDistance) {
         ComparisonSubpath lastSubpath = getLastSubpath(moveDistance);
 
+        // TODO: Start and end are switched here. Find out why
         double remaining = Math.abs(moveDistance - lastSubpath.getDistanceSoFar());
-        var start = lastSubpath.getSubpath().getStart();
-        var end = lastSubpath.getSubpath().getEnd();
+        var end = lastSubpath.getSubpath().getStart();
+        var start = lastSubpath.getSubpath().getEnd();
         var distance = lastSubpath.getSubpath().getDistance();
 
         double Px = Math.abs(start.getLat() * end.getLat());
