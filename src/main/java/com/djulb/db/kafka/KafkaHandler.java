@@ -1,4 +1,4 @@
-package com.djulb.kafka;
+package com.djulb.db.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

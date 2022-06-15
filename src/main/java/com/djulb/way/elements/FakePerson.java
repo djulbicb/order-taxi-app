@@ -13,7 +13,7 @@ public class FakePerson {
     public enum Status {
         IDLE, WAITING_FOR_CAR, RIDING_IN_CAR, FINISHED
     }
-    private UUID uuid;
+    private String uuid;
     private Status status;
     private String zone;
     private Coordinate currentPosition;
