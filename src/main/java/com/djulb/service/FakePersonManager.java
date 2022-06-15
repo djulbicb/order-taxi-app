@@ -1,6 +1,8 @@
 package com.djulb.service;
 
 import com.djulb.db.kafka.KafkaHandler;
+import com.djulb.db.redis.RedisStudent;
+import com.djulb.db.redis.StudentRepository;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.FakePerson;
@@ -28,6 +30,7 @@ public class FakePersonManager implements ApplicationRunner {
     private final MongoTemplate mongoTemplate;
     private final List<FakePerson> fakePersonMap = new ArrayList<>();
 
+    private final StudentRepository studentRepository;
     @Override
     public void run(ApplicationArguments args) throws Exception {
         HashMap<String, List<Coordinate>> coordinatesWithZones = zoneService.getCoordinatesWithZones();
@@ -56,6 +59,12 @@ public class FakePersonManager implements ApplicationRunner {
         producer.flush(); // close also does flush
         producer.close();
 
-        log.info("Initial {} users created", fakePersonMap.size());
+        log.info("Initial {} fake users created.", fakePersonMap.size());
+
+        // Redis
+        RedisStudent student = RedisStudent.builder().gender(RedisStudent.Gender.MALE).id("Eng2015001").name("John Doe").build();
+        studentRepository.save(student);
+        RedisStudent retrievedStudent =
+                studentRepository.findById("Eng2015001").get();
     }
 }

@@ -49,7 +49,7 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
     depends_on:
       - zookeeper
- mongo:
+  mongo:
     image: mongo
     restart: always
     container_name: mongo-docker
@@ -88,12 +88,21 @@ services:
     ports:
       - "9001:80"
     command: "run"
+  cache:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
 volumes:
   osm-data:
     external: true
   kafka_data:
   zookeeper_data:
   mongodb_data_volume:
+    driver: local
+  redis-data:
     driver: local
 
 # Startup order
