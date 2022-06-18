@@ -37,20 +37,22 @@ public class FakePersonManager implements ApplicationRunner {
 
         for (Map.Entry<String, List<Coordinate>> entry : coordinatesWithZones.entrySet()) {
             String zone = entry.getKey();
-            Coordinate coordinate = zoneService.getRandomCoordinateInZone(zone).get();
+            for (int i = 0; i < 2; i++) {
+                Coordinate coordinate = zoneService.getRandomCoordinateInZone(zone).get();
 
-            FakePerson fakePerson = FakePerson.builder()
-                    .currentPosition(coordinate)
-                    .zone(zone)
-                    .uuid(UUID.randomUUID().toString())
-                    .build();
-            fakePersonMap.add(fakePerson);
+                FakePerson fakePerson = FakePerson.builder()
+                        .currentPosition(coordinate)
+                        .zone(zone)
+                        .uuid(UUID.randomUUID().toString())
+                        .build();
+                fakePersonMap.add(fakePerson);
+            }
         }
 
         KafkaProducer producer = kafkaHandler.createKafkaProducer();
         for (FakePerson fakePerson : fakePersonMap) {
             ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_PERSON, fakePerson.getUuid().toString(), fakePerson.getCurrentPosition().formatted());
-            mongoTemplate.save(fakePerson);
+            mongoTemplate.save(fakePerson, fakePerson.getZone());
             producer.send(record);
         }
 

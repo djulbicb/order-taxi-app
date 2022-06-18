@@ -17,7 +17,7 @@ public class ZoneService {
 
     String MATRIX_FOLDER = "src/main/resources/matrix/";
     String MATRIX_50_FILEPATH = Paths.get(MATRIX_FOLDER, "matrix_nearest_50x50.csv").toString();
-    NumberFormat formatter = new DecimalFormat("#0.00");
+    static NumberFormat formatter = new DecimalFormat("#0.00");
     Random rnd = new Random();
 
     public ZoneService() {
@@ -54,10 +54,10 @@ public class ZoneService {
         }
         return Optional.empty();
     }
-    public String getZone(Coordinate coordinate) {
+    public static String getZone(Coordinate coordinate) {
        return getZone(coordinate.getLat(), coordinate.getLng());
     }
-    public String getZone(double lat, double lng) {
+    public static String getZone(double lat, double lng) {
         // Round to nearest next half or whole
         double zoneLat = 5*((int)(Math.floor((lat + 0.05)*100)/5))/100d;
         double zoneLng = Math.floor(lng * 10) / 10d;

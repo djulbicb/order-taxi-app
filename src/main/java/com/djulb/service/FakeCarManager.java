@@ -61,7 +61,7 @@ public class FakeCarManager {
             }
 
             car.move(dist);
-            System.out.println("Tick " + car.getCurrentPosition().formatted());
+            // System.out.println("Tick " + car.getCurrentPosition().formatted());
             if (car.isRouteFinished()) {
                 car.setCurrentRoutePath(Optional.empty());
             }

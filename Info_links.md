@@ -27,3 +27,6 @@ https://codebeautify.org/image-to-base64-converter
 # Other providers
 https://www.maptiler.com/data/
 https://github.com/mbrown3321/openlayers-react-map
+
+# A lot of markers
+https://stackoverflow.com/questions/52620309/constructing-a-lot-of-markers-on-react-leaflet-map-is-too-slow
