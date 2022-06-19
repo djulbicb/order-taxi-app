@@ -22,7 +22,7 @@ public class KConsumerTaxiGps {
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")
     public void listenGroupFoo(ConsumerRecord<String, TaxiGps> message) {
         TaxiGps value = message.value();
-        mongoTaxiDb.save(value, ZoneService.getZone(value.getCoordinate()));
+        mongoTaxiDb.save(value, "users");//ZoneService.getZone(value.getCoordinate()));
         System.out.println("Received Taxi in group foo: " + message.value());
     }
 }

@@ -61,7 +61,7 @@ public class ManagerTaxi implements ApplicationRunner {
         return Optional.of(carsByIdMap.get(id));
     }
 
-    @Scheduled(fixedDelay=5000)
+//    @Scheduled(fixedDelay=5000)
     private void populateList() {
         int currentTaxiCount = carsByIdMap.values().size();
         boolean shouldAddMoreCars = AppSettings.MINIMUM_CARS > currentTaxiCount;

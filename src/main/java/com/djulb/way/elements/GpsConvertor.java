@@ -10,7 +10,7 @@ public class GpsConvertor {
                 .id(taxi.getId())
                 .status(taxi.getStatus())
                 .coordinate(taxi.getCurrentPosition())
-                .timestamp(Instant.now().toString())
+                .timestamp(Date.from(Instant.now()))
                 .build();
     }
     public static PassangerGps toGps(Passanger passanger) {
@@ -18,7 +18,7 @@ public class GpsConvertor {
                 .id(passanger.getId())
                 .status(passanger.getStatus())
                 .coordinate(passanger.getCurrentPosition())
-                .timestamp(Instant.now().toString())
+                .timestamp(Date.from(Instant.now()))
                 .build();
     }
 }

@@ -33,6 +33,6 @@ public class TaxiGps {
     private Taxi.Status status;
     private Coordinate coordinate;
     @Field
-    @Indexed(name="deleteAt", expireAfterSeconds=60)
-    String timestamp;
+    @Indexed(name="deleteAt", expireAfterSeconds=15)
+    Date timestamp;
 }

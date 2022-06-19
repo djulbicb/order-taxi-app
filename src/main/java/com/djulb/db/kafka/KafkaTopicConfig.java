@@ -24,6 +24,16 @@ import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 
 @Configuration
 public class KafkaTopicConfig {
+//    @Bean
+//    @Primary
+//    public ObjectMapper objectMapper() {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        objectMapper.registerModule(new JavaTimeModule());
+//        objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//        return objectMapper;
+//    }
+
+
     //    @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress = KafkaCommon.BOOTSTRAP_SERVER;
 

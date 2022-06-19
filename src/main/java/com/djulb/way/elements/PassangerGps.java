@@ -31,6 +31,6 @@ public class PassangerGps implements Serializable {
     private Passanger.Status status;
     private Coordinate coordinate;
     @Field
-    @Indexed(name="deleteAt", expireAfterSeconds=60)
-    String timestamp;
+    @Indexed(name="deleteAt", expireAfterSeconds=15)
+    Date timestamp;
 }
