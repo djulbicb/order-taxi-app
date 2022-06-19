@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.lookup;
+import static com.mongodb.client.model.Aggregates.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -33,12 +35,19 @@ public class GetViewportSampleUsecase {
         String zone = zoneService.getZone(request.getCoordinate());
         SampleSize size = request.getSize();
         List<String> zones = SampleSize.getZones(request.getCoordinate(), size);
-
+// https://stackoverflow.com/questions/65735942/convert-the-aggregation-query-of-mongodb-for-spring-boot
+//        Aggregation.newAggregation(
+//                project().and(ObjectOperators.valueOf(ROOT).toArray()).as("data"),
+//                unwind("data"),
+//                match(Criteria.where("data.v").regex("Mohit Chandani")
+//                )
+//        ).withOptions(AggregationOptions.builder().allowDiskUse(Boolean.TRUE).build());
 
         List<UnionWithOperation> union = new ArrayList<>();
         for (String s : zones) {
             union.add(UnionWithOperation.unionWith(s));
         }
+        mongoTaxiDb.find()
 
         Aggregation aggregation = TypedAggregation.newAggregation(
 //               UnionWithOperation.unionWith("52.40,13.10"),
