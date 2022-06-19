@@ -1,12 +1,11 @@
 package com.djulb.way.bojan;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 @Data
 @Builder
-@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class Coordinate {
     private double lat;
     private double lng;

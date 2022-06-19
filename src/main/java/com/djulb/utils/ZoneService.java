@@ -13,7 +13,7 @@ import java.util.*;
 @Component
 @Slf4j
 public class ZoneService {
-    private final HashMap<String, List<Coordinate>> coordinatesWithZones = new HashMap<>();
+    private final HashMap<String, List<Coordinate>> zoneCoordinatesMap = new HashMap<>();
 
     String MATRIX_FOLDER = "src/main/resources/matrix/";
     String MATRIX_50_FILEPATH = Paths.get(MATRIX_FOLDER, "matrix_nearest_50x50.csv").toString();
@@ -24,22 +24,22 @@ public class ZoneService {
         List<Coordinate> coordinates = loadCoordinates(MATRIX_50_FILEPATH);
         for (Coordinate coordinate : coordinates) {
             String zone = getZone(coordinate);
-            if (!coordinatesWithZones.containsKey(zone)) {
-                coordinatesWithZones.put(zone, new ArrayList<>());
+            if (!zoneCoordinatesMap.containsKey(zone)) {
+                zoneCoordinatesMap.put(zone, new ArrayList<>());
             }
-            coordinatesWithZones.get(zone).add(coordinate);
+            zoneCoordinatesMap.get(zone).add(coordinate);
         }
-      log.info("Loaded {} coordinates in {} zones", coordinates.size(), coordinatesWithZones.entrySet().size());
+      log.info("Loaded {} coordinates in {} zones", coordinates.size(), zoneCoordinatesMap.entrySet().size());
     }
 
-    public HashMap<String, List<Coordinate>> getCoordinatesWithZones() {
-        return coordinatesWithZones;
+    public HashMap<String, List<Coordinate>> getZoneCoordinatesMap() {
+        return zoneCoordinatesMap;
     }
 
     public List<Coordinate> getCoordinatesInZone(Coordinate coordinate) {
         String zone = getZone(coordinate);
-        if (coordinatesWithZones.containsKey(zone)) {
-            return coordinatesWithZones.get(zone);
+        if (zoneCoordinatesMap.containsKey(zone)) {
+            return zoneCoordinatesMap.get(zone);
         }
         return new ArrayList<>();
     }
@@ -48,8 +48,8 @@ public class ZoneService {
         return getRandomCoordinateInZone(zone);
     }
     public Optional<Coordinate> getRandomCoordinateInZone(String zone) {
-        if (coordinatesWithZones.containsKey(zone)) {
-            List<Coordinate> zoneMap = coordinatesWithZones.get(zone);
+        if (zoneCoordinatesMap.containsKey(zone)) {
+            List<Coordinate> zoneMap = zoneCoordinatesMap.get(zone);
             return Optional.of(zoneMap.get(rnd.nextInt(zoneMap.size())));
         }
         return Optional.empty();
@@ -136,5 +136,11 @@ public class ZoneService {
             return true;
         }
         return false;
+    }
+
+    public Coordinate getRandomCoordinate() {
+        ArrayList<String> zonesAsList = new ArrayList<>(zoneCoordinatesMap.keySet());
+        String randomZone = zonesAsList.get(rnd.nextInt(zoneCoordinatesMap.size()));
+        return getRandomCoordinateInZone(randomZone).get();
     }
 }

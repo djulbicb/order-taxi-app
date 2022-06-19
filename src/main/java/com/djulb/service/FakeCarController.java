@@ -2,9 +2,8 @@ package com.djulb.service;
 
 import com.djulb.PathBank;
 import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.FakeCar;
+import com.djulb.way.elements.Taxi;
 import com.sun.codemodel.JCodeModel;
-import lombok.RequiredArgsConstructor;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class FakeCarController {
     @Autowired
     PathBank pathBank;
     @Autowired
-    FakeCarManager fakeCarManager;
+    ManagerTaxi managerTaxi;
     @GetMapping("/test")
     public String test () throws IOException {
         return "sss";
@@ -33,13 +32,13 @@ public class FakeCarController {
 
     @GetMapping("/waypoints")
     public List<Object[]> getWaypoints () throws IOException {
-        return fakeCarManager.getCarById("id").get().getCurrentRoutePath().get().getPathArray();
+        return managerTaxi.getCarById("id").get().getCurrentRoutePath().get().getPathArray();
         // return pathBank.getPathArray();
     }
 
     @GetMapping("/point")
     public List<Double> point () throws IOException {
-        Optional<FakeCar> id = fakeCarManager.getCarById("id");
+        Optional<Taxi> id = managerTaxi.getCarById("id");
         Coordinate currentPosition = id.get().getCurrentPosition();
 
         return List.of(currentPosition.getLat(),currentPosition.getLng());

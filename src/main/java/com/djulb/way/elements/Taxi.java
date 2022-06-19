@@ -9,7 +9,8 @@ import java.util.Optional;
 
 @Data
 @Builder
-public class FakeCar {
+public class Taxi {
+    String id;
     Coordinate currentPosition;
     Status status;
     Optional<RoutePath> currentRoutePath;
