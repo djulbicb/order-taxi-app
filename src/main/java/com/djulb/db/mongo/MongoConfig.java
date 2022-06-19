@@ -1,8 +1,12 @@
 package com.djulb.db.mongo;
 
+import com.djulb.utils.ZoneService;
+import com.djulb.way.elements.PassangerGps;
+import com.djulb.way.elements.TaxiGps;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +19,11 @@ import org.springframework.data.mongodb.core.index.Index;
 import java.util.Arrays;
 
 @Configuration
+@RequiredArgsConstructor
 public class MongoConfig {
+
+    private final ZoneService zoneService;
+
     int expireAfterSeconds = 5;
     @Bean
     public MongoClient mongo() {
@@ -29,16 +37,25 @@ public class MongoConfig {
 
     @Bean
     public MongoTemplate mongoTaxiDb() throws Exception {
-        MongoTemplate taxi = new MongoTemplate(mongo(), "taxi");
-        taxi.indexOps("users").ensureIndex(
-                new Index().on("timestamp", Sort.Direction.ASC)
-                        .expire(expireAfterSeconds)
-        );
-        return taxi;
+        MongoTemplate taxiTemplate = new MongoTemplate(mongo(), "taxi");
+
+        for (String zone : zoneService.getZoneCoordinatesMap().keySet()) {
+            taxiTemplate.indexOps(zone).ensureIndex(
+                    new Index().on("timestamp", Sort.Direction.ASC)
+                            .expire(expireAfterSeconds)
+            );
+        }
+
+        return taxiTemplate;
     }
 
     @Bean
     public MongoTemplate mongoPassangerDb() throws Exception {
-        return new MongoTemplate(mongo(), "passanger");
+        MongoTemplate taxi = new MongoTemplate(mongo(), "passanger");
+        taxi.indexOps("passangers").ensureIndex(
+                new Index().on("timestamp", Sort.Direction.ASC)
+                        .expire(expireAfterSeconds)
+        );
+        return taxi;
     }
 }

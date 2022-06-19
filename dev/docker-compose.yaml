@@ -95,6 +95,16 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=cache
+      - REDIS_HOST=cache
+      - REDIS_PORT=cache:6379
+    ports:
+      - 6380:8081
 volumes:
   osm-data:
     external: true

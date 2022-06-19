@@ -81,7 +81,6 @@ public class ManagerTaxi implements ApplicationRunner {
 
             // ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_TAXI, car.getUuid().toString(), car.getCurrentPosition().formatted());
             //mongoTemplate.save(fakePerson, fakePerson.getZone());
-            System.out.println("sending");
             kafkaTemplate.send(TOPIC_GPS_TAXI, car.getId().toString(), toGps(car));
         }
         kafkaTemplate.flush();

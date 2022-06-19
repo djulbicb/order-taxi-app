@@ -24,15 +24,6 @@ import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 
 @Configuration
 public class KafkaTopicConfig {
-//    @Bean
-//    @Primary
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule());
-//        objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        return objectMapper;
-//    }
-
 
     //    @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress = KafkaCommon.BOOTSTRAP_SERVER;
@@ -49,7 +40,7 @@ public class KafkaTopicConfig {
         return TopicBuilder.name(TOPIC_GPS_PASSENGER)
                 .partitions(3)
                 .replicas(1)
-                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(5).toMillis()))
+                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
                 .build();
     }
     @Bean
@@ -57,7 +48,7 @@ public class KafkaTopicConfig {
         return TopicBuilder.name(TOPIC_GPS_TAXI)
                 .partitions(3)
                 .replicas(1)
-                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(5).toMillis()))
+                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
                 .build();
     }
 }
