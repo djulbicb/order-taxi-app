@@ -22,3 +22,4 @@ public class CoordinatesBank {
         return new HashSet<String>(lines);
     }
 }
+

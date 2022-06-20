@@ -51,11 +51,13 @@ public class MongoConfig {
 
     @Bean
     public MongoTemplate mongoPassangerDb() throws Exception {
-        MongoTemplate taxi = new MongoTemplate(mongo(), "passanger");
-        taxi.indexOps("passangers").ensureIndex(
-                new Index().on("timestamp", Sort.Direction.ASC)
-                        .expire(expireAfterSeconds)
-        );
-        return taxi;
+        MongoTemplate passangerTemplate = new MongoTemplate(mongo(), "passanger");
+        for (String zone : zoneService.getZoneCoordinatesMap().keySet()) {
+            passangerTemplate.indexOps(zone).ensureIndex(
+                    new Index().on("timestamp", Sort.Direction.ASC)
+                            .expire(expireAfterSeconds)
+            );
+        }
+        return passangerTemplate;
     }
 }

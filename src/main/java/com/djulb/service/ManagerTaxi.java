@@ -1,6 +1,7 @@
 package com.djulb.service;
 
 import com.djulb.AppSettings;
+import com.djulb.service.generator.TaxiIdGenerator;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Taxi;
@@ -28,6 +29,7 @@ public class ManagerTaxi implements ApplicationRunner {
     private final ZoneService zoneService;
     private final KafkaTemplate<String, TaxiGps> kafkaTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
+    private final TaxiIdGenerator generator;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -41,12 +43,12 @@ public class ManagerTaxi implements ApplicationRunner {
 
     private Taxi createFakeCar() {
         Coordinate randomCoordinate = zoneService.getRandomCoordinate();
-        return createFakeCar(UUID.randomUUID().toString(), randomCoordinate);
+        return createFakeCar(generator.getNext(), randomCoordinate);
     }
 
     private Taxi createFakeCar(String id, Coordinate coordinate) {
         Taxi car = Taxi.builder()
-                .id(UUID.randomUUID().toString())
+                .id(generator.getNext())
                 .status(Taxi.Status.IDLE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();

@@ -18,6 +18,10 @@
 #    command:
 #      - run
 
+
+
+
+
 # Set up volume data for tile server
 # docker volume create osm-data
 # docker run -v /home/sss/Documents/dev/workspace/order-taxi-app/dev/berlin/berlin-latest.osm.pbf:/data/region.osm.pbf -v osm-data:/data/database/ overv/openstreetmap-tile-server     import

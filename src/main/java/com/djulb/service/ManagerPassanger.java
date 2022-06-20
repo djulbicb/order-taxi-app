@@ -1,6 +1,7 @@
 package com.djulb.service;
 
 import com.djulb.AppSettings;
+import com.djulb.service.generator.PassangerIdGenerator;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Passanger;
@@ -29,6 +30,8 @@ public class ManagerPassanger implements ApplicationRunner {
     private final ZoneService zoneService;
     private final KafkaTemplate<String, PassangerGps> kafkaTemplate;
     private final ConcurrentHashMap<String, Passanger> passangersByIdMap = new ConcurrentHashMap<>();
+
+    private final PassangerIdGenerator generator;
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
@@ -40,7 +43,7 @@ public class ManagerPassanger implements ApplicationRunner {
 
     private Passanger createFakePassanger() {
         Coordinate randomCoordinate = zoneService.getRandomCoordinate();
-        return createFakePassanger(UUID.randomUUID().toString(), randomCoordinate);
+        return createFakePassanger(generator.getNext(), randomCoordinate);
     }
 
     private Passanger createFakePassanger(String id, Coordinate coordinate) {
