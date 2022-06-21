@@ -24,6 +24,12 @@
 	</repository>
 </repositories>
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+		</dependency>
+
+
 <!--		For converting images to base64-->
 		<dependency>
 			<groupId>commons-io</groupId>

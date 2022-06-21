@@ -26,12 +26,13 @@ public class GetViewportObjectsUseCase {
 
     @PostMapping("/viewport/objects-by-id")
     public Iterable<RedisGps> getViewportObjects(@RequestBody ViewportObjectsGetByIds ids) {
+        return new ArrayList<>();
 //        System.out.println(ids);
-        if (ids.getIds().size() == 0) {
-            return new ArrayList<>();
-        }
-
-        return redisGpsRepository.findAllById(ids.getIds());
+//        if (ids.getIds().size() == 0) {
+//            return new ArrayList<>();
+//        }
+//
+//        return redisGpsRepository.findAllById(ids.getIds());
     }
 }
 

@@ -1,5 +1,6 @@
 package com.djulb.way.elements;
 
+import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.redis.RedisGps;
 import org.springframework.data.geo.Point;
 
@@ -11,7 +12,7 @@ public class GpsConvertor {
         return RedisGps.builder()
                 .id(taxi.getId())
                 .status(RedisGps.Status.PASSANGER)
-                .coordinate(new Point(taxi.getCoordinate().getLng(), taxi.getCoordinate().getLat()))
+                .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .build();
     }
@@ -19,7 +20,7 @@ public class GpsConvertor {
         return RedisGps.builder()
                 .id(taxi.getId())
                 .status(RedisGps.Status.TAXI)
-                .coordinate(new Point(taxi.getCoordinate().getLng(), taxi.getCoordinate().getLat()))
+                .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .build();
     }
