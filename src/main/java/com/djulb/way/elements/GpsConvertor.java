@@ -1,26 +1,25 @@
 package com.djulb.way.elements;
 
-import com.djulb.way.elements.redis.PassangerRedisGps;
-import com.djulb.way.elements.redis.TaxiRedisGps;
+import com.djulb.way.elements.redis.RedisGps;
+import org.springframework.data.geo.Point;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class GpsConvertor {
-    public static PassangerRedisGps toRedisGps(PassangerGps taxi) {
-        return PassangerRedisGps.builder()
+    public static RedisGps toRedisGps(PassangerGps taxi) {
+        return RedisGps.builder()
                 .id(taxi.getId())
-                .status(taxi.getStatus())
-                .coordinate(taxi.getCoordinate())
+                .status(RedisGps.Status.PASSANGER)
+                .coordinate(new Point(taxi.getCoordinate().getLng(), taxi.getCoordinate().getLat()))
                 .timestamp(Date.from(Instant.now()))
                 .build();
     }
-    public static TaxiRedisGps toRedisGps(TaxiGps taxi) {
-        return TaxiRedisGps.builder()
+    public static RedisGps toRedisGps(TaxiGps taxi) {
+        return RedisGps.builder()
                 .id(taxi.getId())
-                .status(taxi.getStatus())
-                .coordinate(taxi.getCoordinate())
+                .status(RedisGps.Status.TAXI)
+                .coordinate(new Point(taxi.getCoordinate().getLng(), taxi.getCoordinate().getLat()))
                 .timestamp(Date.from(Instant.now()))
                 .build();
     }

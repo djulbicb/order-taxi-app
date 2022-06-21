@@ -4,7 +4,7 @@ import com.djulb.service.generator.TaxiIdGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class TaxiIdGeneratorTest {
+class TaxiIdGeneratorViewportObjectsGetByIds {
 
     @Test
     void getNext() {

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.djulb.TestData.testBBox;
 
-class BBoxTest {
+class BBoxViewportObjectsGetByIds {
 
     @Test
     void getMiddlePoint() {

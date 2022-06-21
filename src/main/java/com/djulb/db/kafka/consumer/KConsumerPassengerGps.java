@@ -3,7 +3,7 @@ package com.djulb.db.kafka.consumer;
 import com.djulb.db.kafka.KafkaCommon;
 
 //import com.djulb.db.redis.RedisPassangerRepository;
-import com.djulb.db.redis.RedisPassangerRepository;
+import com.djulb.db.redis.RedisGpsRepository;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.elements.PassangerGps;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +22,12 @@ import static com.djulb.way.elements.GpsConvertor.toRedisGps;
 public class KConsumerPassengerGps {
     @Qualifier("mongoPassangerDb")
     private final MongoTemplate mongoPassangerDb;
-    private final RedisPassangerRepository redisPassangerRepository;
+    private final RedisGpsRepository redisGpsRepository;
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_PASSENGER, groupId = "passangerListener", containerFactory = "kafkaListenerContainerFactoryPassangerGps")
     public void listenGroupFoo(ConsumerRecord<String, PassangerGps> message) {
         PassangerGps value = message.value();
         mongoPassangerDb.save(value, ZoneService.getZone(value.getCoordinate()));
-        redisPassangerRepository.save(toRedisGps(value));
+        redisGpsRepository.save(toRedisGps(value));
 
 //        System.out.println("Received Passanger in group foo: " + value);
     }
