@@ -1,5 +1,7 @@
 package com.djulb.way;
 
+import com.djulb.way.bojan.Coordinate;
+
 // Taken from
 //http://www.java2s.com/example/java/java.lang/return-the-xy-position-at-distance-length-into-the-given-polyline.html
 public class PathCalculator{
@@ -12,12 +14,11 @@ public class PathCalculator{
      * @param position Preallocated to int[2]
             * @return True if point is within polyline, false otherwise
      */
-    public static boolean findPolygonPosition(Double[] x, Double[] y,
-                                              double length, double[] position) {
+    public static Coordinate findCoordinateAtPathPosition(Double[] x, Double[] y,
+                                                          double length) {
         if (length < 0) {
-            return false;
+            return Coordinate.builder().lat(0).lng(0).build();
         }
-
         double accumulatedLength = 0.0;
         for (int i = 1; i < x.length; i++) {
             double legLength = length(x[i - 1], y[i - 1],
@@ -25,18 +26,22 @@ public class PathCalculator{
             if (legLength + accumulatedLength >= length) {
                 double part = length - accumulatedLength;
                 double fraction = part / legLength;
-                position[0] = (x[i - 1] + fraction
+                double position0 = (x[i - 1] + fraction
                         * (x[i] - x[i - 1]));
-                position[1] = (y[i - 1] + fraction
+                double position1 = (y[i - 1] + fraction
                         * (y[i] - y[i - 1]));
-                return true;
+
+                return Coordinate.builder()
+                        .lat(position0)
+                        .lng(position1)
+                        .build();
             }
 
             accumulatedLength += legLength;
         }
 
         // Length is longer than polyline
-        return false;
+        return Coordinate.builder().lat(0).lng(0).build();
     }
     /**
      * Return the length of a vector.

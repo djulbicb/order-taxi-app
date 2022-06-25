@@ -15,7 +15,7 @@ public class Taxi {
     Status status;
     Optional<RoutePath> currentRoutePath;
     public enum Status {
-        IDLE, DRIVING_ROUTE, DRIVING_TO_PASSENGER
+        IDLE, IN_PROCESS, FINISHED, TO_BE_REMOVED
     }
     public void addPath(RoutePath route) {
         this.currentRoutePath = Optional.of(route);

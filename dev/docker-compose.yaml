@@ -99,16 +99,23 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
-  redis-commander:
-    container_name: redis-commander
-    image: rediscommander/redis-commander:latest
-    restart: always
-    environment:
-      - REDIS_HOSTS=cache
-      - REDIS_HOST=cache
-      - REDIS_PORT=cache:6379
+#  redis-commander:
+#    container_name: redis-commander
+#    image: rediscommander/redis-commander:latest
+#    restart: always
+#    environment:
+#      - REDIS_HOSTS=cache
+#      - REDIS_HOST=cache
+#      - REDIS_PORT=cache:6379
+#    ports:
+#      - 6380:8081
+  redisinsight:
+    image: redislabs/redisinsight:latest
     ports:
-      - 6380:8081
+      - '8001:8001'
+    volumes:
+      - redis-data:/db
+
 
   elasticsearch:
     container_name: es-container

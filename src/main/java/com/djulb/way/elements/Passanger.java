@@ -3,14 +3,13 @@ package com.djulb.way.elements;
 import com.djulb.way.bojan.Coordinate;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder
 public class Passanger {
-    public enum Status {
-        IDLE, WAITING_FOR_CAR, RIDING_IN_CAR, FINISHED
-    }
     private String id;
-    private Status status;
+    private Taxi.Status status;
     private Coordinate currentPosition;
+    private Coordinate destination;
 }

@@ -31,7 +31,7 @@ import java.util.Date;
 public class PassangerGps implements Serializable {
     @Id
     private String id;
-    private Passanger.Status status;
+    private Taxi.Status status;
     private Coordinate coordinate;
     @Field
     @Indexed(name="deleteAt", expireAfterSeconds=15)

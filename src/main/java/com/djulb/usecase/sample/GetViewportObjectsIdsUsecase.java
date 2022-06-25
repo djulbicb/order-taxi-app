@@ -1,7 +1,6 @@
 package com.djulb.usecase.sample;
 
 import com.djulb.db.elastic.FoodPOIRepository;
-import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
 import com.djulb.db.elastic.ElasticGps;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
@@ -32,7 +31,20 @@ public class GetViewportObjectsIdsUsecase {
     ;
     @GetMapping("/viewport/objects-in-area")
     public List<RedisGps> getViewportObjects(SampleRequest request) {
-//        String placeholderCollectionName = "placeholder";
+        GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
+        return elasticGpsRepository.getObjectsInArea(location, 100.0, "km").stream()
+                .map(searchHit -> {
+                    Double distance = (Double) searchHit.getSortValues().get(0);
+                    ElasticGps content = searchHit.getContent();
+                    return RedisGps.builder()
+                            .id(content.getId())
+                            .status(content.getType() == ElasticGps.Type.TAXI ? RedisGps.Status.TAXI : RedisGps.Status.PASSANGER)
+                            .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
+                            .build();
+                }).collect(Collectors.toList());
+    }
+
+    //        String placeholderCollectionName = "placeholder";
 //
 //        List<String> zones = SampleSize.getZones(request.getCoordinate(), request.getSize());
 //
@@ -58,17 +70,6 @@ public class GetViewportObjectsIdsUsecase {
 //        taxis.stream().forEach(passangerGps -> ids.add(passangerGps.getId()));
 //        Iterable<RedisGps> allById = redisGpsRepository.findAllById(ids);
 
-        GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
-        return elasticGpsRepository.sss(location, 10.0, "km").stream()
-                .map(searchHit -> {
-                    Double distance = (Double) searchHit.getSortValues().get(0);
-                    ElasticGps content = searchHit.getContent();
-                    return RedisGps.builder()
-                            .id(content.getId())
-                            .status(content.getType() == ElasticGps.Type.TAXI ? RedisGps.Status.TAXI : RedisGps.Status.PASSANGER)
-                            .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
-                            .build();
-                }).collect(Collectors.toList());
 //        return testss.stream().map(resultData -> RedisGps.builder()
 //                .id(resultData.getName())
 //                .status(RedisGps.Status.TAXI)
@@ -76,14 +77,14 @@ public class GetViewportObjectsIdsUsecase {
 //                .build()).collect(Collectors.toList());
 //        return StreamSupport.stream(allById.spliterator(), false)
 //                .collect(Collectors.toList());
-        // return redisGpsRepository.findByCoordinateNear(new Point(request.getLng(), request.getLat()), new Distance(10000));
+    // return redisGpsRepository.findByCoordinateNear(new Point(request.getLng(), request.getLat()), new Distance(10000));
 
 //        List<String> ids = new ArrayList<>();
 //        passangers.stream().forEach(passangerGps -> ids.add(passangerGps.getId()));
 //        taxis.stream().forEach(passangerGps -> ids.add(passangerGps.getId()));
 //        System.out.println(ids.size());
 //        return ids;
-    }
+
 
 //    private List<ResultData> testss(SampleRequest requestData) {
 ////        GeoPoint location = new GeoPoint(requestData.getLat(), requestData.getLng());

@@ -6,10 +6,7 @@ import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.TaxiGps;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,20 +20,22 @@ import static com.djulb.way.elements.GpsConvertor.toGps;
 
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 @Slf4j
-public class ManagerTaxi implements ApplicationRunner {
+public class ManagerTaxi {
     private final ZoneService zoneService;
     private final KafkaTemplate<String, TaxiGps> kafkaTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator generator;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public ManagerTaxi(ZoneService zoneService, KafkaTemplate<String, TaxiGps> kafkaTemplate, TaxiIdGenerator generator) {
+        this.zoneService = zoneService;
+        this.kafkaTemplate = kafkaTemplate;
+        this.generator = generator;
 
-        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
-        String id = "test";
-        addFakeCar(createFakeCar(id, coordinate));
+
+//        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
+//        String id = "test";
+//        addFakeCar(createFakeCar(id, zoneService.getRandomCoordinateInZone(ZoneService.getZone(coordinate)).get()));
 
         populateList();
     }
@@ -48,7 +47,7 @@ public class ManagerTaxi implements ApplicationRunner {
 
     private Taxi createFakeCar(String id, Coordinate coordinate) {
         Taxi car = Taxi.builder()
-                .id(generator.getNext())
+                .id(id)
                 .status(Taxi.Status.IDLE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
@@ -61,6 +60,9 @@ public class ManagerTaxi implements ApplicationRunner {
 
     public Optional<Taxi> getCarById(String id){
         return Optional.of(carsByIdMap.get(id));
+    }
+    public ConcurrentHashMap<String, Taxi> getCars() {
+        return carsByIdMap;
     }
 
 //    @Scheduled(fixedDelay=5000)
@@ -75,7 +77,7 @@ public class ManagerTaxi implements ApplicationRunner {
             addFakeCar(createFakeCar());
         }
     }
-    @Scheduled(fixedDelay=500)
+    @Scheduled(fixedDelay=1000)
     private void updateGps() {
         for (Map.Entry<String, Taxi> entry : carsByIdMap.entrySet()) {
             String zone = entry.getKey();
@@ -91,6 +93,18 @@ public class ManagerTaxi implements ApplicationRunner {
 //        kafkaProducer.close();
     }
 
+    public Optional<Taxi> get(List<String> taxiIds) {
+        List<Taxi> taxis = new ArrayList<>();
+        for (String id : taxiIds) {
+            if (carsByIdMap.containsKey(id)) {
+                taxis.add(carsByIdMap.get(id));
+            }
+        }
+        if (taxis.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(taxis.get(0));
+    }
 
 
 //    double dist = 50;

@@ -1,5 +1,6 @@
 package com.djulb.utils;
 
+import com.djulb.usecase.sample.dto.SampleSize;
 import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
 import lombok.extern.slf4j.Slf4j;
@@ -142,5 +143,30 @@ public class ZoneService {
         ArrayList<String> zonesAsList = new ArrayList<>(zoneCoordinatesMap.keySet());
         String randomZone = zonesAsList.get(rnd.nextInt(zoneCoordinatesMap.size()));
         return getRandomCoordinateInZone(randomZone).get();
+    }
+
+    public Optional<Coordinate> getCoordinateInAdjecentZone(Coordinate startCoordinate) {
+        List<String> adjecentZones = getAdjecentZones(startCoordinate);
+        String s = adjecentZones.get(rnd.nextInt(adjecentZones.size()));
+        return getRandomCoordinateInZone(s);
+    }
+
+    public List<String> getAdjecentZones(Coordinate coordinate) {
+        String zone1 = getZone(coordinate);
+        List<Coordinate> coord = getCoord(coordinate, SampleSize.SIZE_3);
+        List<String> zones = new ArrayList<>();
+        for (Coordinate coordinate1 : coord) {
+            String zone = ZoneService.getZone(coordinate1);
+            if (zoneCoordinatesMap.containsKey(zone)) {
+                zones.add(zone);
+            }
+        }
+        if (zones.size() > 1) {
+            zones.remove(zone1);
+        }
+        return zones;
+    }
+    public List<Coordinate> getCoord(Coordinate coordinate, SampleSize size) {
+       return SampleSize.getCoord(coordinate, size);
     }
 }

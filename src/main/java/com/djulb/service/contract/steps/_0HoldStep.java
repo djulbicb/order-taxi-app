@@ -1,31 +1,55 @@
 package com.djulb.service.contract.steps;
 
+import com.djulb.db.elastic.FoodPOIRepository;
+import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
+import com.djulb.service.ManagerTaxi;
+import com.djulb.way.elements.Passanger;
+import com.djulb.way.elements.redis.RedisNotificationService;
+import com.djulb.way.osrm.OsrmBackendApi;
+
 import java.time.Duration;
 import java.time.Instant;
 
+
 public class _0HoldStep extends AbstractContractStep{
 
+    private final Duration threshold;
+    private final Passanger passanger;
     private Instant startTime;
+
+    public _0HoldStep(OsrmBackendApi osrmBackendApi,
+                      RedisNotificationService notificationService,
+                      FoodPOIRepositoryCustomImpl foodPOIRepository,
+                      FoodPOIRepository repository,
+                      Passanger passanger,
+                      Duration threshold,
+                      ManagerTaxi managerTaxi) {
+        super(osrmBackendApi, notificationService, repository, foodPOIRepository, managerTaxi);
+        startTime = Instant.now();
+        this.threshold = threshold;
+        this.passanger = passanger;
+    }
 
     public static boolean timeHasElapsedSince(Instant then, Duration threshold) {
         return Duration.between(then, Instant.now()).toSeconds() > threshold.toSeconds();
     }
 
     @Override
-    void start() {
-        startTime = Instant.now();
+    public void start() {
+
     }
 
     @Override
-    void process() {
-        Duration threshold = Duration.ofSeconds(3);
+    public void end() {
+
+    }
+    @Override
+    public void process() {
         if (timeHasElapsedSince(startTime, threshold)) {
             setStatusFinished();
+            _1OrderTaxiStep step = new _1OrderTaxiStep(osrmBackendApi, notificationService,repository, foodPOIRepository, passanger, managerTaxi);
+            addNext(step);
         }
     }
 
-    @Override
-    void end() {
-
-    }
 }

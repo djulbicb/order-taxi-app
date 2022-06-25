@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class TaxiIdGenerator {
-    private AtomicInteger next = new AtomicInteger(1);
+    private AtomicInteger next = new AtomicInteger(10);
     static NumberFormat formatter = new DecimalFormat("T-#00000");
 
     public String getNext() {

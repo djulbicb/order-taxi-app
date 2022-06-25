@@ -6,11 +6,11 @@ import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.PassangerGps;
-import lombok.RequiredArgsConstructor;
+import com.djulb.way.elements.Taxi;
+import com.djulb.way.elements.redis.RedisNotification;
+import com.djulb.way.elements.redis.RedisNotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,33 +24,42 @@ import static com.djulb.way.elements.GpsConvertor.toGps;
 
 @Component
 @EnableScheduling
-@RequiredArgsConstructor
 @Slf4j
-public class ManagerPassanger implements ApplicationRunner {
+public class ManagerPassanger {
     private final ZoneService zoneService;
+    private final RedisNotificationService notificationService;
     private final KafkaTemplate<String, PassangerGps> kafkaTemplate;
     private final ConcurrentHashMap<String, Passanger> passangersByIdMap = new ConcurrentHashMap<>();
-
     private final PassangerIdGenerator generator;
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
+
+    public ManagerPassanger(ZoneService zoneService, RedisNotificationService notificationService, KafkaTemplate<String, PassangerGps> kafkaTemplate, PassangerIdGenerator generator) {
+        this.zoneService = zoneService;
+        this.notificationService = notificationService;
+        this.kafkaTemplate = kafkaTemplate;
+        this.generator = generator;
+
         Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
-        String id = "test";
-        addFakePassanger(createFakePassanger(id, coordinate));
+        Optional<Coordinate> coordinateInAdjecentZone = zoneService.getCoordinateInAdjecentZone(coordinate);
+//        String id = "test";
+//        addFakePassanger(createFakePassanger(id, coordinate, coordinateInAdjecentZone.get()));
 
         populateList();
     }
 
     private Passanger createFakePassanger() {
-        Coordinate randomCoordinate = zoneService.getRandomCoordinate();
-        return createFakePassanger(generator.getNext(), randomCoordinate);
+        Coordinate startCoordinate = zoneService.getRandomCoordinate();
+        Optional<Coordinate> endCoordinate = zoneService.getCoordinateInAdjecentZone(startCoordinate);
+        return createFakePassanger(generator.getNext(), startCoordinate, endCoordinate.get());
     }
 
-    private Passanger createFakePassanger(String id, Coordinate coordinate) {
+    private Passanger createFakePassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
+        notificationService.listPush("test", RedisNotification.builder().id(id).message("Passanger created " + id).build());
         Passanger person = Passanger.builder()
                 .id(id)
-                .status(Passanger.Status.IDLE)
-                .currentPosition(coordinate).build();
+                .status(Taxi.Status.IDLE)
+                .destination(endCoordinate)
+                .currentPosition(startCoordinate)
+                .build();
         return person;
     }
 
@@ -58,11 +67,15 @@ public class ManagerPassanger implements ApplicationRunner {
         passangersByIdMap.put(car.getId(), car);
     }
 
-    public Optional<Passanger> getCarById(String id){
+    public Optional<Passanger> getPassangerById(String id){
         return Optional.of(passangersByIdMap.get(id));
     }
 
-    @Scheduled(fixedDelay=5000)
+    public Collection<Passanger> getPassangers() {
+        return passangersByIdMap.values();
+    }
+
+//    @Scheduled(fixedDelay=5000)
     private void populateList() {
         int currentTaxiCount = passangersByIdMap.values().size();
         boolean shouldAddMoreCars = AppSettings.MINIMUM_PASSENGERS > currentTaxiCount;
@@ -74,7 +87,7 @@ public class ManagerPassanger implements ApplicationRunner {
             addFakePassanger(createFakePassanger());
         }
     }
-    @Scheduled(fixedDelay=500)
+    @Scheduled(fixedDelay=1000)
     private void updateGps() {
         for (Map.Entry<String, Passanger> entry : passangersByIdMap.entrySet()) {
             String zone = entry.getKey();

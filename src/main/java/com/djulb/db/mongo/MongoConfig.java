@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.index.Index;
 
 import java.util.Arrays;
 
+import static com.djulb.AppSettings.MONGO_EXPIRE_AFTER_SECONDS;
+
 @Configuration
 @RequiredArgsConstructor
 public class MongoConfig {
@@ -58,6 +60,16 @@ public class MongoConfig {
                             .expire(expireAfterSeconds)
             );
         }
+        return passangerTemplate;
+    }
+
+    @Bean
+    public MongoTemplate mongoMessageDb() throws Exception {
+        String databaseName = "messageDb";
+        MongoTemplate passangerTemplate = new MongoTemplate(mongo(), databaseName);
+        passangerTemplate.indexOps(databaseName).ensureIndex(
+            new Index().on("timestamp", Sort.Direction.ASC).expire(MONGO_EXPIRE_AFTER_SECONDS)
+        );
         return passangerTemplate;
     }
 }

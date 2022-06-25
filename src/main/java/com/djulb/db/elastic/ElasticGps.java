@@ -1,5 +1,6 @@
 package com.djulb.db.elastic;
 
+import com.djulb.way.elements.Taxi;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +18,13 @@ public class ElasticGps {
     public enum Type {
         TAXI, PASSANGER
     }
-    public enum Status {
-        IDLE, IN_PROCESS
-    }
 
     @Id
     private String id;
     @Field(type = FieldType.Text)
     private Type type;
     @Field(type = FieldType.Text)
-    private Status status;
+    private Taxi.Status status;
     private GeoPoint location;
 
 //    @Field(type = FieldType.Integer)

@@ -32,6 +32,15 @@ public class GpsConvertor {
                 .timestamp(Date.from(Instant.now()))
                 .build();
     }
+
+    public static Taxi toGps(TaxiGps taxi) {
+        return Taxi.builder()
+                .id(taxi.getId())
+                .status(taxi.getStatus())
+                .currentPosition(taxi.getCoordinate())
+                .build();
+    }
+
     public static PassangerGps toGps(Passanger passanger) {
         return PassangerGps.builder()
                 .id(passanger.getId())

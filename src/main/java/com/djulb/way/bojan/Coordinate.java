@@ -13,4 +13,7 @@ public class Coordinate {
     public String formatted() {
         return String.format("%s,%s", lat, lng);
     }
+    public boolean isZero() {
+        return lat <= 0d && lng <= 0d;
+    }
 }
