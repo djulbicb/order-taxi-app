@@ -3,6 +3,7 @@ package com.djulb.db.elastic;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.redis.RedisGps;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
@@ -46,7 +47,8 @@ public class FoodPOIRepositoryCustomImpl implements FoodPOIRepositoryCustom{
 
 
         Criteria criteria = Criteria.and().subCriteria(location).subCriteria(status).subCriteria(type);
-        Query query = new CriteriaQuery(criteria);
+
+        Query query = new CriteriaQuery(criteria, Pageable.ofSize(5));
 
         // add a sort to get the actual distance back in the sort value
         Sort sort = Sort.by(new GeoDistanceOrder("location", gps).withUnit(unit));

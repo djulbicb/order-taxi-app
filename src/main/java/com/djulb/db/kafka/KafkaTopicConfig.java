@@ -4,6 +4,8 @@ import com.djulb.db.kafka.KafkaCommon;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.kafka.clients.KafkaClient;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -17,6 +19,7 @@ import org.springframework.kafka.core.KafkaAdmin;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
@@ -32,13 +35,21 @@ public class KafkaTopicConfig {
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        KafkaAdmin kafkaAdmin = new KafkaAdmin(configs);
+
+
+        AdminClient adminClient = AdminClient.create(configs);
+        adminClient.deleteTopics(List.of(TOPIC_GPS_TAXI, TOPIC_GPS_PASSENGER));
+
+
         return new KafkaAdmin(configs);
+
     }
 
     @Bean
     public NewTopic topicGpsPerson() {
         return TopicBuilder.name(TOPIC_GPS_PASSENGER)
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
                 .build();
@@ -46,7 +57,7 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic topicGpsTaxi() {
         return TopicBuilder.name(TOPIC_GPS_TAXI)
-                .partitions(3)
+                .partitions(1)
                 .replicas(1)
                 .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
                 .build();

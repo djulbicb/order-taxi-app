@@ -32,7 +32,7 @@ public class GetViewportObjectsIdsUsecase {
     @GetMapping("/viewport/objects-in-area")
     public List<RedisGps> getViewportObjects(SampleRequest request) {
         GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
-        return elasticGpsRepository.getObjectsInArea(location, 100.0, "km").stream()
+        return elasticGpsRepository.getObjectsInArea(location, 50.0, "km").stream()
                 .map(searchHit -> {
                     Double distance = (Double) searchHit.getSortValues().get(0);
                     ElasticGps content = searchHit.getContent();

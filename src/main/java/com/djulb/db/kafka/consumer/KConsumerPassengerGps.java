@@ -29,7 +29,7 @@ public class KConsumerPassengerGps {
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_PASSENGER, groupId = "passangerListener", containerFactory = "kafkaListenerContainerFactoryPassangerGps")
     public void listenGroupFoo(ConsumerRecord<String, PassangerGps> message) {
         PassangerGps value = message.value();
-        System.out.println("Passanger " + value.getId());
+//        System.out.println("Passanger " + value.getId());
         mongoPassangerDb.save(value, ZoneService.getZone(value.getCoordinate()));
 //        redisGpsRepository.save(toRedisGps(value));
         ElasticGps gps = ElasticGps.builder()

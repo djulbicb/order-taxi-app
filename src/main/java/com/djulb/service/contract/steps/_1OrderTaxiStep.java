@@ -1,5 +1,6 @@
 package com.djulb.service.contract.steps;
 
+import com.djulb.AppSettings;
 import com.djulb.db.elastic.ElasticGps;
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.djulb.AppSettings.INCREMENT;
 import static com.djulb.way.elements.GpsConvertor.toGps;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
@@ -81,18 +83,13 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 .build();
     }
 
-    private int increment = 100;
-    private int distance = increment;
+    private int distance = INCREMENT;
     @Override
     public void process() {
         try {
-            distance +=increment;
+            distance +=INCREMENT;
             // Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
-
-            if (taxi.getId().equals("T-00003")) {
-                System.out.println("T-00003");
-            }
 
             if (position.isZero()) {
                 setStatusFinished();

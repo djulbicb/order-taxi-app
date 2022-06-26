@@ -1,12 +1,15 @@
 package com.djulb.service;
 
 import com.djulb.AppSettings;
+import com.djulb.db.elastic.ElasticGps;
+import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.service.generator.TaxiIdGenerator;
 import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.TaxiGps;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,10 +30,13 @@ public class ManagerTaxi {
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator generator;
 
-    public ManagerTaxi(ZoneService zoneService, KafkaTemplate<String, TaxiGps> kafkaTemplate, TaxiIdGenerator generator) {
+    private final FoodPOIRepository foodPOIRepository;
+
+    public ManagerTaxi(ZoneService zoneService, KafkaTemplate<String, TaxiGps> kafkaTemplate, TaxiIdGenerator generator, FoodPOIRepository foodPOIRepository) {
         this.zoneService = zoneService;
         this.kafkaTemplate = kafkaTemplate;
         this.generator = generator;
+        this.foodPOIRepository = foodPOIRepository;
 
 
 //        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
@@ -51,7 +57,18 @@ public class ManagerTaxi {
                 .status(Taxi.Status.IDLE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
+
+        foodPOIRepository.save(toElasticGps(car));
         return car;
+    }
+
+    private ElasticGps toElasticGps(Taxi car) {
+        return ElasticGps.builder()
+                .id(car.getId())
+                .status(car.getStatus())
+                .type(ElasticGps.Type.PASSANGER)
+                .location(new GeoPoint(car.getCurrentPosition().getLat(), car.getCurrentPosition().getLng()))
+                .build();
     }
 
     private void addFakeCar(Taxi car) {

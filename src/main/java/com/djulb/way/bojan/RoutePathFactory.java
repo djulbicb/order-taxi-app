@@ -89,10 +89,10 @@ public class RoutePathFactory {
 
             double distance1 = distance(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
             double distance = distanceFlatEarth(i0.getLat(), i1.getLat(), i0.getLng(), i1.getLng());
-            System.out.println(String.format("A: %s; B: %s; Distance: %sm", i0.toString(), i1.toString(), distance));
+//            System.out.println(String.format("A: %s; B: %s; Distance: %sm", i0.toString(), i1.toString(), distance));
             subpaths.add(Subpath.builder().start(i0).end(i1).distance(distance).build());
         }
-        System.out.println("Total distance: " + totalDistance);
+//        System.out.println("Total distance: " + totalDistance);
 
 
         return RoutePath.builder().subpaths(subpaths).totalDistance(totalDistance).waypoint(block).build();

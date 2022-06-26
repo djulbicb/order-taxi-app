@@ -16,6 +16,8 @@ import com.djulb.way.osrm.model.Step;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.djulb.AppSettings.INCREMENT;
+
 public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
     private final Taxi taxi;
@@ -50,12 +52,11 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             }
         }
     }
-    private int increment = 100;
-    private int distance = increment;
+    private int distance = INCREMENT;
     @Override
     public void process() {
         try {
-            distance +=increment;
+            distance +=INCREMENT;
             // Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
