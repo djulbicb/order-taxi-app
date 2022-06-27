@@ -16,6 +16,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.djulb.way.elements.GpsConvertor.toRedisGps;
 
 @Component
@@ -27,18 +30,24 @@ public class KConsumerPassengerGps {
     private final FoodPOIRepository foodPOIRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_PASSENGER, groupId = "passangerListener", containerFactory = "kafkaListenerContainerFactoryPassangerGps")
-    public void listenGroupFoo(ConsumerRecord<String, PassangerGps> message) {
-        PassangerGps value = message.value();
+    public void listenGroupFoo(List<PassangerGps> messages) {
+        List<ElasticGps> gpss = new ArrayList<>();
+        for (PassangerGps value : messages) {
+
 //        System.out.println("Passanger " + value.getId());
-        mongoPassangerDb.save(value, ZoneService.getZone(value.getCoordinate()));
+            mongoPassangerDb.save(value, ZoneService.getZone(value.getCoordinate()));
 //        redisGpsRepository.save(toRedisGps(value));
-        ElasticGps gps = ElasticGps.builder()
-                .id(value.getId())
-                .status(value.getStatus())
-                .type(ElasticGps.Type.PASSANGER)
-                .location(new GeoPoint(value.getCoordinate().getLat(), value.getCoordinate().getLng()))
-                .build();
-        foodPOIRepository.save(gps);
+            ElasticGps build = ElasticGps.builder()
+                    .id(value.getId())
+                    .status(value.getStatus())
+                    .type(ElasticGps.Type.PASSANGER)
+                    .location(new GeoPoint(value.getCoordinate().getLat(), value.getCoordinate().getLng()))
+                    .build();
+            gpss.add(build);
+        }
+
+
+        foodPOIRepository.saveAll(gpss);
 //        System.out.println("Received Passanger in group foo: " + value);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,10 +61,15 @@ public class ManagerContract {
     @Scheduled(fixedDelay=1000)
     private void populateList() {
         System.out.println("-----------" + LocalDateTime.now());
+
+        Instant start = Instant.now();
         for (Contract contract : contracts) {
             contract.getActive().process();
         }
-        System.out.println("Contract cycle finished" + LocalDateTime.now());
+        Instant end = Instant.now();
+        System.out.println("Contract cycle finished. Duration is" + Duration.between(start, end));
+
+
 
     }
 }

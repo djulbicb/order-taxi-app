@@ -17,6 +17,7 @@ import com.djulb.way.osrm.model.Intersection;
 import com.djulb.way.osrm.model.Step;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +70,10 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                         y.add(lng);
                     }
                 }
+            } else {
+                setStatusFinished();
+                _0HoldStep step = new _0HoldStep(this.osrmBackendApi, notificationService, foodPOIRepository, repository, passanger, Duration.ofSeconds(5), managerTaxi);
+                addNext(step);
             }
 
 
@@ -103,7 +108,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
         }
         catch (NullPointerException e) {
-            System.out.println("Null");
+            // System.out.println("Null");
         }
     }
 }

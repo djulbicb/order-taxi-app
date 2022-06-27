@@ -29,6 +29,9 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, "20");
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(50*1024)); // 30kb
+        configProps.put(ProducerConfig.ACKS_CONFIG, Integer.toString(0));
 
 return new DefaultKafkaProducerFactory<>(configProps);
         //return new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
@@ -47,7 +50,9 @@ return new DefaultKafkaProducerFactory<>(configProps);
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, "20");
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(50*1024)); // 30kb
+        configProps.put(ProducerConfig.ACKS_CONFIG, Integer.toString(0));
         return new DefaultKafkaProducerFactory<>(configProps);
 //        return new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
     }

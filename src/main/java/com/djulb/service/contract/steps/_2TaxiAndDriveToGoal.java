@@ -69,7 +69,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
         }
         catch (NullPointerException e) {
-            System.out.println("Null");
+            // System.out.println("Null");
         }
     }
 }
