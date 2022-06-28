@@ -1,5 +1,6 @@
 package com.djulb.utils;
 
+import com.djulb.AppSettings;
 import com.djulb.usecase.sample.dto.SampleSize;
 import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
@@ -140,6 +141,10 @@ public class ZoneService {
     }
 
     public Coordinate getRandomCoordinate() {
+        if (AppSettings.PRIORITIZE_COORDINATES_IN_CENTER) {
+            return getRandomCoordinateInZone(getZone(BBox.getBerlinBbox().getMiddlePoint())).get();
+        }
+
         ArrayList<String> zonesAsList = new ArrayList<>(zoneCoordinatesMap.keySet());
         String randomZone = zonesAsList.get(rnd.nextInt(zoneCoordinatesMap.size()));
         return getRandomCoordinateInZone(randomZone).get();

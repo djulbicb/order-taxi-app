@@ -59,7 +59,8 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
             if (position.isZero()) {
-
+                setStatusFinished();
+                addNext(new _3TaxiRelease(contractFactory, passanger, taxi));
             } else {
                 taxi.setCurrentPosition(position);
                 passanger.setCurrentPosition(position);

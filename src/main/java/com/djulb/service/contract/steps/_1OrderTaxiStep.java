@@ -66,13 +66,11 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                         y.add(lng);
                     }
                 }
-            } else {
-                setStatusFinished();
-                _0HoldStep step = new _0HoldStep(contractFactory,passanger, Duration.ofSeconds(5));
-                addNext(step);
             }
-
-
+        }else {
+            setStatusFinished();
+            _0HoldStep step = new _0HoldStep(contractFactory,passanger, Duration.ofSeconds(10));
+            addNext(step);
         }
 
     }
