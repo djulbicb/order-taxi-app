@@ -5,6 +5,7 @@ import com.djulb.db.elastic.ElasticGps;
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
 import com.djulb.service.ManagerTaxi;
+import com.djulb.service.contract.ContractFactory;
 import com.djulb.way.PathCalculator;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.bojan.RoutePath;
@@ -32,19 +33,14 @@ public class _1OrderTaxiStep extends AbstractContractStep{
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
 
-    public _1OrderTaxiStep(OsrmBackendApi osrmBackendApi,
-                           RedisNotificationService notificationService,
-                           FoodPOIRepository repository,
-                           FoodPOIRepositoryCustomImpl foodPOIRepository,
-                           Passanger passanger,
-                           ManagerTaxi managerTaxi) {
-        super(osrmBackendApi, notificationService, repository, foodPOIRepository, managerTaxi);
+    public _1OrderTaxiStep(ContractFactory contractFactory, Passanger passanger) {
+        super(contractFactory);
         this.passanger = passanger;
 
-        List<RedisGps> taxisInArea = foodPOIRepository.getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
+        List<RedisGps> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
         if (taxisInArea.size() > 0) {
             List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
-            Optional<Taxi> taxi1 = managerTaxi.get(taxiIds);
+            Optional<Taxi> taxi1 = contractFactory.getManagerTaxi().get(taxiIds);
             if (taxi1.isPresent()) {
                 taxi = taxi1.get();
                 taxi.setStatus(Taxi.Status.IN_PROCESS);
@@ -54,12 +50,12 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                         .type(ElasticGps.Type.TAXI)
                         .location(new GeoPoint(taxi.getCurrentPosition().getLat(), taxi.getCurrentPosition().getLng()))
                         .build();
-                repository.save(gps);
+                contractFactory.getFoodPOIRepository().save(gps);
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();
 
-                RoutePath routePath = osrmBackendApi.getRoute(start, end);
+                RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
 
                 for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
                     List<Intersection> intersections = step.getIntersections();
@@ -72,7 +68,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 }
             } else {
                 setStatusFinished();
-                _0HoldStep step = new _0HoldStep(this.osrmBackendApi, notificationService, foodPOIRepository, repository, passanger, Duration.ofSeconds(5), managerTaxi);
+                _0HoldStep step = new _0HoldStep(contractFactory,passanger, Duration.ofSeconds(5));
                 addNext(step);
             }
 
@@ -98,7 +94,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
             if (position.isZero()) {
                 setStatusFinished();
-                addNext(new _2TaxiAndDriveToGoal(this.osrmBackendApi, notificationService,repository, foodPOIRepository, this.passanger, this.taxi, managerTaxi));
+                addNext(new _2TaxiAndDriveToGoal(contractFactory, this.passanger, this.taxi));
             } else {
                 taxi.setCurrentPosition(position);
 //                Coordinate currentPosition = taxi.getCurrentPosition();

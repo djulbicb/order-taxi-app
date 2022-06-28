@@ -1,5 +1,7 @@
 package com.djulb.service.contract;
 
+import com.djulb.db.elastic.FoodPOIRepository;
+import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
 import com.djulb.service.ManagerPassanger;
 import com.djulb.service.ManagerTaxi;
 import com.djulb.service.contract.steps._0HoldStep;
@@ -10,18 +12,23 @@ import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.redis.RedisNotificationService;
 import com.djulb.way.osrm.OsrmBackendApi;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
 @Service
+@Getter
 @RequiredArgsConstructor
 public class ContractFactory {
     private final ManagerPassanger managerPassanger;
     private final ManagerTaxi managerTaxi;
     private final OsrmBackendApi osrmBackendApi;
     private final RedisNotificationService redisNotificationService;
+    private final FoodPOIRepositoryCustomImpl foodPOIRepositoryCustom;
+    private final FoodPOIRepository foodPOIRepository;
+
 
 
 

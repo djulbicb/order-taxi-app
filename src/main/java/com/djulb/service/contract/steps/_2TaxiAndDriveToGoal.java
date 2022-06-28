@@ -3,6 +3,7 @@ package com.djulb.service.contract.steps;
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
 import com.djulb.service.ManagerTaxi;
+import com.djulb.service.contract.ContractFactory;
 import com.djulb.way.PathCalculator;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.bojan.RoutePath;
@@ -26,13 +27,10 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
 
-    public _2TaxiAndDriveToGoal(OsrmBackendApi osrmBackendApi,
-                                RedisNotificationService notificationService,
-                                FoodPOIRepository repository,
-                                FoodPOIRepositoryCustomImpl foodPOIRepository,
-                                Passanger passanger, Taxi taxi,
-                                ManagerTaxi managerTaxi) {
-        super(osrmBackendApi, notificationService, repository, foodPOIRepository, managerTaxi);
+    public _2TaxiAndDriveToGoal(ContractFactory contractFactory,
+                                Passanger passanger,
+                                Taxi taxi) {
+        super(contractFactory);
 
         this.taxi = taxi;
         this.passanger = passanger;
@@ -40,7 +38,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
         Coordinate start = taxi.getCurrentPosition();
         Coordinate end = passanger.getDestination();
 
-        RoutePath routePath = osrmBackendApi.getRoute(start, end);
+        RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
 
         for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
             List<Intersection> intersections = step.getIntersections();

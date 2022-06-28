@@ -52,7 +52,7 @@ public class ManagerContract {
             Contract build = Contract.builder()
                     .person(passanger)
                     //.step(contractFactory.orderTaxi(passanger))
-                    .step(new _0HoldStep(this.osrmBackendApi,  notificationService, foodPOIRepository, repository, passanger, Duration.ofSeconds(5), managerTaxi))
+                    .step(new _0HoldStep(this.contractFactory, passanger, Duration.ofSeconds(5)))
                     .build();
             contracts.add(build);
         }

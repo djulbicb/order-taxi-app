@@ -3,6 +3,7 @@ package com.djulb.service.contract.steps;
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
 import com.djulb.service.ManagerTaxi;
+import com.djulb.service.contract.ContractFactory;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.redis.RedisNotificationService;
 import com.djulb.way.osrm.OsrmBackendApi;
@@ -17,14 +18,8 @@ public class _0HoldStep extends AbstractContractStep{
     private final Passanger passanger;
     private Instant startTime;
 
-    public _0HoldStep(OsrmBackendApi osrmBackendApi,
-                      RedisNotificationService notificationService,
-                      FoodPOIRepositoryCustomImpl foodPOIRepository,
-                      FoodPOIRepository repository,
-                      Passanger passanger,
-                      Duration threshold,
-                      ManagerTaxi managerTaxi) {
-        super(osrmBackendApi, notificationService, repository, foodPOIRepository, managerTaxi);
+    public _0HoldStep(ContractFactory contractFactory, Passanger passanger, Duration threshold) {
+        super(contractFactory);
         startTime = Instant.now();
         this.threshold = threshold;
         this.passanger = passanger;
@@ -47,7 +42,7 @@ public class _0HoldStep extends AbstractContractStep{
     public void process() {
         if (timeHasElapsedSince(startTime, threshold)) {
             setStatusFinished();
-            _1OrderTaxiStep step = new _1OrderTaxiStep(osrmBackendApi, notificationService,repository, foodPOIRepository, passanger, managerTaxi);
+            _1OrderTaxiStep step = new _1OrderTaxiStep(contractFactory, passanger);
             addNext(step);
         }
     }
