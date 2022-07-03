@@ -1,16 +1,14 @@
 package com.djulb.db.kafka.consumer;
 
-import com.djulb.db.elastic.ElasticGps;
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.kafka.KafkaCommon;
 //import com.djulb.db.redis.RedisTaxiRepository;
 
-import com.djulb.way.elements.ObjectType;
-import com.djulb.way.elements.TaxiGps;
+import com.djulb.way.elements.TaxiKGps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.way.elements.GpsConvertor.toRedisGps;
 
 @Component
@@ -30,17 +29,11 @@ public class KConsumerTaxiGps {
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")
     //  public void listenGroupFoo(ConsumerRecord<String, TaxiGps> message) {
-    public void listenGroupFoo(List<TaxiGps> messages) {
-        List<ElasticGps> gpss = new ArrayList<>();
-        for (TaxiGps value : messages) {
+    public void listenGroupFoo(List<TaxiKGps> messages) {
+        List<EGps> gpss = new ArrayList<>();
+        for (TaxiKGps value : messages) {
 //            mongoTaxiDb.save(value, ZoneService.getZone(value.getCoordinate()));
-            ElasticGps gps = ElasticGps.builder()
-                    .id(value.getId())
-                    .status(value.getStatus())
-                    .type(ObjectType.TAXI)
-                    .location(new GeoPoint(value.getCoordinate().getLat(), value.getCoordinate().getLng()))
-                    .build();
-            gpss.add(gps);
+            gpss.add(objToElastic(value));
 
         }
         elasticSearchRepository.saveAll(gpss);

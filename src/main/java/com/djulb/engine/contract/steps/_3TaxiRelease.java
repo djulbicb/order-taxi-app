@@ -1,12 +1,15 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.db.elastic.ElasticGps;
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.way.elements.ObjectActivity;
 import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.Taxi;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+
+import java.util.List;
+
+import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 
 public class _3TaxiRelease extends AbstractContractStep {
     private final Passanger passanger;
@@ -23,12 +26,11 @@ public class _3TaxiRelease extends AbstractContractStep {
     @Override
     public void process() {
         taxi.setStatus(ObjectStatus.IDLE);
-        ElasticGps gps = ElasticGps.builder()
-                .id(taxi.getId())
-                .status(ObjectStatus.IDLE)
-                .type(ObjectType.TAXI)
-                .location(new GeoPoint(taxi.getCurrentPosition().getLat(), taxi.getCurrentPosition().getLng()))
-                .build();
-        contractFactory.getElasticSearchRepository().save(gps);
+        passanger.setActivity(ObjectActivity.DEACTIVATED);
+
+        EGps taxiGps = objToElastic(taxi);
+        EGps passangerGps = objToElastic(passanger);
+
+        contractFactory.getElasticSearchRepository().saveAll(List.of(taxiGps, passangerGps));
     }
 }

@@ -1,10 +1,31 @@
 package com.djulb.way;
 
+import com.djulb.osrm.model.Intersection;
+import com.djulb.osrm.model.Step;
 import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.bojan.RoutePath;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // Taken from
 //http://www.java2s.com/example/java/java.lang/return-the-xy-position-at-distance-length-into-the-given-polyline.html
 public class PathCalculator{
+
+    public void haveNoIdea(RoutePath routePath) {
+        List<Double> x = new ArrayList<>();
+        List<Double> y = new ArrayList<>();
+
+        for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
+            List<Intersection> intersections = step.getIntersections();
+            for (Intersection intersection : intersections) {
+                double lat = intersection.getLocation().get(1);
+                double lng = intersection.getLocation().get(0);
+                x.add(lat);
+                y.add(lng);
+            }
+        }
+    }
     /* from   ww  w.  j  a  v a2s  .c o m
      * Return the x,y position at distance "length" into the given polyline.
             *

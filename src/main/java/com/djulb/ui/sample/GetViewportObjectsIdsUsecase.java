@@ -1,7 +1,7 @@
 package com.djulb.ui.sample;
 
 import com.djulb.db.elastic.ElasticSearchRepository;
-import com.djulb.db.elastic.ElasticGps;
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.redis.RedisGps;
@@ -35,7 +35,7 @@ public class GetViewportObjectsIdsUsecase {
         return elasticGpsRepository.getObjectsInArea(location, 50.0, "km").stream()
                 .map(searchHit -> {
                     Double distance = (Double) searchHit.getSortValues().get(0);
-                    ElasticGps content = searchHit.getContent();
+                    EGps content = searchHit.getContent();
                     return RedisGps.builder()
                             .id(content.getId())
                             .status(content.getType())

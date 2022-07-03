@@ -1,4 +1,4 @@
-package com.djulb.db.elastic;
+package com.djulb.db.elastic.dto;
 
 import com.djulb.way.elements.ObjectActivity;
 import com.djulb.way.elements.ObjectStatus;
@@ -14,7 +14,7 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 @Data
 @Builder
 @Document(indexName = "gps")
-public class ElasticGps {
+public class EGps {
     @Id
     private String id;
     @Field(type = FieldType.Text)

@@ -2,51 +2,55 @@ package com.djulb.way.elements;
 
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.redis.RedisGps;
-import org.springframework.data.geo.Point;
 
 import java.time.Instant;
 import java.util.Date;
 
 public class GpsConvertor {
-    public static RedisGps toRedisGps(PassangerGps taxi) {
+    public static RedisGps toRedisGps(PassangerKGps taxi) {
         return RedisGps.builder()
                 .id(taxi.getId())
                 .status(ObjectType.PASSANGER)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
+                .activity(taxi.getActivity())
                 .build();
     }
-    public static RedisGps toRedisGps(TaxiGps taxi) {
+    public static RedisGps toRedisGps(TaxiKGps taxi) {
         return RedisGps.builder()
                 .id(taxi.getId())
                 .status(ObjectType.TAXI)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
+                .activity(taxi.getActivity())
                 .build();
     }
-    public static TaxiGps toGps(Taxi taxi) {
-        return TaxiGps.builder()
+    public static TaxiKGps toGps(Taxi taxi) {
+        return TaxiKGps.builder()
                 .id(taxi.getId())
                 .status(taxi.getStatus())
                 .coordinate(taxi.getCurrentPosition())
                 .timestamp(Date.from(Instant.now()))
+                .activity(taxi.getActivity())
                 .build();
     }
 
-    public static Taxi toGps(TaxiGps taxi) {
+    public static Taxi toGps(TaxiKGps taxi) {
         return Taxi.builder()
                 .id(taxi.getId())
                 .status(taxi.getStatus())
                 .currentPosition(taxi.getCoordinate())
+                .activity(taxi.getActivity())
                 .build();
     }
 
-    public static PassangerGps toGps(Passanger passanger) {
-        return PassangerGps.builder()
+    public static PassangerKGps toGps(Passanger passanger) {
+        return PassangerKGps.builder()
                 .id(passanger.getId())
                 .status(passanger.getStatus())
                 .coordinate(passanger.getCurrentPosition())
                 .timestamp(Date.from(Instant.now()))
+                .activity(passanger.getActivity())
                 .build();
     }
 }

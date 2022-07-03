@@ -1,6 +1,8 @@
 package com.djulb.db.elastic;
 
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.elements.ObjectActivity;
 import com.djulb.way.elements.ObjectStatus;
 import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.redis.RedisGps;
@@ -24,10 +26,10 @@ public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositor
         this.operations = operations;
     }
 
-    public List<RedisGps> toDto(List<SearchHit<ElasticGps>> searchHits) {
+    public List<RedisGps> toDto(List<SearchHit<EGps>> searchHits) {
         return searchHits.stream()
                 .map(searchHit -> {
-                    ElasticGps content = searchHit.getContent();
+                    EGps content = searchHit.getContent();
                     return RedisGps.builder()
                             .id(content.getId())
                             .status(content.getType())
@@ -38,14 +40,10 @@ public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositor
     public List<RedisGps> getAvailableTaxisInArea(Coordinate coordinate, Double distance, String unit) {
         GeoPoint gps = new GeoPoint(coordinate.getLat(), coordinate.getLng());
 
-
         Criteria location = new Criteria("location").within(gps, distance.toString() + unit);
-        Criteria status = new Criteria("status");
-        status.is(ObjectStatus.IDLE);
-
-        Criteria type = new Criteria("type");
-        type.is(ObjectType.TAXI);
-
+        Criteria status = new Criteria("status").is(ObjectStatus.IDLE);
+        Criteria type = new Criteria("type").is(ObjectType.TAXI);
+        //Criteria activity = new Criteria("type").is(ObjectActivity.ACTIVE);
 
         Criteria criteria = Criteria.and().subCriteria(location).subCriteria(status).subCriteria(type);
 
@@ -54,15 +52,20 @@ public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositor
         // add a sort to get the actual distance back in the sort value
         Sort sort = Sort.by(new GeoDistanceOrder("location", gps).withUnit(unit));
         query.addSort(sort);
-        return toDto(operations.search(query, ElasticGps.class).getSearchHits());
+        return toDto(operations.search(query, EGps.class).getSearchHits());
     }
-    public List<SearchHit<ElasticGps>> getObjectsInArea(GeoPoint geoPoint, Double distance, String unit) {
+    public List<SearchHit<EGps>> getObjectsInArea(GeoPoint geoPoint, Double distance, String unit) {
         Query query = new CriteriaQuery(
+                new Criteria("location").within(geoPoint, distance.toString() + unit)
+                        .and().subCriteria(new Criteria("activity").is(ObjectActivity.ACTIVE))
+        );
+
+        Query q = new CriteriaQuery(
                 new Criteria("location").within(geoPoint, distance.toString() + unit)
         );
         // add a sort to get the actual distance back in the sort value
         Sort sort = Sort.by(new GeoDistanceOrder("location", geoPoint).withUnit(unit));
         query.addSort(sort);
-        return operations.search(query, ElasticGps.class).getSearchHits();
+        return operations.search(query, EGps.class).getSearchHits();
     }
 }

@@ -13,6 +13,7 @@ public class Taxi {
     String id;
     Coordinate currentPosition;
     ObjectStatus status;
+    ObjectActivity activity;
     Optional<RoutePath> currentRoutePath;
 
     public void addPath(RoutePath route) {

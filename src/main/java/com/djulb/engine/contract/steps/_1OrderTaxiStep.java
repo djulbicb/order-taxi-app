@@ -1,18 +1,16 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.db.elastic.ElasticGps;
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.way.PathCalculator;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.bojan.RoutePath;
 import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.redis.RedisGps;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
+import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.way.elements.GpsConvertor.toGps;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
@@ -40,12 +39,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
             if (taxi1.isPresent()) {
                 taxi = taxi1.get();
                 taxi.setStatus(ObjectStatus.IN_PROCESS);
-                ElasticGps gps = ElasticGps.builder()
-                        .id(taxi.getId())
-                        .status(ObjectStatus.IN_PROCESS)
-                        .type(ObjectType.TAXI)
-                        .location(new GeoPoint(taxi.getCurrentPosition().getLat(), taxi.getCurrentPosition().getLng()))
-                        .build();
+                EGps gps = objToElastic(taxi);
                 contractFactory.getElasticSearchRepository().save(gps);
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();

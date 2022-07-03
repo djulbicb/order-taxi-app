@@ -1,7 +1,6 @@
 package com.djulb.engine;
 
 import com.djulb.OrderTaxiAppSettings;
-import com.djulb.db.elastic.ElasticGps;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.contract.Contract;
@@ -16,7 +15,6 @@ import com.djulb.way.elements.redis.RedisNotificationService;
 import com.djulb.osrm.OsrmBackendApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 import static com.djulb.way.elements.GpsConvertor.toGps;
@@ -43,11 +42,11 @@ public class EngineManager {
 
     private final ZoneService zoneService;
     private final RedisNotificationService notificationService;
-    private final KafkaTemplate<String, PassangerGps> kafkaPassangerTemplate;
+    private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
     private final ConcurrentHashMap<String, Passanger> passangersByIdMap = new ConcurrentHashMap<>();
     private final PassangerIdGenerator passangerIdGenerator;
 
-    private final KafkaTemplate<String, TaxiGps> kafkaTaxiTemplate;
+    private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator taxiIdGenerator;
     protected final ElasticSearchRepositoryCustomImpl foodPOIRepository;
@@ -56,9 +55,9 @@ public class EngineManager {
     public EngineManager(OsrmBackendApi osrmBackendApi,
                          ZoneService zoneService,
                          RedisNotificationService notificationService,
-                         KafkaTemplate<String, PassangerGps> kafkaPassangerTemplate,
+                         KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate,
                          PassangerIdGenerator passangerIdGenerator,
-                         KafkaTemplate<String, TaxiGps> kafkaTaxiTemplate,
+                         KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate,
                          TaxiIdGenerator taxiIdGenerator,
                          ElasticSearchRepositoryCustomImpl foodPOIRepository,
                          ElasticSearchRepository repository) {
@@ -137,21 +136,14 @@ public class EngineManager {
         Taxi car = Taxi.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
+                .activity(ObjectActivity.ACTIVE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
 
-        repository.save(toElasticGps(car));
+        repository.save(objToElastic(car));
         return car;
     }
 
-    private ElasticGps toElasticGps(Taxi car) {
-        return ElasticGps.builder()
-                .id(car.getId())
-                .status(car.getStatus())
-                .type(ObjectType.PASSANGER)
-                .location(new GeoPoint(car.getCurrentPosition().getLat(), car.getCurrentPosition().getLng()))
-                .build();
-    }
 
     public void addFakeCar(Taxi car) {
         carsByIdMap.put(car.getId().toString(), car);
@@ -225,6 +217,7 @@ public class EngineManager {
         Passanger person = Passanger.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
+                .activity(ObjectActivity.ACTIVE)
                 .destination(endCoordinate)
                 .currentPosition(startCoordinate)
                 .build();

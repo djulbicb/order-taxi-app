@@ -1,11 +1,10 @@
 package com.djulb.db.kafka.consumer.config;
 
 import com.djulb.db.kafka.KafkaCommon;
-import com.djulb.way.elements.PassangerGps;
-import com.djulb.way.elements.TaxiGps;
+import com.djulb.way.elements.PassangerKGps;
+import com.djulb.way.elements.TaxiKGps;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -22,8 +21,8 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ConsumerFactory<String, TaxiGps> consumerFactoryTaxi() {
-        JsonDeserializer<TaxiGps> deserializer = new JsonDeserializer<>(TaxiGps.class);
+    public ConsumerFactory<String, TaxiKGps> consumerFactoryTaxi() {
+        JsonDeserializer<TaxiKGps> deserializer = new JsonDeserializer<>(TaxiKGps.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -38,8 +37,8 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TaxiGps> kafkaListenerContainerFactoryTaxiGps() {
-        ConcurrentKafkaListenerContainerFactory<String, TaxiGps> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, TaxiKGps> kafkaListenerContainerFactoryTaxiGps() {
+        ConcurrentKafkaListenerContainerFactory<String, TaxiKGps> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryTaxi());
         // for batch processing
         factory.setBatchListener(true);
@@ -47,8 +46,8 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, PassangerGps> consumerFactoryPassanger() {
-        JsonDeserializer<PassangerGps> deserializer = new JsonDeserializer<>(PassangerGps.class);
+    public ConsumerFactory<String, PassangerKGps> consumerFactoryPassanger() {
+        JsonDeserializer<PassangerKGps> deserializer = new JsonDeserializer<>(PassangerKGps.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -62,8 +61,8 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, PassangerGps> kafkaListenerContainerFactoryPassangerGps() {
-        ConcurrentKafkaListenerContainerFactory<String, PassangerGps> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, PassangerKGps> kafkaListenerContainerFactoryPassangerGps() {
+        ConcurrentKafkaListenerContainerFactory<String, PassangerKGps> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryPassanger());
         // for batch processing
         factory.setBatchListener(true);

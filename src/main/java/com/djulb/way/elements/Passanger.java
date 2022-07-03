@@ -9,6 +9,7 @@ import lombok.Data;
 public class Passanger {
     private String id;
     private ObjectStatus status;
+    private ObjectActivity activity;
     private Coordinate currentPosition;
     private Coordinate destination;
 }

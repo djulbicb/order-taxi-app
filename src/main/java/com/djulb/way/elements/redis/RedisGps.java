@@ -1,6 +1,7 @@
 package com.djulb.way.elements.redis;
 
 import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.elements.ObjectActivity;
 import com.djulb.way.elements.ObjectType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class RedisGps {
 
     private String id;
     private ObjectType status;
+    private ObjectActivity activity;
 
     private Coordinate coordinate;
 

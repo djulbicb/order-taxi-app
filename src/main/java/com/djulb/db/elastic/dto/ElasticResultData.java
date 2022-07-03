@@ -1,15 +1,14 @@
-package com.djulb.db.elastic;
+package com.djulb.db.elastic.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class ResultData {
+public class ElasticResultData {
     private String name;
     private GeoPoint location;
     private Double distance;
