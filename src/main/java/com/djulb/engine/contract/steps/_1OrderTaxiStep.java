@@ -34,7 +34,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
         List<RedisGps> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
         if (taxisInArea.size() > 0) {
             List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
-            Optional<Taxi> taxi1 = contractFactory.getManagerTaxi().get(taxiIds);
+            Optional<Taxi> taxi1 = contractFactory.getEngineManager().getTaxiByIds(taxiIds);
             if (taxi1.isPresent()) {
                 taxi = taxi1.get();
                 taxi.setStatus(Taxi.Status.IN_PROCESS);

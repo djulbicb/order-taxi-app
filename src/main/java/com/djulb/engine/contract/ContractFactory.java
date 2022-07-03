@@ -2,29 +2,27 @@ package com.djulb.engine.contract;
 
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
-import com.djulb.engine.ManagerPassanger;
-import com.djulb.engine.ManagerTaxi;
-import com.djulb.way.elements.redis.RedisNotificationService;
+import com.djulb.engine.EngineManager;
 import com.djulb.osrm.OsrmBackendApi;
+import com.djulb.way.elements.redis.RedisNotificationService;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
 @Getter
-@RequiredArgsConstructor
 public class ContractFactory {
-    private final ManagerPassanger managerPassanger;
-    private final ManagerTaxi managerTaxi;
+    private final EngineManager engineManager;
     private final OsrmBackendApi osrmBackendApi;
     private final RedisNotificationService redisNotificationService;
     private final FoodPOIRepositoryCustomImpl foodPOIRepositoryCustom;
     private final FoodPOIRepository foodPOIRepository;
 
-
-
-
-//    public _0HoldStep passangerIdle(Passanger passanger, Duration duration) {
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RedisNotificationService redisNotificationService, FoodPOIRepositoryCustomImpl foodPOIRepositoryCustom, FoodPOIRepository foodPOIRepository) {
+        this.engineManager = engineManager;
+        this.osrmBackendApi = osrmBackendApi;
+        this.redisNotificationService = redisNotificationService;
+        this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
+        this.foodPOIRepository = foodPOIRepository;
+    }
+    //    public _0HoldStep passangerIdle(Passanger passanger, Duration duration) {
 //        return new _0HoldStep(osrmBackendApi, redisNotificationService, passanger, duration);
 //    }
 //

@@ -38,89 +38,14 @@ public class ManagerTaxi {
         this.foodPOIRepository = foodPOIRepository;
 
 
-//        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
-//        String id = "test";
-//        addFakeCar(createFakeCar(id, zoneService.getRandomCoordinateInZone(ZoneService.getZone(coordinate)).get()));
-
-        populateList();
+////        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
+////        String id = "test";
+////        addFakeCar(createFakeCar(id, zoneService.getRandomCoordinateInZone(ZoneService.getZone(coordinate)).get()));
+//
+//        populateCarList();
     }
 
-    private Taxi createFakeCar() {
-        Coordinate randomCoordinate = zoneService.getRandomCoordinate();
-        return createFakeCar(generator.getNext(), randomCoordinate);
-    }
 
-    private Taxi createFakeCar(String id, Coordinate coordinate) {
-        Taxi car = Taxi.builder()
-                .id(id)
-                .status(Taxi.Status.IDLE)
-                .currentRoutePath(Optional.empty())
-                .currentPosition(coordinate).build();
-
-        foodPOIRepository.save(toElasticGps(car));
-        return car;
-    }
-
-    private ElasticGps toElasticGps(Taxi car) {
-        return ElasticGps.builder()
-                .id(car.getId())
-                .status(car.getStatus())
-                .type(ElasticGps.Type.PASSANGER)
-                .location(new GeoPoint(car.getCurrentPosition().getLat(), car.getCurrentPosition().getLng()))
-                .build();
-    }
-
-    private void addFakeCar(Taxi car) {
-        carsByIdMap.put(car.getId().toString(), car);
-    }
-
-    public Optional<Taxi> getCarById(String id){
-        return Optional.of(carsByIdMap.get(id));
-    }
-    public ConcurrentHashMap<String, Taxi> getCars() {
-        return carsByIdMap;
-    }
-
-//    @Scheduled(fixedDelay=5000)
-    private void populateList() {
-        int currentTaxiCount = carsByIdMap.values().size();
-        boolean shouldAddMoreCars = OrderTaxiAppSettings.MINIMUM_CARS > currentTaxiCount;
-        if (!shouldAddMoreCars) { return; }
-
-        int countOfTaxiToAdd = OrderTaxiAppSettings.MINIMUM_CARS - currentTaxiCount;
-
-        for (int i = 0; i < countOfTaxiToAdd; i++) {
-            addFakeCar(createFakeCar());
-        }
-    }
-    @Scheduled(fixedDelay=1000)
-    private void updateGps() {
-        for (Map.Entry<String, Taxi> entry : carsByIdMap.entrySet()) {
-            String zone = entry.getKey();
-            Taxi car = entry.getValue();
-
-            // ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_TAXI, car.getUuid().toString(), car.getCurrentPosition().formatted());
-            //mongoTemplate.save(fakePerson, fakePerson.getZone());
-            kafkaTemplate.send(TOPIC_GPS_TAXI, car.getId().toString(), toGps(car));
-        }
-        kafkaTemplate.flush();
-        // force send - sync. Cause if it shuts down, it may not be sent
-//        kafkaProducer.flush(); // close also does flush
-//        kafkaProducer.close();
-    }
-
-    public Optional<Taxi> get(List<String> taxiIds) {
-        List<Taxi> taxis = new ArrayList<>();
-        for (String id : taxiIds) {
-            if (carsByIdMap.containsKey(id)) {
-                taxis.add(carsByIdMap.get(id));
-            }
-        }
-        if (taxis.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(taxis.get(0));
-    }
 
 
 //    double dist = 50;
