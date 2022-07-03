@@ -1,10 +1,11 @@
 package com.djulb.db.kafka.consumer;
 
 import com.djulb.db.elastic.ElasticGps;
-import com.djulb.db.elastic.FoodPOIRepository;
+import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.kafka.KafkaCommon;
 //import com.djulb.db.redis.RedisTaxiRepository;
 
+import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.TaxiGps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import static com.djulb.way.elements.GpsConvertor.toRedisGps;
 public class KConsumerTaxiGps {
     @Qualifier("mongoTaxiDb")
     private final MongoTemplate mongoTaxiDb;
-    private final FoodPOIRepository foodPOIRepository;
+    private final ElasticSearchRepository elasticSearchRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")
     //  public void listenGroupFoo(ConsumerRecord<String, TaxiGps> message) {
@@ -36,13 +37,13 @@ public class KConsumerTaxiGps {
             ElasticGps gps = ElasticGps.builder()
                     .id(value.getId())
                     .status(value.getStatus())
-                    .type(ElasticGps.Type.TAXI)
+                    .type(ObjectType.TAXI)
                     .location(new GeoPoint(value.getCoordinate().getLat(), value.getCoordinate().getLng()))
                     .build();
             gpss.add(gps);
 
         }
-        foodPOIRepository.saveAll(gpss);
+        elasticSearchRepository.saveAll(gpss);
 
 //        redisGpsRepository.save(toRedisGps(value));
 //        studentRepository.save(RedisStudent.builder().id(value.getId()).name(value.getCoordinate().formatted()).gender(RedisStudent.Gender.MALE).build());

@@ -1,6 +1,6 @@
 package com.djulb.ui.sample;
 
-import com.djulb.db.elastic.FoodPOIRepository;
+import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticGps;
 import com.djulb.engine.ZoneService;
 import com.djulb.way.bojan.Coordinate;
@@ -27,7 +27,7 @@ public class GetViewportObjectsIdsUsecase {
     private final MongoTemplate mongoTaxiDb;
     @Qualifier("mongoPassangerDb")
     private final MongoTemplate mongoPassangerDb;
-    private final FoodPOIRepository elasticGpsRepository;
+    private final ElasticSearchRepository elasticGpsRepository;
     ;
     @GetMapping("/viewport/objects-in-area")
     public List<RedisGps> getViewportObjects(SampleRequest request) {
@@ -38,7 +38,7 @@ public class GetViewportObjectsIdsUsecase {
                     ElasticGps content = searchHit.getContent();
                     return RedisGps.builder()
                             .id(content.getId())
-                            .status(content.getType() == ElasticGps.Type.TAXI ? RedisGps.Status.TAXI : RedisGps.Status.PASSANGER)
+                            .status(content.getType())
                             .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
                             .build();
                 }).collect(Collectors.toList());

@@ -5,6 +5,8 @@ import com.djulb.engine.contract.ContractFactory;
 import com.djulb.way.PathCalculator;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.bojan.RoutePath;
+import com.djulb.way.elements.ObjectStatus;
+import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.redis.RedisGps;
@@ -37,14 +39,14 @@ public class _1OrderTaxiStep extends AbstractContractStep{
             Optional<Taxi> taxi1 = contractFactory.getEngineManager().getTaxiByIds(taxiIds);
             if (taxi1.isPresent()) {
                 taxi = taxi1.get();
-                taxi.setStatus(Taxi.Status.IN_PROCESS);
+                taxi.setStatus(ObjectStatus.IN_PROCESS);
                 ElasticGps gps = ElasticGps.builder()
                         .id(taxi.getId())
-                        .status(Taxi.Status.IN_PROCESS)
-                        .type(ElasticGps.Type.TAXI)
+                        .status(ObjectStatus.IN_PROCESS)
+                        .type(ObjectType.TAXI)
                         .location(new GeoPoint(taxi.getCurrentPosition().getLat(), taxi.getCurrentPosition().getLng()))
                         .build();
-                contractFactory.getFoodPOIRepository().save(gps);
+                contractFactory.getElasticSearchRepository().save(gps);
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();

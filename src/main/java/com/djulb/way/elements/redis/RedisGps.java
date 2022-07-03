@@ -1,6 +1,7 @@
 package com.djulb.way.elements.redis;
 
 import com.djulb.way.bojan.Coordinate;
+import com.djulb.way.elements.ObjectType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,11 +18,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RedisGps {
-    public enum Status {
-        TAXI, PASSANGER
-    }
+
     private String id;
-    private Status status;
+    private ObjectType status;
 
     private Coordinate coordinate;
 

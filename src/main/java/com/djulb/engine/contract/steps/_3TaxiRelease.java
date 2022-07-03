@@ -2,6 +2,8 @@ package com.djulb.engine.contract.steps;
 
 import com.djulb.db.elastic.ElasticGps;
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.way.elements.ObjectStatus;
+import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.Taxi;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
@@ -20,13 +22,13 @@ public class _3TaxiRelease extends AbstractContractStep {
 
     @Override
     public void process() {
-        taxi.setStatus(Taxi.Status.IDLE);
+        taxi.setStatus(ObjectStatus.IDLE);
         ElasticGps gps = ElasticGps.builder()
                 .id(taxi.getId())
-                .status(Taxi.Status.IDLE)
-                .type(ElasticGps.Type.TAXI)
+                .status(ObjectStatus.IDLE)
+                .type(ObjectType.TAXI)
                 .location(new GeoPoint(taxi.getCurrentPosition().getLat(), taxi.getCurrentPosition().getLng()))
                 .build();
-        contractFactory.getFoodPOIRepository().save(gps);
+        contractFactory.getElasticSearchRepository().save(gps);
     }
 }

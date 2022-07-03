@@ -11,7 +11,7 @@ public class GpsConvertor {
     public static RedisGps toRedisGps(PassangerGps taxi) {
         return RedisGps.builder()
                 .id(taxi.getId())
-                .status(RedisGps.Status.PASSANGER)
+                .status(ObjectType.PASSANGER)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .build();
@@ -19,7 +19,7 @@ public class GpsConvertor {
     public static RedisGps toRedisGps(TaxiGps taxi) {
         return RedisGps.builder()
                 .id(taxi.getId())
-                .status(RedisGps.Status.TAXI)
+                .status(ObjectType.TAXI)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .build();

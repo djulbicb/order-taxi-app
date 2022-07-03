@@ -1,11 +1,12 @@
 package com.djulb.db.kafka.consumer;
 
 import com.djulb.db.elastic.ElasticGps;
-import com.djulb.db.elastic.FoodPOIRepository;
+import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.kafka.KafkaCommon;
 
 //import com.djulb.db.redis.RedisPassangerRepository;
 import com.djulb.engine.ZoneService;
+import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.PassangerGps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ import static com.djulb.way.elements.GpsConvertor.toRedisGps;
 public class KConsumerPassengerGps {
     @Qualifier("mongoPassangerDb")
     private final MongoTemplate mongoPassangerDb;
-    private final FoodPOIRepository foodPOIRepository;
+    private final ElasticSearchRepository elasticSearchRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_PASSENGER, groupId = "passangerListener", containerFactory = "kafkaListenerContainerFactoryPassangerGps")
     public void listenGroupFoo(List<PassangerGps> messages) {
@@ -39,14 +40,14 @@ public class KConsumerPassengerGps {
             ElasticGps build = ElasticGps.builder()
                     .id(value.getId())
                     .status(value.getStatus())
-                    .type(ElasticGps.Type.PASSANGER)
+                    .type(ObjectType.PASSANGER)
                     .location(new GeoPoint(value.getCoordinate().getLat(), value.getCoordinate().getLng()))
                     .build();
             gpss.add(build);
         }
 
 
-        foodPOIRepository.saveAll(gpss);
+        elasticSearchRepository.saveAll(gpss);
 //        System.out.println("Received Passanger in group foo: " + value);
     }
 }

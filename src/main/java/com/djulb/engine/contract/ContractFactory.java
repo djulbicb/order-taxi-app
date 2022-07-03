@@ -1,7 +1,7 @@
 package com.djulb.engine.contract;
 
-import com.djulb.db.elastic.FoodPOIRepository;
-import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
+import com.djulb.db.elastic.ElasticSearchRepository;
+import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.EngineManager;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.way.elements.redis.RedisNotificationService;
@@ -12,15 +12,15 @@ public class ContractFactory {
     private final EngineManager engineManager;
     private final OsrmBackendApi osrmBackendApi;
     private final RedisNotificationService redisNotificationService;
-    private final FoodPOIRepositoryCustomImpl foodPOIRepositoryCustom;
-    private final FoodPOIRepository foodPOIRepository;
+    private final ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom;
+    private final ElasticSearchRepository elasticSearchRepository;
 
-    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RedisNotificationService redisNotificationService, FoodPOIRepositoryCustomImpl foodPOIRepositoryCustom, FoodPOIRepository foodPOIRepository) {
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RedisNotificationService redisNotificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository) {
         this.engineManager = engineManager;
         this.osrmBackendApi = osrmBackendApi;
         this.redisNotificationService = redisNotificationService;
         this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
-        this.foodPOIRepository = foodPOIRepository;
+        this.elasticSearchRepository = elasticSearchRepository;
     }
     //    public _0HoldStep passangerIdle(Passanger passanger, Duration duration) {
 //        return new _0HoldStep(osrmBackendApi, redisNotificationService, passanger, duration);

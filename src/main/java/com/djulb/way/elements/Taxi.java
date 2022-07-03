@@ -12,11 +12,9 @@ import java.util.Optional;
 public class Taxi {
     String id;
     Coordinate currentPosition;
-    Status status;
+    ObjectStatus status;
     Optional<RoutePath> currentRoutePath;
-    public enum Status {
-        IDLE, IN_PROCESS, FINISHED, TO_BE_REMOVED
-    }
+
     public void addPath(RoutePath route) {
         this.currentRoutePath = Optional.of(route);
     }
@@ -41,7 +39,7 @@ public class Taxi {
 
 
     public boolean isIdle() {
-        return status == Status.IDLE;
+        return status == ObjectStatus.IDLE;
     }
     public boolean hasPath() {
         return currentRoutePath.isPresent();

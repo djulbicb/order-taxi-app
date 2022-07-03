@@ -5,6 +5,6 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 import java.util.List;
 
-public interface FoodPOIRepositoryCustom  {
+public interface ElasticSearchRepositoryCustom {
         public List<SearchHit<ElasticGps>> getObjectsInArea(GeoPoint geoPoint, Double distance, String unit);
 }

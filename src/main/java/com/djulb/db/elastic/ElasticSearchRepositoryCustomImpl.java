@@ -1,7 +1,8 @@
 package com.djulb.db.elastic;
 
 import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.Taxi;
+import com.djulb.way.elements.ObjectStatus;
+import com.djulb.way.elements.ObjectType;
 import com.djulb.way.elements.redis.RedisGps;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -15,11 +16,11 @@ import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FoodPOIRepositoryCustomImpl implements FoodPOIRepositoryCustom{
+public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositoryCustom {
 
     private final ElasticsearchOperations operations;
 
-    public FoodPOIRepositoryCustomImpl(ElasticsearchOperations operations) {
+    public ElasticSearchRepositoryCustomImpl(ElasticsearchOperations operations) {
         this.operations = operations;
     }
 
@@ -29,7 +30,7 @@ public class FoodPOIRepositoryCustomImpl implements FoodPOIRepositoryCustom{
                     ElasticGps content = searchHit.getContent();
                     return RedisGps.builder()
                             .id(content.getId())
-                            .status(content.getType() == ElasticGps.Type.TAXI ? RedisGps.Status.TAXI : RedisGps.Status.PASSANGER)
+                            .status(content.getType())
                             .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
                             .build();
                 }).collect(Collectors.toList());
@@ -40,10 +41,10 @@ public class FoodPOIRepositoryCustomImpl implements FoodPOIRepositoryCustom{
 
         Criteria location = new Criteria("location").within(gps, distance.toString() + unit);
         Criteria status = new Criteria("status");
-        status.is(Taxi.Status.IDLE);
+        status.is(ObjectStatus.IDLE);
 
         Criteria type = new Criteria("type");
-        type.is(ElasticGps.Type.TAXI);
+        type.is(ObjectType.TAXI);
 
 
         Criteria criteria = Criteria.and().subCriteria(location).subCriteria(status).subCriteria(type);

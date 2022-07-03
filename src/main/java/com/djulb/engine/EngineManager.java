@@ -2,18 +2,15 @@ package com.djulb.engine;
 
 import com.djulb.OrderTaxiAppSettings;
 import com.djulb.db.elastic.ElasticGps;
-import com.djulb.db.elastic.FoodPOIRepository;
-import com.djulb.db.elastic.FoodPOIRepositoryCustomImpl;
+import com.djulb.db.elastic.ElasticSearchRepository;
+import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.contract.Contract;
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.Passanger;
-import com.djulb.way.elements.PassangerGps;
-import com.djulb.way.elements.Taxi;
-import com.djulb.way.elements.TaxiGps;
+import com.djulb.way.elements.*;
 import com.djulb.way.elements.redis.RedisNotification;
 import com.djulb.way.elements.redis.RedisNotificationService;
 import com.djulb.osrm.OsrmBackendApi;
@@ -53,8 +50,8 @@ public class EngineManager {
     private final KafkaTemplate<String, TaxiGps> kafkaTaxiTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator taxiIdGenerator;
-    protected final FoodPOIRepositoryCustomImpl foodPOIRepository;
-    protected final FoodPOIRepository repository;
+    protected final ElasticSearchRepositoryCustomImpl foodPOIRepository;
+    protected final ElasticSearchRepository repository;
 
     public EngineManager(OsrmBackendApi osrmBackendApi,
                          ZoneService zoneService,
@@ -63,8 +60,8 @@ public class EngineManager {
                          PassangerIdGenerator passangerIdGenerator,
                          KafkaTemplate<String, TaxiGps> kafkaTaxiTemplate,
                          TaxiIdGenerator taxiIdGenerator,
-                         FoodPOIRepositoryCustomImpl foodPOIRepository,
-                         FoodPOIRepository repository) {
+                         ElasticSearchRepositoryCustomImpl foodPOIRepository,
+                         ElasticSearchRepository repository) {
         this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, foodPOIRepository, repository);
         this.osrmBackendApi = osrmBackendApi;
         this.zoneService = zoneService;
@@ -139,7 +136,7 @@ public class EngineManager {
     public Taxi createFakeCar(String id, Coordinate coordinate) {
         Taxi car = Taxi.builder()
                 .id(id)
-                .status(Taxi.Status.IDLE)
+                .status(ObjectStatus.IDLE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
 
@@ -151,7 +148,7 @@ public class EngineManager {
         return ElasticGps.builder()
                 .id(car.getId())
                 .status(car.getStatus())
-                .type(ElasticGps.Type.PASSANGER)
+                .type(ObjectType.PASSANGER)
                 .location(new GeoPoint(car.getCurrentPosition().getLat(), car.getCurrentPosition().getLng()))
                 .build();
     }
@@ -227,7 +224,7 @@ public class EngineManager {
         notificationService.listPush("test", RedisNotification.builder().id(id).message("Passanger created " + id).build());
         Passanger person = Passanger.builder()
                 .id(id)
-                .status(Taxi.Status.IDLE)
+                .status(ObjectStatus.IDLE)
                 .destination(endCoordinate)
                 .currentPosition(startCoordinate)
                 .build();
