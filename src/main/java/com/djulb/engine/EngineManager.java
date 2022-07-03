@@ -127,12 +127,16 @@ public class EngineManager {
 
 
 
-    private Taxi createFakeCar() {
+    public Taxi createFakeCar() {
         Coordinate randomCoordinate = zoneService.getRandomCoordinate();
         return createFakeCar(taxiIdGenerator.getNext(), randomCoordinate);
     }
 
-    private Taxi createFakeCar(String id, Coordinate coordinate) {
+    public Taxi createFakeCar(Coordinate coordinate) {
+        return createFakeCar(taxiIdGenerator.getNext(), coordinate);
+    }
+
+    public Taxi createFakeCar(String id, Coordinate coordinate) {
         Taxi car = Taxi.builder()
                 .id(id)
                 .status(Taxi.Status.IDLE)
@@ -152,7 +156,7 @@ public class EngineManager {
                 .build();
     }
 
-    private void addFakeCar(Taxi car) {
+    public void addFakeCar(Taxi car) {
         carsByIdMap.put(car.getId().toString(), car);
     }
 
@@ -208,13 +212,18 @@ public class EngineManager {
 
 
 
-    private Passanger createFakePassanger() {
+    public Passanger createFakePassanger() {
         Coordinate startCoordinate = zoneService.getRandomCoordinate();
         Optional<Coordinate> endCoordinate = zoneService.getCoordinateInAdjecentZone(startCoordinate);
         return createFakePassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
     }
 
-    private Passanger createFakePassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
+    public Passanger createFakePassanger(Coordinate startCoordinate) {
+        Optional<Coordinate> endCoordinate = zoneService.getCoordinateInAdjecentZone(startCoordinate);
+        return createFakePassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
+    }
+
+    public Passanger createFakePassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
         notificationService.listPush("test", RedisNotification.builder().id(id).message("Passanger created " + id).build());
         Passanger person = Passanger.builder()
                 .id(id)
@@ -225,7 +234,7 @@ public class EngineManager {
         return person;
     }
 
-    private void addFakePassanger(Passanger car) {
+    public void addFakePassanger(Passanger car) {
         passangersByIdMap.put(car.getId(), car);
     }
 
