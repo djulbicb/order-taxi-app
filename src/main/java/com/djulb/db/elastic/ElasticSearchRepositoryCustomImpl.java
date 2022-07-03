@@ -1,11 +1,11 @@
 package com.djulb.db.elastic;
 
 import com.djulb.db.elastic.dto.EGps;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.ObjectActivity;
-import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.ObjectType;
-import com.djulb.way.elements.redis.RedisGps;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.objects.ObjectActivity;
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.common.objects.ObjectType;
+import com.djulb.messages.redis.RedisGps;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;

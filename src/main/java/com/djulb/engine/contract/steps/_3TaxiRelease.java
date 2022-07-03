@@ -2,10 +2,10 @@ package com.djulb.engine.contract.steps;
 
 import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.contract.ContractFactory;
-import com.djulb.way.elements.ObjectActivity;
-import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.Passanger;
-import com.djulb.way.elements.Taxi;
+import com.djulb.common.objects.ObjectActivity;
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.common.objects.Passanger;
+import com.djulb.common.objects.Taxi;
 
 import java.util.List;
 

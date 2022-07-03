@@ -1,17 +1,13 @@
 package com.djulb.ui.placeholders;
 
 import com.djulb.engine.EngineManager;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.Passanger;
-import com.djulb.way.elements.Taxi;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.objects.Passanger;
+import com.djulb.common.objects.Taxi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collection;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")

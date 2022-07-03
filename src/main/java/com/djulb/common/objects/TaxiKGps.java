@@ -1,6 +1,6 @@
-package com.djulb.way.elements;
+package com.djulb.common.objects;
 
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,17 +10,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.io.Serializable;
 import java.util.Date;
 
-
-
-@Document
 @Data
 @Builder
+@Document
 @NoArgsConstructor
 @AllArgsConstructor
-public class PassangerKGps implements Serializable {
+public class TaxiKGps {
     @Id
     private String id;
     private ObjectStatus status;

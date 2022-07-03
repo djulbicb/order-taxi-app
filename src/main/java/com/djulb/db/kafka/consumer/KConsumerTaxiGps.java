@@ -5,7 +5,7 @@ import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.kafka.KafkaCommon;
 //import com.djulb.db.redis.RedisTaxiRepository;
 
-import com.djulb.way.elements.TaxiKGps;
+import com.djulb.common.objects.TaxiKGps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
-import static com.djulb.way.elements.GpsConvertor.toRedisGps;
+import static com.djulb.common.objects.GpsConvertor.toRedisGps;
 
 @Component
 @RequiredArgsConstructor

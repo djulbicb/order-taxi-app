@@ -1,5 +1,6 @@
-package com.djulb.way.bojan;
+package com.djulb.common.paths;
 
+import com.djulb.common.coord.Coordinate;
 import com.djulb.osrm.model.Waypoint;
 import lombok.Builder;
 import lombok.Data;

@@ -4,7 +4,7 @@ import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.EngineManager;
 import com.djulb.osrm.OsrmBackendApi;
-import com.djulb.way.elements.redis.RedisNotificationService;
+import com.djulb.messages.redis.RedisNotificationService;
 import lombok.Getter;
 
 @Getter

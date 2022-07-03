@@ -1,6 +1,7 @@
 package com.djulb.engine;
 
 import com.djulb.OrderTaxiAppSettings;
+import com.djulb.common.objects.*;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.contract.Contract;
@@ -8,10 +9,10 @@ import com.djulb.engine.contract.ContractFactory;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import com.djulb.way.elements.*;
-import com.djulb.way.elements.redis.RedisNotification;
-import com.djulb.way.elements.redis.RedisNotificationService;
+import com.djulb.messages.redis.RedisNotification;
+import com.djulb.messages.redis.RedisNotificationService;
 import com.djulb.osrm.OsrmBackendApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -29,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
-import static com.djulb.way.elements.GpsConvertor.toGps;
+import static com.djulb.common.objects.GpsConvertor.toGps;
 
 @Component
 @EnableScheduling

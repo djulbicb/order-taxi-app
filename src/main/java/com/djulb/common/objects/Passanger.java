@@ -1,6 +1,6 @@
-package com.djulb.way.elements;
+package com.djulb.common.objects;
 
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import lombok.Builder;
 import lombok.Data;
 

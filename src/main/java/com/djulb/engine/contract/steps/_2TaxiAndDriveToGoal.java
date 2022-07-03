@@ -1,11 +1,11 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
-import com.djulb.way.PathCalculator;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.RoutePath;
-import com.djulb.way.elements.Passanger;
-import com.djulb.way.elements.Taxi;
+import com.djulb.utils.PathCalculator;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.paths.RoutePath;
+import com.djulb.common.objects.Passanger;
+import com.djulb.common.objects.Taxi;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
 

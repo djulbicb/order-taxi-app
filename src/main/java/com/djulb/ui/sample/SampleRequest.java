@@ -3,7 +3,7 @@ package com.djulb.ui.sample;
 import com.djulb.ui.sample.dto.SampleLayer;
 import com.djulb.ui.sample.dto.SampleObject;
 import com.djulb.ui.sample.dto.SampleSize;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import lombok.Data;
 
 import java.util.List;

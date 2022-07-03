@@ -1,4 +1,4 @@
-package com.djulb.engine.messanger.model;
+package com.djulb.messages.mongo.model;
 
 import lombok.Builder;
 import lombok.Data;

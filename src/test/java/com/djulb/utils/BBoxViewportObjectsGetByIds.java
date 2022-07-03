@@ -1,7 +1,7 @@
 package com.djulb.utils;
 
-import com.djulb.way.bojan.BBox;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.BBox;
+import com.djulb.common.coord.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

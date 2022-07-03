@@ -1,6 +1,6 @@
 package com.djulb.utils;
 
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 
 public class GeoUtils {
     public static Coordinate getMiddle(Coordinate pOne, Coordinate pTwo) {

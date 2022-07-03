@@ -1,7 +1,7 @@
-package com.djulb.way.elements;
+package com.djulb.common.objects;
 
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.elements.redis.RedisGps;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.messages.redis.RedisGps;
 
 import java.time.Instant;
 import java.util.Date;

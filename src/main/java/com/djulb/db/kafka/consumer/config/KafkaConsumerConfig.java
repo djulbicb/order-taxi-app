@@ -1,8 +1,8 @@
 package com.djulb.db.kafka.consumer.config;
 
 import com.djulb.db.kafka.KafkaCommon;
-import com.djulb.way.elements.PassangerKGps;
-import com.djulb.way.elements.TaxiKGps;
+import com.djulb.common.objects.PassangerKGps;
+import com.djulb.common.objects.TaxiKGps;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

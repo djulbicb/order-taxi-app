@@ -1,8 +1,8 @@
 package com.djulb.osrm;
 
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.RoutePath;
-import com.djulb.way.bojan.RoutePathFactory;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.paths.RoutePath;
+import com.djulb.common.paths.RoutePathFactory;
 import com.djulb.osrm.model.Waypoint;
 import com.djulb.osrm.model.Waypoints;
 import org.springframework.stereotype.Component;
