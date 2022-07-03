@@ -1,7 +1,7 @@
 package com.djulb.ui.sample;
 
 import com.djulb.db.redis.RedisGpsRepository;
-import com.djulb.utils.ZoneService;
+import com.djulb.engine.ZoneService;
 import com.djulb.way.elements.redis.RedisGps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;

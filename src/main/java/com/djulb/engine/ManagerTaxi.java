@@ -4,7 +4,6 @@ import com.djulb.OrderTaxiAppSettings;
 import com.djulb.db.elastic.ElasticGps;
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.engine.generator.TaxiIdGenerator;
-import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Taxi;
 import com.djulb.way.elements.TaxiGps;

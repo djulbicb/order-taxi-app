@@ -2,7 +2,6 @@ package com.djulb.engine;
 
 import com.djulb.OrderTaxiAppSettings;
 import com.djulb.engine.generator.PassangerIdGenerator;
-import com.djulb.utils.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.Passanger;
 import com.djulb.way.elements.PassangerGps;

@@ -2,7 +2,7 @@ package com.djulb.ui.sample;
 
 import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.elastic.ElasticGps;
-import com.djulb.utils.ZoneService;
+import com.djulb.engine.ZoneService;
 import com.djulb.way.bojan.Coordinate;
 import com.djulb.way.elements.redis.RedisGps;
 import lombok.RequiredArgsConstructor;

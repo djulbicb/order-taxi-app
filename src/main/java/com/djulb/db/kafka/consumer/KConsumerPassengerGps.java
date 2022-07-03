@@ -5,11 +5,10 @@ import com.djulb.db.elastic.FoodPOIRepository;
 import com.djulb.db.kafka.KafkaCommon;
 
 //import com.djulb.db.redis.RedisPassangerRepository;
-import com.djulb.utils.ZoneService;
+import com.djulb.engine.ZoneService;
 import com.djulb.way.elements.PassangerGps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.data.mongodb.core.MongoTemplate;
