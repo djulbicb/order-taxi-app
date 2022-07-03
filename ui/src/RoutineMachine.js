@@ -16,8 +16,8 @@ const createRoutineMachineLayer = (props) => {
   const instance = L.Routing.control({
     serviceUrl: 'http://localhost:5000/route/v1',
     waypoints: [
-      // L.latLng(52.5200, 13.4050),
-      // L.latLng(52.5133763440482, 13.329894697824987), /* ovaj*/
+      L.latLng(52.55,13.40),
+      L.latLng(52.55,13.50)
       // L.latLng(52.50546582848033, 13.29547681726967)
     ],
     lineOptions: {

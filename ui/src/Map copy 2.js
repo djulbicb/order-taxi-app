@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvents } from "react-leaflet";
 import RoutineMachine from "./RoutineMachine";
-import Taxi from "./markers/Taxi";
+import Taxi from "./ui/markers/Taxi";
 
 
 const fillBlueOptions = { fillColor: 'blue' }

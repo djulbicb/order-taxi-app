@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import Map from './Map'
+import Mapp from './Mapp'
 
 function App() {
   
@@ -8,7 +8,7 @@ function App() {
 
   return (
       <div className="App">
-        <Map />
+        <Mapp />
       </div>
     );
 }
