@@ -56,11 +56,9 @@ public class TileService {
 
         return block;
     }
-    @Autowired
-    WebClient client;
 
     public BufferedImage drawTest (int x, int y, int z) throws IOException {
-        // WebClient client = WebClient.create();
+        WebClient client = WebClient.create();
         String url = "http://localhost:5000/tile/v1/car/tile(8806,5375,14).mvt";
         url = String.format("http://localhost:5000/tile/v1/car/tile(%s,%s,%s).mvt", x, y, z);
 
