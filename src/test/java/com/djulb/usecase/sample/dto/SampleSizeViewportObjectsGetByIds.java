@@ -1,7 +1,7 @@
 package com.djulb.usecase.sample.dto;
 
 import com.djulb.ui.sample.dto.SampleSize;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

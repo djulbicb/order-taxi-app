@@ -1,6 +1,6 @@
 package com.djulb.osrm;
 
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 

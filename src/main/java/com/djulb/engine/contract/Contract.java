@@ -1,8 +1,8 @@
 package com.djulb.engine.contract;
 
 import com.djulb.engine.contract.steps.AbstractContractStep;
-import com.djulb.way.elements.Taxi;
-import com.djulb.way.elements.Passanger;
+import com.djulb.common.objects.Taxi;
+import com.djulb.common.objects.Passanger;
 import lombok.Builder;
 import lombok.Data;
 

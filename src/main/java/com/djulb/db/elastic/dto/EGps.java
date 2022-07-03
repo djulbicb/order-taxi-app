@@ -1,8 +1,8 @@
 package com.djulb.db.elastic.dto;
 
-import com.djulb.way.elements.ObjectActivity;
-import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.ObjectType;
+import com.djulb.common.objects.ObjectActivity;
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.common.objects.ObjectType;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

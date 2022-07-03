@@ -1,8 +1,8 @@
 package com.djulb.db.elastic;
 
 import com.djulb.db.elastic.dto.EGps;
-import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.ObjectType;
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.common.objects.ObjectType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

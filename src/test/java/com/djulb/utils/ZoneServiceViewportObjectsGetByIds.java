@@ -1,7 +1,7 @@
 package com.djulb.utils;
 
 import com.djulb.engine.ZoneService;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,5 +1,6 @@
 package com.djulb.db.elastic;
 
+import com.djulb.common.objects.*;
 import com.djulb.db.elastic.dto.EGps;
 import com.djulb.way.elements.*;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;

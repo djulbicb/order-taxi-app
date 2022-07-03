@@ -1,7 +1,7 @@
 package com.djulb.ui.sample.dto;
 
 import com.djulb.engine.ZoneService;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 
 import java.util.ArrayList;
 import java.util.List;

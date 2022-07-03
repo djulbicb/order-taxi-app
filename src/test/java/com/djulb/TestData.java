@@ -1,7 +1,7 @@
 package com.djulb;
 
-import com.djulb.way.bojan.BBox;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.BBox;
+import com.djulb.common.coord.Coordinate;
 
 public class TestData {
     public static BBox testBBox() {

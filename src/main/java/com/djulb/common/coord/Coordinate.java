@@ -1,4 +1,4 @@
-package com.djulb.way.bojan;
+package com.djulb.common.coord;
 
 import lombok.*;
 

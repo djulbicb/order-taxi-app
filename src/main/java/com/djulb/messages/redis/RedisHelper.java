@@ -1,4 +1,4 @@
-package com.djulb.way.elements.redis;
+package com.djulb.messages.redis;
 
 import java.util.List;
 import java.util.Map;

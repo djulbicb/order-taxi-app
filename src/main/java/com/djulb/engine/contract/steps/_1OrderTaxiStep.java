@@ -2,13 +2,13 @@ package com.djulb.engine.contract.steps;
 
 import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.contract.ContractFactory;
-import com.djulb.way.PathCalculator;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.RoutePath;
-import com.djulb.way.elements.ObjectStatus;
-import com.djulb.way.elements.Passanger;
-import com.djulb.way.elements.Taxi;
-import com.djulb.way.elements.redis.RedisGps;
+import com.djulb.utils.PathCalculator;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.paths.RoutePath;
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.common.objects.Passanger;
+import com.djulb.common.objects.Taxi;
+import com.djulb.messages.redis.RedisGps;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
-import static com.djulb.way.elements.GpsConvertor.toGps;
+import static com.djulb.common.objects.GpsConvertor.toGps;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
     private final Passanger passanger;

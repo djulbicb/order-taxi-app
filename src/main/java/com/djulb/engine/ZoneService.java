@@ -3,8 +3,8 @@ package com.djulb.engine;
 import com.djulb.OrderTaxiAppSettings;
 import com.djulb.ui.sample.dto.SampleSize;
 import com.djulb.utils.FileUtils;
-import com.djulb.way.bojan.BBox;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.BBox;
+import com.djulb.common.coord.Coordinate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

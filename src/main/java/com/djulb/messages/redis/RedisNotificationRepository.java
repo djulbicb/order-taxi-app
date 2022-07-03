@@ -1,4 +1,4 @@
-package com.djulb.way.elements.redis;
+package com.djulb.messages.redis;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

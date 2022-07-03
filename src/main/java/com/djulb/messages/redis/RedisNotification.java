@@ -1,4 +1,4 @@
-package com.djulb.way.elements.redis;
+package com.djulb.messages.redis;
 
 import com.djulb.utils.TimeUtils;
 import lombok.AllArgsConstructor;

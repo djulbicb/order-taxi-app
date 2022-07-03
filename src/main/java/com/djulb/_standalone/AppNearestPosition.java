@@ -1,9 +1,9 @@
 package com.djulb._standalone;
 
-import com.djulb.way.bojan.BBox;
+import com.djulb.common.coord.BBox;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.osrm.model.Waypoints;
-import com.djulb.way.bojan.Coordinate;
+import com.djulb.common.coord.Coordinate;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.djulb.way.bojan.BBox.getBerlinBbox;
+import static com.djulb.common.coord.BBox.getBerlinBbox;
 
 public class AppNearestPosition {
     public static void main(String[] args) throws IOException {

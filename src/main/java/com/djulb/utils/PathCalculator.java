@@ -1,9 +1,9 @@
-package com.djulb.way;
+package com.djulb.utils;
 
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
-import com.djulb.way.bojan.Coordinate;
-import com.djulb.way.bojan.RoutePath;
+import com.djulb.common.coord.Coordinate;
+import com.djulb.common.paths.RoutePath;
 
 import java.util.ArrayList;
 import java.util.List;
