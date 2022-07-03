@@ -1,8 +1,8 @@
 package com.djulb.way.bojan;
 
-import com.djulb.way.osrm.model.Intersection;
-import com.djulb.way.osrm.model.Step;
-import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.osrm.model.Intersection;
+import com.djulb.osrm.model.Step;
+import com.djulb.osrm.model.Waypoint;
 import lombok.Data;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package com.djulb.utils;
 
-import com.djulb.AppSettings;
-import com.djulb.usecase.sample.dto.SampleSize;
+import com.djulb.OrderTaxiAppSettings;
+import com.djulb.ui.sample.dto.SampleSize;
 import com.djulb.way.bojan.BBox;
 import com.djulb.way.bojan.Coordinate;
 import lombok.extern.slf4j.Slf4j;
@@ -141,7 +141,7 @@ public class ZoneService {
     }
 
     public Coordinate getRandomCoordinate() {
-        if (AppSettings.PRIORITIZE_COORDINATES_IN_CENTER) {
+        if (OrderTaxiAppSettings.PRIORITIZE_COORDINATES_IN_CENTER) {
             return getRandomCoordinateInZone(getZone(BBox.getBerlinBbox().getMiddlePoint())).get();
         }
 

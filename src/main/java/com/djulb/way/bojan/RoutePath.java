@@ -1,8 +1,6 @@
 package com.djulb.way.bojan;
 
-import com.djulb.way.osrm.model.Route;
-import com.djulb.way.osrm.model.Step;
-import com.djulb.way.osrm.model.Waypoint;
+import com.djulb.osrm.model.Waypoint;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.PackagePrivate;

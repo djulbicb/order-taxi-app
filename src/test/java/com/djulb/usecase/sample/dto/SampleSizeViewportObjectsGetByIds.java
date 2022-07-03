@@ -1,12 +1,11 @@
 package com.djulb.usecase.sample.dto;
 
+import com.djulb.ui.sample.dto.SampleSize;
 import com.djulb.way.bojan.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SampleSizeViewportObjectsGetByIds {
 

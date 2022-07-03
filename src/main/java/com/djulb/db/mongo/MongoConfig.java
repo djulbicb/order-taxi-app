@@ -1,24 +1,17 @@
 package com.djulb.db.mongo;
 
 import com.djulb.utils.ZoneService;
-import com.djulb.way.elements.PassangerGps;
-import com.djulb.way.elements.TaxiGps;
 import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 
-import java.util.Arrays;
-
-import static com.djulb.AppSettings.MONGO_EXPIRE_AFTER_SECONDS;
+import static com.djulb.OrderTaxiAppSettings.MONGO_EXPIRE_AFTER_SECONDS;
 
 @Configuration
 @RequiredArgsConstructor
