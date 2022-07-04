@@ -31,13 +31,8 @@ public abstract class AbstractContractStep {
     public enum Status {
          IN_PROGRESS, FINISHED
     }
-    public void start() {
 
-    }
     public void process() {
-
-    }
-    public void end() {
 
     }
 

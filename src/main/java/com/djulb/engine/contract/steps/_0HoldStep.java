@@ -25,15 +25,6 @@ public class _0HoldStep extends AbstractContractStep{
     }
 
     @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void end() {
-
-    }
-    @Override
     public void process() {
         if (timeHasElapsedSince(startTime, threshold)) {
             setStatusFinished();

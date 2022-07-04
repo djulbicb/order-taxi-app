@@ -77,7 +77,6 @@ public class _1OrderTaxiStep extends AbstractContractStep{
     public void process() {
         try {
             distance += MOVE_INCREMENT;
-            // Coordinate coordinateAtDistance = path.getCoordinateAtDistance(dist);
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
             if (position.isZero()) {
@@ -85,9 +84,6 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 addNext(new _2TaxiAndDriveToGoal(contractFactory, this.passanger, this.taxi));
             } else {
                 taxi.setCurrentPosition(position);
-//                Coordinate currentPosition = taxi.getCurrentPosition();
-//                Coordinate next = Coordinate.builder().lat(currentPosition.getLat() + 0.01).lng(currentPosition.getLng()).build();
-//                taxi.setCurrentPosition(next);
             }
 
         }

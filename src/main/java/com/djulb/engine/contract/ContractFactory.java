@@ -1,11 +1,16 @@
 package com.djulb.engine.contract;
 
+import com.djulb.common.objects.Passanger;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.EngineManager;
+import com.djulb.engine.contract.steps._0HoldStep;
+import com.djulb.engine.contract.steps._1OrderTaxiStep;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.messages.redis.RedisNotificationService;
 import lombok.Getter;
+
+import java.time.Duration;
 
 @Getter
 public class ContractFactory {
@@ -22,6 +27,12 @@ public class ContractFactory {
         this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
         this.elasticSearchRepository = elasticSearchRepository;
     }
+
+    public void holdPassangerAndOrder(Passanger passanger) {
+        _0HoldStep holdStep = new _0HoldStep(this, passanger, Duration.ofSeconds(10));
+        _1OrderTaxiStep step = new _1OrderTaxiStep(this, passanger);
+    }
+
     //    public _0HoldStep passangerIdle(Passanger passanger, Duration duration) {
 //        return new _0HoldStep(osrmBackendApi, redisNotificationService, passanger, duration);
 //    }
