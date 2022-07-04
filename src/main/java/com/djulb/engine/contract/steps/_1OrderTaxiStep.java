@@ -39,8 +39,8 @@ public class _1OrderTaxiStep extends AbstractContractStep{
             if (taxi1.isPresent()) {
                 taxi = taxi1.get();
                 taxi.setStatus(ObjectStatus.IN_PROCESS);
-                EGps gps = objToElastic(taxi);
-                contractFactory.getElasticSearchRepository().save(gps);
+
+                contractFactory.getElasticSearchRepository().save(objToElastic(taxi));
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();

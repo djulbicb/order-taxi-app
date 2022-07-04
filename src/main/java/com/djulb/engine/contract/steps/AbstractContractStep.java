@@ -12,8 +12,11 @@ public abstract class AbstractContractStep {
         this.contractFactory = contractFactory;
     }
 
-    protected void addNext(AbstractContractStep step) {
-        this.next = step;
+    protected void addNext(AbstractContractStep ...step) {
+        this.next = step[0];
+        for (int i = 0; i < step.length - 1; i++) {
+            step[i].next = step[i+1];
+        }
     }
     private Status status = Status.IN_PROGRESS;
 
@@ -25,20 +28,22 @@ public abstract class AbstractContractStep {
         return next;
     }
 
-    enum Status {
+    public enum Status {
          IN_PROGRESS, FINISHED
     }
     public void start() {
 
-    };
+    }
     public void process() {
 
-    };
+    }
     public void end() {
 
-    };
+    }
 
-
+    public Status getStatus() {
+        return status;
+    }
 
     void setStatusInProgress() {
         this.status = Status.IN_PROGRESS;
@@ -49,5 +54,5 @@ public abstract class AbstractContractStep {
 
     boolean isFinished() {
         return this.status == Status.FINISHED;
-    };
+    }
 }

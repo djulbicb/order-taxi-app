@@ -10,7 +10,6 @@ import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.common.coord.Coordinate;
-import com.djulb.way.elements.*;
 import com.djulb.messages.redis.RedisNotification;
 import com.djulb.messages.redis.RedisNotificationService;
 import com.djulb.osrm.OsrmBackendApi;

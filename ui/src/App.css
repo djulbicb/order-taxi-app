@@ -86,10 +86,13 @@
 
 .admin-panel {
   position: absolute;
-  z-index: 999;
-  width: 99%;
-  bottom: 0;
-  margin-left: 0.5em;
-  margin-bottom: 0.5em;
-  opacity: 0.8;
+
+  padding-right: 0.5em;
+  /* opacity: 0.8; */
+
+  right: 0.5em;
+  top: 0.5em;
+  width: 15%;
+  z-index: 9999;
+  height: 98%;
 }

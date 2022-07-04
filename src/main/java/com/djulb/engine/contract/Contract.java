@@ -5,6 +5,7 @@ import com.djulb.common.objects.Taxi;
 import com.djulb.common.objects.Passanger;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Builder
@@ -13,10 +14,15 @@ public class Contract {
     Passanger person;
     AbstractContractStep step;
 
+    public Contract(Taxi car, Passanger person, AbstractContractStep step) {
+        this.car = car;
+        this.person = person;
+        this.step = step;
+    }
 
     public AbstractContractStep getActive() {
         AbstractContractStep last = step;
-        while (last.hasNext()) {
+        while (last.hasNext() && last.getStatus() == AbstractContractStep.Status.FINISHED) {
             last = last.getNext();
         }
         return last;

@@ -165,7 +165,7 @@ const Mapp = (props) => {
       <CardContent>
 
         <Grid container spacing={2}>
-          <Grid item xs={4}>
+          <Grid item xs={12}>
             <FormControl>
               <FormLabel id="demo-radio-buttons-group-label">Grid</FormLabel>
               <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="Show grid" />
@@ -182,7 +182,7 @@ const Mapp = (props) => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={2}>
+          <Grid item xs={12}>
               <FormLabel id="demo-radio-buttons-group-label">Update speed</FormLabel>
               <Slider aria-label="Temperature" defaultValue={1000} getAriaValueText={valuetext} valueLabelDisplay="auto" step={100} marks min={100} max={1500}/>
 
@@ -190,22 +190,14 @@ const Mapp = (props) => {
               <Slider aria-label="Temperature" defaultValue={200} getAriaValueText={valuetext} valueLabelDisplay="auto" step={10} marks min={10} max={400}/>
           </Grid>
 
-          <Grid item xs={2}>
-            <FormLabel id="demo-radio-buttons-group-label">Grid</FormLabel>
+          <Grid item xs={12}>
+            <FormLabel id="demo-radio-buttons-group-label">View Contract Filter</FormLabel>
             <br/>
-            <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="Show grid" />
+            <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="View by id" />
             <MinimumDistanceSlider/>
           </Grid>
-          
+        
         </Grid>
-
-        {/* <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Word of the Day
-        </Typography> */}
-       
-        {/* <CardActions>
-          <Button size="small">Learn More</Button>
-        </CardActions> */}
       </CardContent>
     </Card>
 
@@ -229,6 +221,7 @@ const Mapp = (props) => {
 
       {showPlaceholder && (<PlaceholderLayer placeholderType={placeholderType}></PlaceholderLayer>)}
       {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)} 
+
       <Polyline pathOptions={fillBlueOptions} positions={pos} />
       {/* <Person  position={marker}></Person> */}
       {markers}
