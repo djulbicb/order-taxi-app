@@ -42,5 +42,5 @@ public class ContractM {
     private String routeSnapshotTaxi;
     private String routeSnapshotPassanger;
 
-    private final List<Coordinate> coordinateList = new ArrayList<>();
+    private final List<Coordinate> coordinateList;
 }
