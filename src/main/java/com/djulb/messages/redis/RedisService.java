@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public interface RedisHelper<HK, T> {
+public interface RedisService<HK, T> {
     /**
      * Hash Structure Add Element* @param key * @param hashKey hashKey * @param domain element
      */

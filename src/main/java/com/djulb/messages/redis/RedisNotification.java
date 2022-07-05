@@ -12,7 +12,7 @@ import java.io.Serializable;
 //https://programmer.group/example-of-using-redis-in-spring-boot.html
 @Data
 @Builder
-@RedisHash("notifications")
+@RedisHash(value = "notifications",timeToLive = 10)
 @NoArgsConstructor
 @PackagePrivate
 @AllArgsConstructor
@@ -21,4 +21,7 @@ public class RedisNotification implements Serializable {
     private String message;
     private long timestamp;
 
+    public static RedisNotification build(String id, String started) {
+        return RedisNotification.builder().id(id).message(started).timestamp(TimeUtils.getNowEpoch()).build();
+    }
 }

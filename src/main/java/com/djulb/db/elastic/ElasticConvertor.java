@@ -2,6 +2,8 @@ package com.djulb.db.elastic;
 
 import com.djulb.common.objects.*;
 import com.djulb.db.elastic.dto.EGps;
+import com.djulb.db.kafka.model.PassangerKGps;
+import com.djulb.db.kafka.model.TaxiKGps;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
 public class ElasticConvertor {

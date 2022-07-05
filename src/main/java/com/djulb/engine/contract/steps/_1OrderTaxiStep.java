@@ -1,6 +1,5 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
@@ -8,7 +7,7 @@ import com.djulb.common.paths.RoutePath;
 import com.djulb.common.objects.ObjectStatus;
 import com.djulb.common.objects.Passanger;
 import com.djulb.common.objects.Taxi;
-import com.djulb.messages.redis.RedisGps;
+import com.djulb.ui.model.GpsUi;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
 
@@ -32,15 +31,18 @@ public class _1OrderTaxiStep extends AbstractContractStep{
         super(contractFactory);
         this.passanger = passanger;
 
-        List<RedisGps> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
+        List<GpsUi> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
         if (taxisInArea.size() > 0) {
             List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
             Optional<Taxi> taxi1 = contractFactory.getEngineManager().getTaxiByIds(taxiIds);
             if (taxi1.isPresent()) {
+
                 taxi = taxi1.get();
                 taxi.setStatus(ObjectStatus.IN_PROCESS);
 
                 contractFactory.getElasticSearchRepository().save(objToElastic(taxi));
+
+                contractFactory.getNotificationService().orderedTaxi(passanger, taxi);
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();
@@ -58,6 +60,9 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 }
             }
         }else {
+
+            contractFactory.getNotificationService().passangerDidntGetTaxi(passanger);
+
             setStatusFinished();
             _0HoldStep step = new _0HoldStep(contractFactory,passanger, Duration.ofSeconds(10));
             addNext(step);
@@ -65,10 +70,10 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
     }
 
-    private Taxi toGps(RedisGps redisGps) {
+    private Taxi toGps(GpsUi gpsUi) {
         return Taxi.builder()
-                .currentPosition(redisGps.getCoordinate())
-                .id(redisGps.getId())
+                .currentPosition(gpsUi.getCoordinate())
+                .id(gpsUi.getId())
                 .build();
     }
 

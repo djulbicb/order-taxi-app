@@ -4,14 +4,15 @@ import com.djulb.OrderTaxiAppSettings;
 import com.djulb.common.objects.*;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
+import com.djulb.db.kafka.model.PassangerKGps;
+import com.djulb.db.kafka.model.TaxiKGps;
 import com.djulb.engine.contract.Contract;
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.common.coord.Coordinate;
-import com.djulb.messages.redis.RedisNotification;
-import com.djulb.messages.redis.RedisNotificationService;
 import com.djulb.osrm.OsrmBackendApi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -41,36 +42,35 @@ public class EngineManager {
     private ArrayList<Contract>  contracts = new ArrayList<>();
 
     private final ZoneService zoneService;
-    private final RedisNotificationService notificationService;
     private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
     private final ConcurrentHashMap<String, Passanger> passangersByIdMap = new ConcurrentHashMap<>();
     private final PassangerIdGenerator passangerIdGenerator;
-
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator taxiIdGenerator;
-    protected final ElasticSearchRepositoryCustomImpl foodPOIRepository;
-    protected final ElasticSearchRepository repository;
+    protected final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom;
+    protected final ElasticSearchRepository elasticSearchRepository;
+    protected final RNotificationService notificationService;
 
     public EngineManager(OsrmBackendApi osrmBackendApi,
                          ZoneService zoneService,
-                         RedisNotificationService notificationService,
                          KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate,
+                        RNotificationService notificationService,
                          PassangerIdGenerator passangerIdGenerator,
                          KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate,
                          TaxiIdGenerator taxiIdGenerator,
-                         ElasticSearchRepositoryCustomImpl foodPOIRepository,
-                         ElasticSearchRepository repository) {
-        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, foodPOIRepository, repository);
+                         ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom,
+                         ElasticSearchRepository elasticSearchRepository) {
+        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository);
         this.osrmBackendApi = osrmBackendApi;
         this.zoneService = zoneService;
-        this.notificationService = notificationService;
         this.kafkaPassangerTemplate = kafkaPassangerTemplate;
         this.passangerIdGenerator = passangerIdGenerator;
         this.taxiIdGenerator = taxiIdGenerator;
         this.kafkaTaxiTemplate = kafkaTaxiTemplate;
-        this.foodPOIRepository = foodPOIRepository;
-        this.repository = repository;
+        this.elasticSearchRepositoryCustom = elasticSearchRepositoryCustom;
+        this.elasticSearchRepository = elasticSearchRepository;
+        this.notificationService = notificationService;
 
         // Car manager
 //        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
@@ -89,7 +89,7 @@ public class EngineManager {
 
 
 
-        repository.deleteAll();
+        elasticSearchRepository.deleteAll();
 
 //        Taxi taxi = managerTaxi.getCarById("T-00001").get();
 
@@ -140,7 +140,7 @@ public class EngineManager {
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
 
-        repository.save(objToElastic(car));
+        elasticSearchRepository.save(objToElastic(car));
         return car;
     }
 
@@ -213,7 +213,6 @@ public class EngineManager {
     }
 
     public Passanger createFakePassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
-        notificationService.listPush("test", RedisNotification.builder().id(id).message("Passanger created " + id).build());
         Passanger person = Passanger.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)

@@ -4,10 +4,10 @@ import com.djulb.common.objects.Passanger;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
 import com.djulb.engine.EngineManager;
+import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.contract.steps._1OrderTaxiStep;
 import com.djulb.osrm.OsrmBackendApi;
-import com.djulb.messages.redis.RedisNotificationService;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -16,14 +16,14 @@ import java.time.Duration;
 public class ContractFactory {
     private final EngineManager engineManager;
     private final OsrmBackendApi osrmBackendApi;
-    private final RedisNotificationService redisNotificationService;
     private final ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom;
     private final ElasticSearchRepository elasticSearchRepository;
+    private final RNotificationService notificationService;
 
-    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RedisNotificationService redisNotificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository) {
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository) {
         this.engineManager = engineManager;
         this.osrmBackendApi = osrmBackendApi;
-        this.redisNotificationService = redisNotificationService;
+        this.notificationService = notificationService;
         this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
         this.elasticSearchRepository = elasticSearchRepository;
     }

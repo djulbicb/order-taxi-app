@@ -1,25 +1,27 @@
 package com.djulb.common.objects;
 
 import com.djulb.common.coord.Coordinate;
-import com.djulb.messages.redis.RedisGps;
+import com.djulb.db.kafka.model.PassangerKGps;
+import com.djulb.db.kafka.model.TaxiKGps;
+import com.djulb.ui.model.GpsUi;
 
 import java.time.Instant;
 import java.util.Date;
 
 public class GpsConvertor {
-    public static RedisGps toRedisGps(PassangerKGps taxi) {
-        return RedisGps.builder()
+    public static GpsUi toGpsUi(PassangerKGps taxi) {
+        return GpsUi.builder()
                 .id(taxi.getId())
-                .status(ObjectType.PASSANGER)
+                .type(ObjectType.PASSANGER)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .activity(taxi.getActivity())
                 .build();
     }
-    public static RedisGps toRedisGps(TaxiKGps taxi) {
-        return RedisGps.builder()
+    public static GpsUi toGpsUi(TaxiKGps taxi) {
+        return GpsUi.builder()
                 .id(taxi.getId())
-                .status(ObjectType.TAXI)
+                .type(ObjectType.TAXI)
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .activity(taxi.getActivity())

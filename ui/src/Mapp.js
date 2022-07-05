@@ -123,13 +123,14 @@ const Mapp = (props) => {
   }
 
   const elements = viewportObjects.map((element, index) => {
+    console.log(element);
     const lat = element.coordinate.lat;
     const lng = element.coordinate.lng;
     const coordinate = [lat, lng];
 
-    if (element.status === "TAXI") {
+    if (element.type === "TAXI") {
       return <Taxi key={index} id={element.id} position={coordinate}></Taxi>
-    } else if (element.status === "PASSANGER") {
+    } else if (element.type === "PASSANGER") {
       return <Person key={index} id={element.id} position={coordinate}></Person>
     }
   })
@@ -154,6 +155,8 @@ const Mapp = (props) => {
     return `${value}ms`;
   }
   
+console.log(elements)
+
   return (
     <>
     
@@ -226,7 +229,7 @@ const Mapp = (props) => {
       {/* <Person  position={marker}></Person> */}
       {markers}
       {elements}
-      
+
       <RoutineMachine />
     </MapContainer>
 

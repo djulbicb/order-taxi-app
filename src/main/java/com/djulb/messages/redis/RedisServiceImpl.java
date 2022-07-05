@@ -11,11 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-public class RedisNotificationService implements RedisHelper<String, RedisNotification> {
-
-    //    private final RedisTemplate<String, RedisNotification> redisTemplate;
-//    private final RedisNotificationRepository notificationRepository;
-//    private final NotificationRepository repository;
+public class RedisServiceImpl implements RedisService<String, RedisNotification> {
 
     // Get redisTemplate instance in constructor, key(not hashKey) uses String type by default
     private RedisTemplate<String, RedisNotification> redisTemplate;
@@ -28,7 +24,7 @@ public class RedisNotificationService implements RedisHelper<String, RedisNotifi
 
     // IDEA can be injected successfully even though it has errors. After instantiating the operation object, the method can be called directly to operate the Redis database
     @Autowired
-    public RedisNotificationService(RedisTemplate<String, RedisNotification> redisTemplate) {
+    public RedisServiceImpl(RedisTemplate<String, RedisNotification> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.hashOperations = redisTemplate.opsForHash();
         this.listOperations = redisTemplate.opsForList();

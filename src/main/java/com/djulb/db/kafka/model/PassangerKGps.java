@@ -1,6 +1,8 @@
-package com.djulb.common.objects;
+package com.djulb.db.kafka.model;
 
 import com.djulb.common.coord.Coordinate;
+import com.djulb.common.objects.ObjectActivity;
+import com.djulb.common.objects.ObjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,8 +1,8 @@
 package com.djulb.db.kafka.producer.config;
 
 import com.djulb.db.kafka.KafkaCommon;
-import com.djulb.common.objects.PassangerKGps;
-import com.djulb.common.objects.TaxiKGps;
+import com.djulb.db.kafka.model.PassangerKGps;
+import com.djulb.db.kafka.model.TaxiKGps;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

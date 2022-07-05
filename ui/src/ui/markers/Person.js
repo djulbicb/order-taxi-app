@@ -4,6 +4,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Marker, Popup } from 'react-leaflet';
 import ReactDOMServer from 'react-dom/server';
 import * as L from 'leaflet';
+import axios from 'axios';
+
+
+import MarkerPopup from './MarkerPopup';
+
 
 function Person(props) {
 
@@ -13,12 +18,33 @@ function Person(props) {
       className: 'marker-person'
     });
 
+    const [notifications, setNotifications] = useState([]);
+    
+
+    const eventHandlers={
+      popupopen: (e) => {
+        console.log(e);
+
+        const url = `http://localhost:8080/api/notifications/${props.id}`;
+
+        axios.get(url)
+        .then(function (response) {
+          console.log(response);
+          setNotifications(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      },
+      popupclose: (e) => {
+        console.log("close")
+      }
+    };
+
     return (
-        <Marker  icon={customMarkerIcon} position={props.position} eventHandlers={props.eventHandlers}>  
-            <Popup>
-              <h3>{props.id}</h3>
-              {JSON.stringify(props.position)}
-            </Popup>
+        <Marker  icon={customMarkerIcon} position={props.position} eventHandlers={eventHandlers}>  
+             <MarkerPopup id={props.id} position={props.position} notifications={notifications}></MarkerPopup>
         </Marker>
       );
   }

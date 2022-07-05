@@ -30,3 +30,17 @@ https://github.com/alex3165/react-mapbox-gl/blob/HEAD/docs/API.md
 
 # Leaflet
 https://react-leaflet.js.org/docs/example-vector-layers/
+
+
+# How to Jedisson
+https://dzone.com/articles/overview-of-redisson-the-redis-java-client
+
+```
+Config config = new Config();
+config.useSingleServer()
+.setAddress("redis://127.0.0.1:6379");
+RedissonClient client = Redisson.create(config);
+
+client.getMapCache("qqq").put("1", creates("1"));
+client.getMapCache("qqq").put("2", creates("1"), 30, TimeUnit.SECONDS);
+```

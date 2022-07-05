@@ -106,7 +106,16 @@ services:
       - "5001:5001"
     links:
       - cache
-
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    build: .
+    restart: always
+    environment:
+      - REDIS_HOSTS=cache
+    ports:
+      - 8081:8081
 
   elasticsearch:
     container_name: es-container

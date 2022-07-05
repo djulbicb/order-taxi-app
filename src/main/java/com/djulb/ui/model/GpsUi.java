@@ -1,4 +1,4 @@
-package com.djulb.messages.redis;
+package com.djulb.ui.model;
 
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.ObjectActivity;
@@ -14,13 +14,11 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RedisGps {
+public class GpsUi {
 
     private String id;
-    private ObjectType status;
+    private ObjectType type;
     private ObjectActivity activity;
-
     private Coordinate coordinate;
-
-    Date timestamp;
+    private Date timestamp;
 }

@@ -1,6 +1,7 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.messages.redis.RedisNotification;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.paths.RoutePath;
@@ -44,6 +45,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
                 y.add(lng);
             }
         }
+        contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
     }
     private int distance = MOVE_INCREMENT;
     @Override
@@ -54,6 +56,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
             if (position.isZero()) {
+                contractFactory.getNotificationService().taxiAndPassangerArrived(passanger, taxi);
                 setStatusFinished();
                 addNext(new _3TaxiRelease(contractFactory, passanger, taxi));
             } else {

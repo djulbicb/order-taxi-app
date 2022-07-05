@@ -4,7 +4,7 @@ import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.dto.EGps;
 import com.djulb.engine.ZoneService;
 import com.djulb.common.coord.Coordinate;
-import com.djulb.messages.redis.RedisGps;
+import com.djulb.ui.model.GpsUi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -30,15 +30,15 @@ public class GetViewportObjectsIdsUsecase {
     private final ElasticSearchRepository elasticGpsRepository;
     ;
     @GetMapping("/viewport/objects-in-area")
-    public List<RedisGps> getViewportObjects(SampleRequest request) {
+    public List<GpsUi> getViewportObjects(SampleRequest request) {
         GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
         return elasticGpsRepository.getObjectsInArea(location, 50.0, "km").stream()
                 .map(searchHit -> {
                     Double distance = (Double) searchHit.getSortValues().get(0);
                     EGps content = searchHit.getContent();
-                    return RedisGps.builder()
+                    return GpsUi.builder()
                             .id(content.getId())
-                            .status(content.getType())
+                            .type(content.getType())
                             .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
                             .build();
                 }).collect(Collectors.toList());
