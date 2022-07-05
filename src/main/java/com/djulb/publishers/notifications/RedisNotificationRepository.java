@@ -1,4 +1,4 @@
-package com.djulb.messages.redis;
+package com.djulb.publishers.notifications;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

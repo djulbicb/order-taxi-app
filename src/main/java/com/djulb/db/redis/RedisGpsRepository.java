@@ -1,6 +1,6 @@
 package com.djulb.db.redis;
 
-import com.djulb.messages.redis.RedisNotification;
+import com.djulb.publishers.notifications.RedisNotification;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

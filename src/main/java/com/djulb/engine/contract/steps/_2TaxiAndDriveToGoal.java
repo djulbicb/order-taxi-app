@@ -1,7 +1,6 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
-import com.djulb.messages.redis.RedisNotification;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.paths.RoutePath;

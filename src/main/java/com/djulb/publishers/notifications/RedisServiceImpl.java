@@ -1,4 +1,4 @@
-package com.djulb.messages.redis;
+package com.djulb.publishers.notifications;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

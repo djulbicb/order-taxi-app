@@ -1,4 +1,4 @@
-package com.djulb.messages.mongo;
+package com.djulb.publishers.contracts;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MongoNotificationRepository {
+public class ContractServiceMRepository {
     @Qualifier("mongoMessageDb")
     private final MongoTemplate mongoMessageDb;
+
+    public void getMongoMessageDb() {
+
+    }
 }

@@ -1,7 +1,7 @@
 package com.djulb.db.redis.usecase;
 
 import com.djulb.db.redis.RedissonMapCacheRepository;
-import com.djulb.messages.redis.RedisNotification;
+import com.djulb.publishers.notifications.RedisNotification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

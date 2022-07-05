@@ -3,7 +3,7 @@ package com.djulb.engine.contract.steps;
 import com.djulb.common.objects.Passanger;
 import com.djulb.common.objects.Taxi;
 import com.djulb.db.redis.RedissonMapCacheRepository;
-import com.djulb.messages.redis.RedisNotification;
+import com.djulb.publishers.notifications.RedisNotification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

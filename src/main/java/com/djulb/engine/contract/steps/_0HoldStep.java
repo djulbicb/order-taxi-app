@@ -2,7 +2,6 @@ package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.common.objects.Passanger;
-import com.djulb.messages.redis.RedisNotification;
 
 import java.time.Duration;
 import java.time.Instant;

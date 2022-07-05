@@ -1,4 +1,4 @@
-package com.djulb.messages.redis;
+package com.djulb.publishers.notifications;
 
 import java.util.List;
 import java.util.Map;
