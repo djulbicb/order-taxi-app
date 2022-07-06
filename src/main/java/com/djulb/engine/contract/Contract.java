@@ -10,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder
 public class Contract {
+    String id;
     Taxi car;
     Passanger person;
     AbstractContractStep step;
 
-    public Contract(Taxi car, Passanger person, AbstractContractStep step) {
+    public Contract(String id, Taxi car, Passanger person, AbstractContractStep step) {
+        this.id = id;
         this.car = car;
         this.person = person;
         this.step = step;

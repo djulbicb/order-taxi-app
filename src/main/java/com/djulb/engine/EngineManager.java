@@ -10,10 +10,12 @@ import com.djulb.engine.contract.Contract;
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
+import com.djulb.engine.generator.ContractIdGenerator;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.osrm.OsrmBackendApi;
+import com.djulb.publishers.contracts.ContractServiceMRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -39,6 +41,7 @@ import static com.djulb.common.objects.GpsConvertor.toGps;
 public class EngineManager {
     private final ContractFactory contractFactory;
     private final OsrmBackendApi osrmBackendApi;
+    private final ContractServiceMRepository contractServiceMRepository;
     private ArrayList<Contract>  contracts = new ArrayList<>();
 
     private final ZoneService zoneService;
@@ -48,6 +51,7 @@ public class EngineManager {
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
     private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
     private final TaxiIdGenerator taxiIdGenerator;
+    private final ContractIdGenerator contractIdGenerator;
     protected final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom;
     protected final ElasticSearchRepository elasticSearchRepository;
     protected final RNotificationService notificationService;
@@ -55,13 +59,16 @@ public class EngineManager {
     public EngineManager(OsrmBackendApi osrmBackendApi,
                          ZoneService zoneService,
                          KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate,
-                        RNotificationService notificationService,
+                         RNotificationService notificationService,
                          PassangerIdGenerator passangerIdGenerator,
                          KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate,
                          TaxiIdGenerator taxiIdGenerator,
                          ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom,
-                         ElasticSearchRepository elasticSearchRepository) {
-        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository);
+                         ElasticSearchRepository elasticSearchRepository,
+                         ContractServiceMRepository contractServiceMRepository,
+                         ContractIdGenerator contractIdGenerator) {
+        this.contractIdGenerator = contractIdGenerator;
+        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository, contractServiceMRepository);
         this.osrmBackendApi = osrmBackendApi;
         this.zoneService = zoneService;
         this.kafkaPassangerTemplate = kafkaPassangerTemplate;
@@ -71,6 +78,7 @@ public class EngineManager {
         this.elasticSearchRepositoryCustom = elasticSearchRepositoryCustom;
         this.elasticSearchRepository = elasticSearchRepository;
         this.notificationService = notificationService;
+        this.contractServiceMRepository = contractServiceMRepository;
 
         // Car manager
 //        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
@@ -96,9 +104,10 @@ public class EngineManager {
         Collection<Passanger> passangers = getPassangers();
         for (Passanger passanger : passangers) {
             Contract build = Contract.builder()
+                    .id(contractIdGenerator.getNext())
                     .person(passanger)
                     //.step(contractFactory.orderTaxi(passanger))
-                    .step(new _0HoldStep(this.contractFactory, passanger, Duration.ofSeconds(5)))
+                    .step(new _0HoldStep(this.contractFactory, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
                     .build();
             contracts.add(build);
         }

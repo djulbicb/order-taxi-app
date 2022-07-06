@@ -56,16 +56,16 @@ public class RoutePath {
         return null;
     }
 
-    public List<Object[]> getPathArray() {
-        List<Object[]> sss = new ArrayList<>();
+    public List<Double[]> getPathArray() {
+        List<Double[]> sss = new ArrayList<>();
 
         for (Subpath subpath : subpaths) {
             double lat = subpath.getStart().getLat();
             double lng = subpath.getStart().getLng();
-            List<Double> q = new ArrayList<>();
-            q.add(lat);
-            q.add(lng);
-            sss.add(q.toArray());
+            Double[] q = new Double[2];
+            q[0] = lat;
+            q[1] = lng;
+            sss.add(q);
         }
         return sss;
     }

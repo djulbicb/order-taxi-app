@@ -5,10 +5,7 @@ import { Marker, Popup } from 'react-leaflet';
 import ReactDOMServer from 'react-dom/server';
 import * as L from 'leaflet';
 import axios from 'axios';
-
-
 import MarkerPopup from './MarkerPopup';
-
 
 function Person(props) {
 
@@ -31,6 +28,18 @@ function Person(props) {
         .then(function (response) {
           console.log(response);
           setNotifications(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+
+
+        const urlll = `http://localhost:8080/api/contract/${props.type}/${props.id}`;
+        axios.get(urlll)
+        .then(function (response) {
+          console.log(response);
+
         })
         .catch(function (error) {
           console.log(error);

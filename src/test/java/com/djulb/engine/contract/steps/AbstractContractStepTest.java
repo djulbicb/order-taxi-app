@@ -19,7 +19,7 @@ class AbstractContractStepTest {
 
         firstContractStep.addNext(secondContractStep, thirdContractStep);
 
-        Contract contract = new Contract(Taxi.builder().build(), Passanger.builder().build(), firstContractStep);
+        Contract contract = new Contract("anything", Taxi.builder().build(), Passanger.builder().build(), firstContractStep);
 
         assertEquals(contract.getActive(), firstContractStep);
 

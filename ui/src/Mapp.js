@@ -123,15 +123,15 @@ const Mapp = (props) => {
   }
 
   const elements = viewportObjects.map((element, index) => {
-    console.log(element);
+    
     const lat = element.coordinate.lat;
     const lng = element.coordinate.lng;
     const coordinate = [lat, lng];
 
     if (element.type === "TAXI") {
-      return <Taxi key={index} id={element.id} position={coordinate}></Taxi>
+      return <Taxi key={index} id={element.id} position={coordinate} type="TAXI"></Taxi>
     } else if (element.type === "PASSANGER") {
-      return <Person key={index} id={element.id} position={coordinate}></Person>
+      return <Person key={index} id={element.id} position={coordinate} type="PASSANGER"></Person>
     }
   })
 
@@ -155,7 +155,7 @@ const Mapp = (props) => {
     return `${value}ms`;
   }
   
-console.log(elements)
+
 
   return (
     <>

@@ -1,6 +1,7 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.publishers.contracts.model.ContractM;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.paths.RoutePath;
@@ -23,13 +24,15 @@ import static com.djulb.common.objects.GpsConvertor.toGps;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
     private final Passanger passanger;
+    private final String contractId;
     private Taxi taxi;
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
 
-    public _1OrderTaxiStep(ContractFactory contractFactory, Passanger passanger) {
+    public _1OrderTaxiStep(ContractFactory contractFactory, String contractId, Passanger passanger) {
         super(contractFactory);
         this.passanger = passanger;
+        this.contractId = contractId;
 
         List<GpsUi> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
         if (taxisInArea.size() > 0) {
@@ -58,13 +61,23 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                         y.add(lng);
                     }
                 }
+
+                contractFactory.getContractServiceMRepository().updateFullContract(
+                        ContractM.builder()
+                                ._id(contractId)
+                                .passangerId(passanger.getId())
+                                .taxiId(taxi.getId())
+                                .passangerStartPosition(passanger.getCurrentPosition())
+                                .pathTaxiToPassanger(routePath.getPathArray())
+                                .build()
+                );
             }
         }else {
 
             contractFactory.getNotificationService().passangerDidntGetTaxi(passanger);
 
             setStatusFinished();
-            _0HoldStep step = new _0HoldStep(contractFactory,passanger, Duration.ofSeconds(10));
+            _0HoldStep step = new _0HoldStep(contractFactory, contractId, passanger, Duration.ofSeconds(10));
             addNext(step);
         }
 
@@ -86,7 +99,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
             if (position.isZero()) {
                 setStatusFinished();
-                addNext(new _2TaxiAndDriveToGoal(contractFactory, this.passanger, this.taxi));
+                addNext(new _2TaxiAndDriveToGoal(contractFactory, contractId, this.passanger, this.taxi));
             } else {
                 taxi.setCurrentPosition(position);
             }

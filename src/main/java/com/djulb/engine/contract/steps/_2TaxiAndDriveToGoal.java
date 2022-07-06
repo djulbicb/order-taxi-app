@@ -1,6 +1,7 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.publishers.contracts.model.ContractM;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.paths.RoutePath;
@@ -23,6 +24,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
     private ArrayList<Double> y = new ArrayList<>();
 
     public _2TaxiAndDriveToGoal(ContractFactory contractFactory,
+                                String contractId,
                                 Passanger passanger,
                                 Taxi taxi) {
         super(contractFactory);
@@ -45,6 +47,13 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             }
         }
         contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
+
+        contractFactory.getContractServiceMRepository().updateFullContract(
+                ContractM.builder()
+                        ._id(contractId)
+                        .passangerStartPosition(passanger.getCurrentPosition())
+                        .pathTaxiToDestination(routePath.getPathArray())
+                        .build());
     }
     private int distance = MOVE_INCREMENT;
     @Override

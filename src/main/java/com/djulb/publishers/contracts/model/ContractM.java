@@ -9,7 +9,6 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -25,7 +24,7 @@ public class ContractM {
         PASSANGER_CLOSE_CONTRACTD
     }
     @Id
-    private final String contractId;
+    private final String _id;
     @Field
     @Indexed(name="passangerId")
     private final String passangerId;
@@ -39,8 +38,10 @@ public class ContractM {
     private Coordinate passangerStartPosition;
     private Coordinate destination;
 
-    private String routeSnapshotTaxi;
-    private String routeSnapshotPassanger;
+    private List<Double[]> pathTaxiToPassanger;
+    private List<Double[]> pathTaxiToDestination;
 
-    private final List<Coordinate> coordinateList;
+
+
+    private final List<Coordinate> coordinates;
 }

@@ -8,6 +8,7 @@ import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.contract.steps._1OrderTaxiStep;
 import com.djulb.osrm.OsrmBackendApi;
+import com.djulb.publishers.contracts.ContractServiceMRepository;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -19,18 +20,20 @@ public class ContractFactory {
     private final ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom;
     private final ElasticSearchRepository elasticSearchRepository;
     private final RNotificationService notificationService;
+    private final ContractServiceMRepository contractServiceMRepository;
 
-    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository) {
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository, ContractServiceMRepository contractServiceMRepository) {
         this.engineManager = engineManager;
         this.osrmBackendApi = osrmBackendApi;
         this.notificationService = notificationService;
         this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
         this.elasticSearchRepository = elasticSearchRepository;
+        this.contractServiceMRepository = contractServiceMRepository;
     }
 
-    public void holdPassangerAndOrder(Passanger passanger) {
-        _0HoldStep holdStep = new _0HoldStep(this, passanger, Duration.ofSeconds(10));
-        _1OrderTaxiStep step = new _1OrderTaxiStep(this, passanger);
+    public void holdPassangerAndOrder(String contractId, Passanger passanger) {
+        _0HoldStep holdStep = new _0HoldStep(this, contractId, passanger, Duration.ofSeconds(10));
+        _1OrderTaxiStep step = new _1OrderTaxiStep(this, contractId, passanger);
     }
 
     //    public _0HoldStep passangerIdle(Passanger passanger, Duration duration) {
