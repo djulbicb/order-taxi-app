@@ -128,10 +128,12 @@ const Mapp = (props) => {
     const lng = element.coordinate.lng;
     const coordinate = [lat, lng];
 
+    
+
     if (element.type === "TAXI") {
-      return <Taxi key={index} id={element.id} position={coordinate} type="TAXI"></Taxi>
+      return <Taxi key={index} id={element.id} position={coordinate} status={element.status} type="TAXI"></Taxi>
     } else if (element.type === "PASSANGER") {
-      return <Person key={index} id={element.id} position={coordinate} type="PASSANGER"></Person>
+      return <Person key={index} id={element.id} position={coordinate} status={element.status} type="PASSANGER"></Person>
     }
   })
 

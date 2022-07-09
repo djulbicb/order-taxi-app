@@ -53,7 +53,7 @@ function Person(props) {
 
     return (
         <Marker  icon={customMarkerIcon} position={props.position} eventHandlers={eventHandlers}>  
-             <MarkerPopup id={props.id} position={props.position} notifications={notifications}></MarkerPopup>
+             <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup>
         </Marker>
       );
   }

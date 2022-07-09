@@ -48,6 +48,7 @@
   stroke: #313131;
   stroke-width: 30px;
   translate: -5px -170%;
+  z-index: 9999 !important;
 }
 .marker-taxi:after, .marker-person::after {
   content:'';

@@ -28,18 +28,12 @@ public class KConsumerTaxiGps {
     private final ElasticSearchRepository elasticSearchRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")
-    //  public void listenGroupFoo(ConsumerRecord<String, TaxiGps> message) {
     public void listenGroupFoo(List<TaxiKGps> messages) {
         List<EGps> gpss = new ArrayList<>();
         for (TaxiKGps value : messages) {
-//            mongoTaxiDb.save(value, ZoneService.getZone(value.getCoordinate()));
             gpss.add(objToElastic(value));
 
         }
         elasticSearchRepository.saveAll(gpss);
-
-//        redisGpsRepository.save(toRedisGps(value));
-//        studentRepository.save(RedisStudent.builder().id(value.getId()).name(value.getCoordinate().formatted()).gender(RedisStudent.Gender.MALE).build());
-//        System.out.println("Received Taxi in group foo: " + message.value());
     }
 }

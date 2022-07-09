@@ -11,6 +11,7 @@ import com.djulb.common.objects.Taxi;
 import com.djulb.ui.model.GpsUi;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.common.objects.GpsConvertor.toGps;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
     private final Passanger passanger;
@@ -34,43 +37,51 @@ public class _1OrderTaxiStep extends AbstractContractStep{
         this.passanger = passanger;
         this.contractId = contractId;
 
-        List<GpsUi> taxisInArea = contractFactory.getFoodPOIRepositoryCustom().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
-        if (taxisInArea.size() > 0) {
-            List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
-            Optional<Taxi> taxi1 = contractFactory.getEngineManager().getTaxiByIds(taxiIds);
+        List<GpsUi> taxisInArea = contractFactory.getElasticSearchRepositoryCustomImpl().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
+        List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
+        Optional<Taxi> taxi1 = contractFactory.getEngineManager().getTaxiByIds(taxiIds);
+        if (taxi1.isPresent()) {
             if (taxi1.isPresent()) {
 
                 taxi = taxi1.get();
                 taxi.setStatus(ObjectStatus.IN_PROCESS);
+                passanger.setStatus(ObjectStatus.IN_PROCESS);
 
-                contractFactory.getElasticSearchRepository().save(objToElastic(taxi));
+                contractFactory.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
+                contractFactory.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, taxi.getId(), toGps(passanger));
+//                contractFactory.getElasticSearchRepository().save(objToElastic(taxi));
 
                 contractFactory.getNotificationService().orderedTaxi(passanger, taxi);
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();
 
-                RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
+                try {
+                    RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
 
-                for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
-                    List<Intersection> intersections = step.getIntersections();
-                    for (Intersection intersection : intersections) {
-                        double lat = intersection.getLocation().get(1);
-                        double lng = intersection.getLocation().get(0);
-                        x.add(lat);
-                        y.add(lng);
+                    for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
+                        List<Intersection> intersections = step.getIntersections();
+                        for (Intersection intersection : intersections) {
+                            double lat = intersection.getLocation().get(1);
+                            double lng = intersection.getLocation().get(0);
+                            x.add(lat);
+                            y.add(lng);
+                        }
                     }
+
+                    contractFactory.getContractServiceMRepository().updateFullContract(
+                            ContractM.builder()
+                                    ._id(contractId)
+                                    .passangerId(passanger.getId())
+                                    .taxiId(taxi.getId())
+                                    .passangerStartPosition(passanger.getCurrentPosition())
+                                    .pathTaxiToPassanger(routePath.getPathArray())
+                                    .build()
+                    );
+                } catch (WebClientResponseException e) {
+                    System.out.println("error");
                 }
 
-                contractFactory.getContractServiceMRepository().updateFullContract(
-                        ContractM.builder()
-                                ._id(contractId)
-                                .passangerId(passanger.getId())
-                                .taxiId(taxi.getId())
-                                .passangerStartPosition(passanger.getCurrentPosition())
-                                .pathTaxiToPassanger(routePath.getPathArray())
-                                .build()
-                );
             }
         }else {
 
@@ -83,12 +94,12 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
     }
 
-    private Taxi toGps(GpsUi gpsUi) {
-        return Taxi.builder()
-                .currentPosition(gpsUi.getCoordinate())
-                .id(gpsUi.getId())
-                .build();
-    }
+//    private Taxi toGps(GpsUi gpsUi) {
+//        return Taxi.builder()
+//                .currentPosition(gpsUi.getCoordinate())
+//                .id(gpsUi.getId())
+//                .build();
+//    }
 
     private int distance = MOVE_INCREMENT;
     @Override

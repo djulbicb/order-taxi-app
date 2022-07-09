@@ -9,6 +9,7 @@ import com.djulb.common.objects.Passanger;
 import com.djulb.common.objects.Taxi;
 import com.djulb.osrm.model.Intersection;
 import com.djulb.osrm.model.Step;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,25 +36,34 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
         Coordinate start = taxi.getCurrentPosition();
         Coordinate end = passanger.getDestination();
 
-        RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
 
-        for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
-            List<Intersection> intersections = step.getIntersections();
-            for (Intersection intersection : intersections) {
-                double lat = intersection.getLocation().get(1);
-                double lng = intersection.getLocation().get(0);
-                x.add(lat);
-                y.add(lng);
+
+        try {
+            RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
+
+            for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
+                List<Intersection> intersections = step.getIntersections();
+                for (Intersection intersection : intersections) {
+                    double lat = intersection.getLocation().get(1);
+                    double lng = intersection.getLocation().get(0);
+                    x.add(lat);
+                    y.add(lng);
+                }
             }
-        }
-        contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
+            contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
 
-        contractFactory.getContractServiceMRepository().updateFullContract(
-                ContractM.builder()
-                        ._id(contractId)
-                        .passangerStartPosition(passanger.getCurrentPosition())
-                        .pathTaxiToDestination(routePath.getPathArray())
-                        .build());
+            contractFactory.getContractServiceMRepository().updateFullContract(
+                    ContractM.builder()
+                            ._id(contractId)
+                            .passangerStartPosition(passanger.getCurrentPosition())
+                            .pathTaxiToDestination(routePath.getPathArray())
+                            .build());
+
+        } catch (WebClientResponseException e) {
+            System.out.println("error1");
+        }
+
+
     }
     private int distance = MOVE_INCREMENT;
     @Override

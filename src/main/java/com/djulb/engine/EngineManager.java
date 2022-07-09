@@ -8,6 +8,7 @@ import com.djulb.db.kafka.model.PassangerKGps;
 import com.djulb.db.kafka.model.TaxiKGps;
 import com.djulb.engine.contract.Contract;
 import com.djulb.engine.contract.ContractFactory;
+import com.djulb.engine.contract.steps.AbstractContractStep;
 import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.ContractIdGenerator;
@@ -27,7 +28,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
@@ -39,17 +39,23 @@ import static com.djulb.common.objects.GpsConvertor.toGps;
 
 @Slf4j
 public class EngineManager {
+
+    private Map<String, Contract> contractsById = new HashMap<>();
+    private final Map<String, Taxi> carsByIdMap = new HashMap<>();
+    private final Map<String, Passanger> passangersByIdMap = new HashMap<>();
+
+    private List<Taxi> addToRegisterCars = new ArrayList<>();
+    private List<Passanger> addToRegisterPassanger = new ArrayList<>();
+    private List<Taxi> removeFromRegisterCars = new ArrayList<>();
+    private List<Contract> removeFromRegisterContract = new ArrayList<>();
+
     private final ContractFactory contractFactory;
     private final OsrmBackendApi osrmBackendApi;
     private final ContractServiceMRepository contractServiceMRepository;
-    private ArrayList<Contract>  contracts = new ArrayList<>();
-
     private final ZoneService zoneService;
     private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
-    private final ConcurrentHashMap<String, Passanger> passangersByIdMap = new ConcurrentHashMap<>();
-    private final PassangerIdGenerator passangerIdGenerator;
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
-    private final ConcurrentHashMap<String, Taxi> carsByIdMap = new ConcurrentHashMap<>();
+    private final PassangerIdGenerator passangerIdGenerator;
     private final TaxiIdGenerator taxiIdGenerator;
     private final ContractIdGenerator contractIdGenerator;
     protected final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom;
@@ -68,7 +74,7 @@ public class EngineManager {
                          ContractServiceMRepository contractServiceMRepository,
                          ContractIdGenerator contractIdGenerator) {
         this.contractIdGenerator = contractIdGenerator;
-        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository, contractServiceMRepository);
+        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate);
         this.osrmBackendApi = osrmBackendApi;
         this.zoneService = zoneService;
         this.kafkaPassangerTemplate = kafkaPassangerTemplate;
@@ -80,68 +86,100 @@ public class EngineManager {
         this.notificationService = notificationService;
         this.contractServiceMRepository = contractServiceMRepository;
 
-        // Car manager
-//        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
-//        String id = "test";
-//        addFakeCar(createFakeCar(id, zoneService.getRandomCoordinateInZone(ZoneService.getZone(coordinate)).get()));
-        populateCarList();
-
-
-        // Passanger
-        Coordinate coordinate = Coordinate.builder().lat(52.5200).lng(13.4050).build();
-        Optional<Coordinate> coordinateInAdjecentZone = zoneService.getCoordinateInAdjecentZone(coordinate);
-//        String id = "test";
-//        addFakePassanger(createFakePassanger(id, coordinate, coordinateInAdjecentZone.get()));
-        populatePassangerList();
-
-
-
-
+        // delete db
         elasticSearchRepository.deleteAll();
 
-//        Taxi taxi = managerTaxi.getCarById("T-00001").get();
+        System.out.println(LocalDateTime.now() + " cars start");
+        populateInitialCarList();
+        System.out.println(LocalDateTime.now() + " cars end");
+        populateInitialPassangerList();
+        System.out.println(LocalDateTime.now() + " passanger end");
+    }
 
-        Collection<Passanger> passangers = getPassangers();
-        for (Passanger passanger : passangers) {
-            Contract build = Contract.builder()
-                    .id(contractIdGenerator.getNext())
-                    .person(passanger)
-                    //.step(contractFactory.orderTaxi(passanger))
-                    .step(new _0HoldStep(this.contractFactory, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
-                    .build();
-            contracts.add(build);
-        }
+    public void createContractFromPassanger(Passanger passanger) {
+        Contract contract = Contract.builder()
+                .id(contractIdGenerator.getNext())
+                .person(passanger)
+                //.step(contractFactory.orderTaxi(passanger))
+                .step(new _0HoldStep(this.contractFactory, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
+                .build();
+        contractsById.put(contract.getId(), contract);
     }
 
     @Scheduled(fixedDelay=1000)
-    private void populateList() {
+    private void process() {
+        if (addToRegisterPassanger.size() > 0) {
+            for (Passanger passanger : addToRegisterPassanger) {
+                createContractFromPassanger(passanger);
+                passangersByIdMap.put(passanger.getId(), passanger);
+            }
+            addToRegisterPassanger.clear();
+        }
+        if (addToRegisterCars.size() > 0) {
+            for (Taxi taxi : addToRegisterCars) {
+                carsByIdMap.put(taxi.getId(), taxi);
+            }
+            addToRegisterCars.clear();
+        }
+
+        // PASSANGERS
+        for (Map.Entry<String, Passanger> entry : passangersByIdMap.entrySet()) {
+            String zone = entry.getKey();
+            Passanger passanger = entry.getValue();
+
+            ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_PASSENGER, passanger.getId(), passanger.getCurrentPosition().formatted());
+            kafkaPassangerTemplate.send(TOPIC_GPS_PASSENGER, passanger.getId(), toGps(passanger));
+
+        }
+//        kafkaPassangerTemplate.flush();
+
+        // CARS
+        for (Map.Entry<String, Taxi> entry : carsByIdMap.entrySet()) {
+            String zone = entry.getKey();
+            Taxi car = entry.getValue();
+            kafkaTaxiTemplate.send(TOPIC_GPS_TAXI, car.getId().toString(), toGps(car));
+        }
+//        kafkaTaxiTemplate.flush();
+
+        // CONTRACTS
         System.out.println("-----------" + LocalDateTime.now());
 
         Instant start = Instant.now();
-        for (Contract contract : contracts) {
+        for (Contract contract : contractsById.values()) {
             contract.getActive().process();
+
+//            if (contract.getActive().getStatus() == AbstractContractStep.Status.FINISHED) {
+//                addToRegisterRemoveContract(contract);
+//            }
         }
         Instant end = Instant.now();
         System.out.println("Contract cycle finished. Duration is" + Duration.between(start, end));
+
+
+        // REMOVE TO BE REMOVED CARS
+        if (removeFromRegisterCars.size() > 0) {
+            for (Taxi taxi : removeFromRegisterCars) {
+                carsByIdMap.remove(taxi.getId());
+            }
+        }
+        // REMOVE CONTRACT AND PASSANGER FROM THE LIST
+        removeFromRegisterContract();
     }
 
+    private void addToRegisterRemoveContract(Contract contract) {
+        removeFromRegisterContract.add(contract);;
+    }
 
-
-
-
-
-
-
-    public Taxi createFakeCar() {
+    public Taxi createCar() {
         Coordinate randomCoordinate = zoneService.getRandomCoordinate();
-        return createFakeCar(taxiIdGenerator.getNext(), randomCoordinate);
+        return createCar(taxiIdGenerator.getNext(), randomCoordinate);
     }
 
-    public Taxi createFakeCar(Coordinate coordinate) {
-        return createFakeCar(taxiIdGenerator.getNext(), coordinate);
+    public Taxi createCar(Coordinate coordinate) {
+        return createCar(taxiIdGenerator.getNext(), coordinate);
     }
 
-    public Taxi createFakeCar(String id, Coordinate coordinate) {
+    public Taxi createCar(String id, Coordinate coordinate) {
         Taxi car = Taxi.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
@@ -149,55 +187,50 @@ public class EngineManager {
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
 
-        elasticSearchRepository.save(objToElastic(car));
+//        elasticSearchRepository.save(objToElastic(car));
         return car;
     }
 
 
-    public void addFakeCar(Taxi car) {
-        carsByIdMap.put(car.getId().toString(), car);
-    }
-
-    public Optional<Taxi> getCarById(String id){
-        return Optional.of(carsByIdMap.get(id));
-    }
-    public ConcurrentHashMap<String, Taxi> getCars() {
-        return carsByIdMap;
-    }
-
-    //    @Scheduled(fixedDelay=5000)
-    private void populateCarList() {
+    private void populateInitialCarList() {
         int currentTaxiCount = carsByIdMap.values().size();
-        boolean shouldAddMoreCars = OrderTaxiAppSettings.MINIMUM_CARS > currentTaxiCount;
-        if (!shouldAddMoreCars) { return; }
-
         int countOfTaxiToAdd = OrderTaxiAppSettings.MINIMUM_CARS - currentTaxiCount;
-
         for (int i = 0; i < countOfTaxiToAdd; i++) {
-            addFakeCar(createFakeCar());
+            addToRegisterFakeCar(createCar());
         }
     }
-    @Scheduled(fixedDelay=1000)
-    private void updateTaxiGps() {
-        for (Map.Entry<String, Taxi> entry : carsByIdMap.entrySet()) {
-            String zone = entry.getKey();
-            Taxi car = entry.getValue();
 
-            // ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_TAXI, car.getUuid().toString(), car.getCurrentPosition().formatted());
-            //mongoTemplate.save(fakePerson, fakePerson.getZone());
-            kafkaTaxiTemplate.send(TOPIC_GPS_TAXI, car.getId().toString(), toGps(car));
-        }
-        kafkaTaxiTemplate.flush();
-        // force send - sync. Cause if it shuts down, it may not be sent
-//        kafkaProducer.flush(); // close also does flush
-//        kafkaProducer.close();
+    public void addToRegisterFakeCar(Taxi taxi) {
+        addToRegisterCars.add(taxi);
     }
+    public void addToRegisterFakeCar(List<Taxi> taxis) {
+        addToRegisterCars.addAll(taxis);
+    }
+    public void addToRegisterPassanger(Passanger passanger) {
+        addToRegisterPassanger.add(passanger);
+    }
+    public void addToRegisterPassanger(List<Passanger> passangers) {
+        addToRegisterPassanger.addAll(passangers);
+    }
+    public void removeFromRegisterContract() {
+        for (Contract contract : removeFromRegisterContract) {
+            if (contractsById.containsKey(contract.getId())) {
+                contractsById.remove(contract.getId());
+                passangersByIdMap.remove(contract.getPerson());
+            }
+        }
+    }
+
+
 
     public Optional<Taxi> getTaxiByIds(List<String> taxiIds) {
         List<Taxi> taxis = new ArrayList<>();
         for (String id : taxiIds) {
             if (carsByIdMap.containsKey(id)) {
-                taxis.add(carsByIdMap.get(id));
+                Taxi taxi = carsByIdMap.get(id);
+                if (taxi.getStatus() == ObjectStatus.IDLE) {
+                    taxis.add(taxi);
+                }
             }
         }
         if (taxis.isEmpty()) {
@@ -206,22 +239,18 @@ public class EngineManager {
         return Optional.of(taxis.get(0));
     }
 
-
-
-
-
-    public Passanger createFakePassanger() {
+    public Passanger createPassanger() {
         Coordinate startCoordinate = zoneService.getRandomCoordinate();
         Optional<Coordinate> endCoordinate = zoneService.getCoordinateInAdjecentZone(startCoordinate);
-        return createFakePassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
+        return createPassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
     }
 
-    public Passanger createFakePassanger(Coordinate startCoordinate) {
+    public Passanger createPassanger(Coordinate startCoordinate) {
         Optional<Coordinate> endCoordinate = zoneService.getCoordinateInAdjecentZone(startCoordinate);
-        return createFakePassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
+        return createPassanger(passangerIdGenerator.getNext(), startCoordinate, endCoordinate.get());
     }
 
-    public Passanger createFakePassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
+    public Passanger createPassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
         Passanger person = Passanger.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
@@ -232,20 +261,9 @@ public class EngineManager {
         return person;
     }
 
-    public void addFakePassanger(Passanger car) {
-        passangersByIdMap.put(car.getId(), car);
-    }
-
-    public Optional<Passanger> getPassangerById(String id){
-        return Optional.of(passangersByIdMap.get(id));
-    }
-
-    public Collection<Passanger> getPassangers() {
-        return passangersByIdMap.values();
-    }
 
     //    @Scheduled(fixedDelay=5000)
-    private void populatePassangerList() {
+    private void populateInitialPassangerList() {
         int currentTaxiCount = passangersByIdMap.values().size();
         boolean shouldAddMoreCars = OrderTaxiAppSettings.MINIMUM_PASSENGERS > currentTaxiCount;
         if (!shouldAddMoreCars) { return; }
@@ -253,25 +271,8 @@ public class EngineManager {
         int countOfTaxiToAdd = OrderTaxiAppSettings.MINIMUM_PASSENGERS - currentTaxiCount;
 
         for (int i = 0; i < countOfTaxiToAdd; i++) {
-            addFakePassanger(createFakePassanger());
+            addToRegisterPassanger(createPassanger());
         }
-    }
-    @Scheduled(fixedDelay=1000)
-    private void updatePassangerGps() {
-        for (Map.Entry<String, Passanger> entry : passangersByIdMap.entrySet()) {
-            String zone = entry.getKey();
-            Passanger passanger = entry.getValue();
-
-            ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_GPS_PASSENGER, passanger.getId(), passanger.getCurrentPosition().formatted());
-            //mongoTemplate.save(fakePerson, fakePerson.getZone());
-//            kafkaProducer.send(record);
-            kafkaPassangerTemplate.send(TOPIC_GPS_PASSENGER, passanger.getId(), toGps(passanger));
-
-        }
-        kafkaPassangerTemplate.flush();
-
-        // force send - sync. Cause if it shuts down, it may not be sent
-//        kafkaProducer.flush(); // close also does flush
     }
 
 }

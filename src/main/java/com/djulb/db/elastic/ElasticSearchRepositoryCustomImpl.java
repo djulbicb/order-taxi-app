@@ -55,14 +55,13 @@ public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositor
         return toDto(operations.search(query, EGps.class).getSearchHits());
     }
     public List<SearchHit<EGps>> getObjectsInArea(GeoPoint geoPoint, Double distance, String unit) {
-        Query query = new CriteriaQuery(
-                new Criteria("location").within(geoPoint, distance.toString() + unit)
-                        .and().subCriteria(new Criteria("activity").is(ObjectActivity.ACTIVE))
-        );
+        Criteria location = new Criteria("location").within(geoPoint, distance.toString() + unit);
+        Criteria activity = new Criteria("activity").is(ObjectActivity.ACTIVE);
 
-        Query q = new CriteriaQuery(
-                new Criteria("location").within(geoPoint, distance.toString() + unit)
-        );
+        Criteria criteria = Criteria.and().subCriteria(location).subCriteria(activity);
+
+        Query query = new CriteriaQuery(criteria, Pageable.ofSize(100));
+
         // add a sort to get the actual distance back in the sort value
         Sort sort = Sort.by(new GeoDistanceOrder("location", geoPoint).withUnit(unit));
         query.addSort(sort);

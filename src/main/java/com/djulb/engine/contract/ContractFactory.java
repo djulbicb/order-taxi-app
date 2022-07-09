@@ -3,6 +3,8 @@ package com.djulb.engine.contract;
 import com.djulb.common.objects.Passanger;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
+import com.djulb.db.kafka.model.PassangerKGps;
+import com.djulb.db.kafka.model.TaxiKGps;
 import com.djulb.engine.EngineManager;
 import com.djulb.engine.contract.steps.RNotificationService;
 import com.djulb.engine.contract.steps._0HoldStep;
@@ -10,6 +12,7 @@ import com.djulb.engine.contract.steps._1OrderTaxiStep;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.publishers.contracts.ContractServiceMRepository;
 import lombok.Getter;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.time.Duration;
 
@@ -17,18 +20,21 @@ import java.time.Duration;
 public class ContractFactory {
     private final EngineManager engineManager;
     private final OsrmBackendApi osrmBackendApi;
-    private final ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom;
+    private final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl;
     private final ElasticSearchRepository elasticSearchRepository;
     private final RNotificationService notificationService;
     private final ContractServiceMRepository contractServiceMRepository;
-
-    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl foodPOIRepositoryCustom, ElasticSearchRepository elasticSearchRepository, ContractServiceMRepository contractServiceMRepository) {
+    private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
+    private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl, ElasticSearchRepository elasticSearchRepository, ContractServiceMRepository contractServiceMRepository, KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate, KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate) {
         this.engineManager = engineManager;
         this.osrmBackendApi = osrmBackendApi;
         this.notificationService = notificationService;
-        this.foodPOIRepositoryCustom = foodPOIRepositoryCustom;
+        this.elasticSearchRepositoryCustomImpl = elasticSearchRepositoryCustomImpl;
         this.elasticSearchRepository = elasticSearchRepository;
         this.contractServiceMRepository = contractServiceMRepository;
+        this.kafkaPassangerTemplate = kafkaPassangerTemplate;
+        this.kafkaTaxiTemplate = kafkaTaxiTemplate;
     }
 
     public void holdPassangerAndOrder(String contractId, Passanger passanger) {

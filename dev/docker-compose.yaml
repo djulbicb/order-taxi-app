@@ -99,6 +99,11 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
+#  prometheus:
+#    image: prom/prometheus:latest
+#    restart: always
+#    ports:
+#      - 9090:9090
 
 #  redis-ui:
 #    image: marian/rebrow
@@ -125,15 +130,15 @@ services:
       - "discovery.type=single-node"
     ports:
       - 9200:9200
-  kibana:
-    container_name: kb-container
-    image: docker.elastic.co/kibana/kibana:7.11.0
-    environment:
-      - ELASTICSEARCH_HOSTS=http://es-container:9200
-    depends_on:
-      - elasticsearch
-    ports:
-      - 5601:5601
+#  kibana:
+#    container_name: kb-container
+#    image: docker.elastic.co/kibana/kibana:7.11.0
+#    environment:
+#      - ELASTICSEARCH_HOSTS=http://es-container:9200
+#    depends_on:
+#      - elasticsearch
+#    ports:
+#      - 5601:5601
 
 volumes:
   osm-data:

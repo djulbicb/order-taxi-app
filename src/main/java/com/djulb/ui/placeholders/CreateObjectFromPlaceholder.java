@@ -21,16 +21,15 @@ public class CreateObjectFromPlaceholder {
         System.out.println("Create taxi " + coordinate);
 
 
-        Taxi fakeCar = engineManager.createFakeCar(coordinate);
-        engineManager.addFakeCar(fakeCar);
-
+        Taxi fakeCar = engineManager.createCar(coordinate);
+        engineManager.addToRegisterFakeCar(fakeCar);
     }
 
     @PostMapping("/api/placeholders/passanger")
     public void createPassangerFromPlaceholder (@RequestBody Coordinate coordinate) throws IOException {
         System.out.println("Create passanger " + coordinate);
 
-        Passanger fakePassanger = engineManager.createFakePassanger(coordinate);
-        engineManager.addFakePassanger(fakePassanger);
+        Passanger fakePassanger = engineManager.createPassanger(coordinate);
+        engineManager.addToRegisterPassanger(fakePassanger);
     }
 }

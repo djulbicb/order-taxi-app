@@ -72,7 +72,7 @@ function Taxi(props) {
         <Polyline color="green" positions={polylineToPassanger} />
         <Polyline color="red" positions={polylineToDestination} />
         <Marker icon={customMarkerIcon} position={props.position} eventHandlers={eventHandlers}>  
-          <MarkerPopup id={props.id} position={props.position} notifications={notifications}></MarkerPopup>
+          <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup>
         </Marker>
       </>
         

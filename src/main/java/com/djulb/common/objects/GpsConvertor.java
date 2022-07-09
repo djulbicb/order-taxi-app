@@ -16,6 +16,7 @@ public class GpsConvertor {
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .activity(taxi.getActivity())
+                .status(taxi.getStatus())
                 .build();
     }
     public static GpsUi toGpsUi(TaxiKGps taxi) {
@@ -25,6 +26,7 @@ public class GpsConvertor {
                 .coordinate(new Coordinate(taxi.getCoordinate().getLat(), taxi.getCoordinate().getLng()))
                 .timestamp(Date.from(Instant.now()))
                 .activity(taxi.getActivity())
+                .status(taxi.getStatus())
                 .build();
     }
     public static TaxiKGps toGps(Taxi taxi) {
@@ -34,6 +36,7 @@ public class GpsConvertor {
                 .coordinate(taxi.getCurrentPosition())
                 .timestamp(Date.from(Instant.now()))
                 .activity(taxi.getActivity())
+                .status(taxi.getStatus())
                 .build();
     }
 
@@ -43,6 +46,7 @@ public class GpsConvertor {
                 .status(taxi.getStatus())
                 .currentPosition(taxi.getCoordinate())
                 .activity(taxi.getActivity())
+                .status(taxi.getStatus())
                 .build();
     }
 

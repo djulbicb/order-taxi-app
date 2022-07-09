@@ -11,13 +11,16 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class ZoneService {
     private final HashMap<String, List<Coordinate>> zoneCoordinatesMap = new HashMap<>();
-
+    private final List<String> zones = new ArrayList<>();
+    private final Coordinate[] allCoordinatesArray;
     String MATRIX_FOLDER = "src/main/resources/matrix/";
     String MATRIX_50_FILEPATH = Paths.get(MATRIX_FOLDER, "matrix_nearest_50x50.csv").toString();
     static NumberFormat formatter = new DecimalFormat("#0.00");
@@ -32,7 +35,14 @@ public class ZoneService {
             }
             zoneCoordinatesMap.get(zone).add(coordinate);
         }
-      log.info("Loaded {} coordinates in {} zones", coordinates.size(), zoneCoordinatesMap.entrySet().size());
+        zones.addAll(zoneCoordinatesMap.keySet());
+
+        List<Coordinate> allCoordinates = new ArrayList<>();
+        for (List<Coordinate> value : zoneCoordinatesMap.values()) {
+            allCoordinates.addAll(value);
+        }
+        allCoordinatesArray = allCoordinates.toArray(Coordinate[]::new);
+        log.info("Loaded {} coordinates in {} zones", coordinates.size(), zoneCoordinatesMap.entrySet().size());
     }
 
     public HashMap<String, List<Coordinate>> getZoneCoordinatesMap() {
@@ -146,12 +156,15 @@ public class ZoneService {
             return getRandomCoordinateInZone(getZone(BBox.getBerlinBbox().getMiddlePoint())).get();
         }
 
-        ArrayList<String> zonesAsList = new ArrayList<>(zoneCoordinatesMap.keySet());
-        String randomZone = zonesAsList.get(rnd.nextInt(zoneCoordinatesMap.size()));
-        return getRandomCoordinateInZone(randomZone).get();
+//        System.out.println(LocalDateTime.now());
+        return allCoordinatesArray[rnd.nextInt(allCoordinatesArray.length)];
     }
 
     public Optional<Coordinate> getCoordinateInAdjecentZone(Coordinate startCoordinate) {
+        if (OrderTaxiAppSettings.PRIORITIZE_COORDINATES_IN_CENTER) {
+            return getRandomCoordinateInZone(getZone(startCoordinate));
+        }
+
         List<String> adjecentZones = getAdjecentZones(startCoordinate);
         String s = adjecentZones.get(rnd.nextInt(adjecentZones.size()));
         return getRandomCoordinateInZone(s);

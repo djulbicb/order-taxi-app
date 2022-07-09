@@ -23,19 +23,6 @@ public class ContractServiceMRepository {
         System.out.println("sss");
 
         mongoMessageDb.dropCollection(ContractM.class);
-
-        ContractM build = ContractM.builder()
-                ._id("C-0111")
-                .passangerId("P-123456")
-                .coordinates(Collections.singletonList(BBox.getBerlinBbox().getMiddlePoint()))
-                .build();
-
-        ContractM build1 = ContractM.builder()
-                ._id("C-0111")
-                .coordinates(Collections.singletonList(BBox.getBerlinBbox().getTopLeft()))
-                .build();
-
-        updateFullContract(build);
     }
 
     //        update.addToSet("coordinateList", BBox.getBerlinBbox().getTopLeft());
@@ -50,6 +37,7 @@ public class ContractServiceMRepository {
         Update update = contractToFullUpdate(contractM);
 
         return mongoMessageDb.upsert(query, update, ContractM.class);
+        // return null;
     }
 
     public Update contractToFullUpdate(ContractM contractM) {

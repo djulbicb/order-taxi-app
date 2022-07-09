@@ -32,16 +32,18 @@ public class GetViewportObjectsIdsUsecase {
     @GetMapping("/viewport/objects-in-area")
     public List<GpsUi> getViewportObjects(SampleRequest request) {
         GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
-        return elasticGpsRepository.getObjectsInArea(location, 50.0, "km").stream()
+        List<GpsUi> results = elasticGpsRepository.getObjectsInArea(location, 100.0, "km").stream()
                 .map(searchHit -> {
-                    Double distance = (Double) searchHit.getSortValues().get(0);
                     EGps content = searchHit.getContent();
                     return GpsUi.builder()
                             .id(content.getId())
                             .type(content.getType())
                             .coordinate(Coordinate.builder().lng(content.getLocation().getLon()).lat(content.getLocation().getLat()).build())
+                            .status(content.getStatus())
+                            .activity(content.getActivity())
                             .build();
                 }).collect(Collectors.toList());
+        return results;
     }
 
     //        String placeholderCollectionName = "placeholder";

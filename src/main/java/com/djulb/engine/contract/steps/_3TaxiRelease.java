@@ -9,7 +9,10 @@ import com.djulb.common.objects.Taxi;
 
 import java.util.List;
 
+import static com.djulb.common.objects.GpsConvertor.toGps;
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 
 public class _3TaxiRelease extends AbstractContractStep {
     private final Passanger passanger;
@@ -28,9 +31,13 @@ public class _3TaxiRelease extends AbstractContractStep {
         taxi.setStatus(ObjectStatus.IDLE);
         passanger.setActivity(ObjectActivity.DEACTIVATED);
 
-        EGps taxiGps = objToElastic(taxi);
-        EGps passangerGps = objToElastic(passanger);
+        contractFactory.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
+        contractFactory.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, taxi.getId(), toGps(passanger));
 
-        contractFactory.getElasticSearchRepository().saveAll(List.of(taxiGps, passangerGps));
+//        EGps taxiGps = objToElastic(taxi);
+//        EGps passangerGps = objToElastic(passanger);
+
+        // contractFactory.getElasticSearchRepository().saveAll(List.of(taxiGps, passangerGps));
+
     }
 }
