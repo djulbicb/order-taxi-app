@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Date;
 
 public class GpsConvertor {
-    public static GpsUi toGpsUi(PassangerKGps taxi) {
+    public static GpsUi convertKafkaGpsUi(PassangerKGps taxi) {
         return GpsUi.builder()
                 .id(taxi.getId())
                 .type(ObjectType.PASSANGER)
@@ -19,7 +19,7 @@ public class GpsConvertor {
                 .status(taxi.getStatus())
                 .build();
     }
-    public static GpsUi toGpsUi(TaxiKGps taxi) {
+    public static GpsUi convertKafkaGpsUi(TaxiKGps taxi) {
         return GpsUi.builder()
                 .id(taxi.getId())
                 .type(ObjectType.TAXI)

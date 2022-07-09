@@ -15,11 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_CONTRACT;
 
 public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
     private final Taxi taxi;
     private final Passanger passanger;
+    private final String contractId;
 
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
@@ -32,6 +34,8 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
         this.taxi = taxi;
         this.passanger = passanger;
+        this.contractId = contractId;
+
 
         Coordinate start = taxi.getCurrentPosition();
         Coordinate end = passanger.getDestination();
@@ -52,12 +56,12 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             }
             contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
 
-            contractFactory.getContractServiceMRepository().updateFullContract(
-                    ContractM.builder()
-                            ._id(contractId)
-                            .passangerStartPosition(passanger.getCurrentPosition())
-                            .pathTaxiToDestination(routePath.getPathArray())
-                            .build());
+            ContractM contractM =  ContractM.builder()
+                    ._id(contractId)
+                    .passangerStartPosition(passanger.getCurrentPosition())
+                    .pathTaxiToDestination(routePath.getPathArray())
+                    .build();
+            contractFactory.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
         } catch (WebClientResponseException e) {
             System.out.println("error1");
@@ -76,7 +80,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             if (position.isZero()) {
                 contractFactory.getNotificationService().taxiAndPassangerArrived(passanger, taxi);
                 setStatusFinished();
-                addNext(new _3TaxiRelease(contractFactory, passanger, taxi));
+                addNext(new _3TaxiRelease(contractFactory, contractId, passanger, taxi));
             } else {
                 taxi.setCurrentPosition(position);
                 passanger.setCurrentPosition(position);

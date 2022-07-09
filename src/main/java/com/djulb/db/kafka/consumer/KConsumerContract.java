@@ -1,11 +1,11 @@
 package com.djulb.db.kafka.consumer;
 
-import com.djulb.db.elastic.dto.EGps;
 import com.djulb.db.elastic.ElasticSearchRepository;
+import com.djulb.db.elastic.dto.EGps;
 import com.djulb.db.kafka.KafkaCommon;
-//import com.djulb.db.redis.RedisTaxiRepository;
-
 import com.djulb.db.kafka.model.TaxiKGps;
+import com.djulb.publishers.contracts.ContractServiceMRepository;
+import com.djulb.publishers.contracts.model.ContractM;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,23 +17,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
-import static com.djulb.common.objects.GpsConvertor.convertKafkaGpsUi;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class KConsumerTaxiGps {
+public class KConsumerContract {
     @Qualifier("mongoTaxiDb")
     private final MongoTemplate mongoTaxiDb;
-    private final ElasticSearchRepository elasticSearchRepository;
+    private final ContractServiceMRepository contractServiceMRepository;
 
-    @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")
-    public void listenGroupFoo(List<TaxiKGps> messages) {
-        List<EGps> gpss = new ArrayList<>();
-        for (TaxiKGps value : messages) {
-            gpss.add(objToElastic(value));
+    @KafkaListener(topics = KafkaCommon.TOPIC_CONTRACT, groupId = "contractListener", containerFactory = "kafkaListenerContainerFactoryContract")
+    public void listenGroupFoo(List<ContractM> contractMS) {
+        // System.out.println(contractMS);
 
+        for (ContractM contractM : contractMS) {
+            contractServiceMRepository.updateFullContract(contractM);
         }
-        elasticSearchRepository.saveAll(gpss);
+
+
     }
 }

@@ -11,6 +11,7 @@ import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.contract.steps._1OrderTaxiStep;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.publishers.contracts.ContractServiceMRepository;
+import com.djulb.publishers.contracts.model.ContractM;
 import lombok.Getter;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -26,7 +27,8 @@ public class ContractFactory {
     private final ContractServiceMRepository contractServiceMRepository;
     private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
-    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl, ElasticSearchRepository elasticSearchRepository, ContractServiceMRepository contractServiceMRepository, KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate, KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate) {
+    private final KafkaTemplate<String, ContractM> kafkaContractTemplate;
+    public ContractFactory(EngineManager engineManager, OsrmBackendApi osrmBackendApi, RNotificationService notificationService, ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl, ElasticSearchRepository elasticSearchRepository, ContractServiceMRepository contractServiceMRepository, KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate, KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate, KafkaTemplate<String, ContractM> kafkaContractTemplate) {
         this.engineManager = engineManager;
         this.osrmBackendApi = osrmBackendApi;
         this.notificationService = notificationService;
@@ -35,6 +37,7 @@ public class ContractFactory {
         this.contractServiceMRepository = contractServiceMRepository;
         this.kafkaPassangerTemplate = kafkaPassangerTemplate;
         this.kafkaTaxiTemplate = kafkaTaxiTemplate;
+        this.kafkaContractTemplate = kafkaContractTemplate;
     }
 
     public void holdPassangerAndOrder(String contractId, Passanger passanger) {

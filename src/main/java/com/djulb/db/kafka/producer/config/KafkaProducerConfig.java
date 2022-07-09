@@ -3,6 +3,7 @@ package com.djulb.db.kafka.producer.config;
 import com.djulb.db.kafka.KafkaCommon;
 import com.djulb.db.kafka.model.PassangerKGps;
 import com.djulb.db.kafka.model.TaxiKGps;
+import com.djulb.publishers.contracts.model.ContractM;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -32,7 +33,7 @@ public class KafkaProducerConfig {
         configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(50*1024)); // 30kb
         configProps.put(ProducerConfig.ACKS_CONFIG, Integer.toString(0));
 
-return new DefaultKafkaProducerFactory<>(configProps);
+        return new DefaultKafkaProducerFactory<>(configProps);
         //return new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
     }
 
@@ -42,7 +43,6 @@ return new DefaultKafkaProducerFactory<>(configProps);
     public KafkaTemplate<String, TaxiKGps> kafkaTemplateTaxiGps() {
         return new KafkaTemplate<>(producerFactoryTaxiGps());
     }
-
     @Bean
     public ProducerFactory<String, PassangerKGps> producerFactoryPassangerGps() {
         Map<String, Object> configProps = new HashMap<>();
@@ -59,5 +59,23 @@ return new DefaultKafkaProducerFactory<>(configProps);
     @Bean
     public KafkaTemplate<String, PassangerKGps> kafkaTemplatePassangerGps() {
         return new KafkaTemplate<>(producerFactoryPassangerGps());
+    }
+
+    @Bean
+    public ProducerFactory<String, ContractM> producerFactoryContract() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, "20");
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(50*1024)); // 30kb
+        configProps.put(ProducerConfig.ACKS_CONFIG, Integer.toString(0));
+        return new DefaultKafkaProducerFactory<>(configProps);
+//        return new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
+    }
+
+    @Bean
+    public KafkaTemplate<String, ContractM> kafkaTemplateContract() {
+        return new KafkaTemplate<>(producerFactoryContract());
     }
 }

@@ -1,5 +1,6 @@
 package com.djulb.engine.contract.steps;
 
+import com.djulb.common.objects.ObjectActivity;
 import com.djulb.engine.contract.ContractFactory;
 import com.djulb.publishers.contracts.model.ContractM;
 import com.djulb.utils.PathCalculator;
@@ -22,8 +23,7 @@ import java.util.stream.Collectors;
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
 import static com.djulb.common.objects.GpsConvertor.toGps;
-import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
-import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
+import static com.djulb.db.kafka.KafkaCommon.*;
 
 public class _1OrderTaxiStep extends AbstractContractStep{
     private final Passanger passanger;
@@ -69,15 +69,16 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                         }
                     }
 
-                    contractFactory.getContractServiceMRepository().updateFullContract(
-                            ContractM.builder()
-                                    ._id(contractId)
-                                    .passangerId(passanger.getId())
-                                    .taxiId(taxi.getId())
-                                    .passangerStartPosition(passanger.getCurrentPosition())
-                                    .pathTaxiToPassanger(routePath.getPathArray())
-                                    .build()
-                    );
+                    ContractM contractM = ContractM.builder()
+                            ._id(contractId)
+                            .passangerId(passanger.getId())
+                            .taxiId(taxi.getId())
+                            .passangerStartPosition(passanger.getCurrentPosition())
+                            .pathTaxiToPassanger(routePath.getPathArray())
+                            .activity(ObjectActivity.ACTIVE)
+                            .build();
+                    contractFactory.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
+
                 } catch (WebClientResponseException e) {
                     System.out.println("error");
                 }

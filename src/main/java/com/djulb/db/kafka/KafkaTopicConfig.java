@@ -22,8 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
-import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
+import static com.djulb.db.kafka.KafkaCommon.*;
 
 @Configuration
 public class KafkaTopicConfig {
@@ -39,11 +38,9 @@ public class KafkaTopicConfig {
 
 
         AdminClient adminClient = AdminClient.create(configs);
-        adminClient.deleteTopics(List.of(TOPIC_GPS_TAXI, TOPIC_GPS_PASSENGER));
-
+        adminClient.deleteTopics(List.of(TOPIC_GPS_TAXI, TOPIC_GPS_PASSENGER, TOPIC_CONTRACT));
 
         return new KafkaAdmin(configs);
-
     }
 
     @Bean
@@ -57,6 +54,14 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic topicGpsTaxi() {
         return TopicBuilder.name(TOPIC_GPS_TAXI)
+                .partitions(1)
+                .replicas(1)
+                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
+                .build();
+    }
+    @Bean
+    public NewTopic topicContract() {
+        return TopicBuilder.name(TOPIC_CONTRACT)
                 .partitions(1)
                 .replicas(1)
                 .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))

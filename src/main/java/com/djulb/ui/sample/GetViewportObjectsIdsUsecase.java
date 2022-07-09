@@ -17,6 +17,8 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.djulb.OrderTaxiAppSettings.VIEWPORT_SAMPLE_SIZE;
+
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
@@ -32,7 +34,7 @@ public class GetViewportObjectsIdsUsecase {
     @GetMapping("/viewport/objects-in-area")
     public List<GpsUi> getViewportObjects(SampleRequest request) {
         GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
-        List<GpsUi> results = elasticGpsRepository.getObjectsInArea(location, 100.0, "km").stream()
+        List<GpsUi> results = elasticGpsRepository.getObjectsInArea(location, VIEWPORT_SAMPLE_SIZE, "km").stream()
                 .map(searchHit -> {
                     EGps content = searchHit.getContent();
                     return GpsUi.builder()

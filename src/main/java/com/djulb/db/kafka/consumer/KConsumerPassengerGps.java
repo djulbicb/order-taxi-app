@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.djulb.db.elastic.ElasticConvertor.objToElastic;
-import static com.djulb.common.objects.GpsConvertor.toGpsUi;
+import static com.djulb.common.objects.GpsConvertor.convertKafkaGpsUi;
 
 @Component
 @RequiredArgsConstructor

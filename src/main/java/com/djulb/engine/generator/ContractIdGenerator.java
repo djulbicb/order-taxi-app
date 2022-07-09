@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class ContractIdGenerator {
-    private AtomicInteger next = new AtomicInteger(10);
+    private AtomicInteger next = new AtomicInteger(1);
     static NumberFormat formatter = new DecimalFormat("C-#00000");
 
     public String getNext() {

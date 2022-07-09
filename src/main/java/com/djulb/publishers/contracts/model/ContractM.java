@@ -2,8 +2,10 @@ package com.djulb.publishers.contracts.model;
 
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.ObjectActivity;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -13,6 +15,8 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(indexName = "constracts")
 public class ContractM {
     public enum Status {
@@ -24,15 +28,15 @@ public class ContractM {
         PASSANGER_CLOSE_CONTRACTD
     }
     @Id
-    private final String _id;
+    private String _id;
     @Field
     @Indexed(name="passangerId")
-    private final String passangerId;
+    private String passangerId;
     @Field
     @Indexed(name="taxiId")
-    private final String taxiId;
+    private String taxiId;
     @Indexed(name="taxiId")
-    private final ObjectActivity activity;
+    private ObjectActivity activity;
 
     private Coordinate taxiStartPosition;
     private Coordinate passangerStartPosition;
@@ -41,7 +45,5 @@ public class ContractM {
     private List<Double[]> pathTaxiToPassanger;
     private List<Double[]> pathTaxiToDestination;
 
-
-
-    private final List<Coordinate> coordinates;
+    private List<Coordinate> coordinates;
 }

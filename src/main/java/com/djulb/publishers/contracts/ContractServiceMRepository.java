@@ -2,6 +2,7 @@ package com.djulb.publishers.contracts;
 
 import com.djulb.common.coord.BBox;
 import com.djulb.common.coord.Coordinate;
+import com.djulb.common.objects.ObjectActivity;
 import com.djulb.publishers.contracts.model.ContractM;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,11 +87,13 @@ public class ContractServiceMRepository {
     public ContractM loadPassangerContract(String passangerId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("passangerId").is(passangerId));
+        query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
         return mongoMessageDb.findOne(query, ContractM.class);
     }
     public ContractM loadTaxiContract(String id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("taxiId").is(id));
+        query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
         return mongoMessageDb.findOne(query, ContractM.class);
     }
 }
