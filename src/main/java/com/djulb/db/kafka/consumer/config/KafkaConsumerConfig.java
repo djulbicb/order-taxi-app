@@ -1,9 +1,10 @@
 package com.djulb.db.kafka.consumer.config;
 
 import com.djulb.db.kafka.KafkaCommon;
+import com.djulb.db.kafka.model.NotificationK;
 import com.djulb.db.kafka.model.PassangerKGps;
 import com.djulb.db.kafka.model.TaxiKGps;
-import com.djulb.publishers.contracts.model.ContractM;
+import com.djulb.publishers.contracts.model.KMContract;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -71,8 +72,8 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, ContractM> consumerFactoryContract() {
-        JsonDeserializer<ContractM> deserializer = new JsonDeserializer<>(ContractM.class);
+    public ConsumerFactory<String, KMContract> consumerFactoryContract() {
+        JsonDeserializer<KMContract> deserializer = new JsonDeserializer<>(KMContract.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -86,9 +87,33 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ContractM> kafkaListenerContainerFactoryContract() {
-        ConcurrentKafkaListenerContainerFactory<String, ContractM> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, KMContract> kafkaListenerContainerFactoryContract() {
+        ConcurrentKafkaListenerContainerFactory<String, KMContract> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryContract());
+        // for batch processing
+        factory.setBatchListener(true);
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, NotificationK> consumerFactoryNotifications() {
+        JsonDeserializer<NotificationK> deserializer = new JsonDeserializer<>(NotificationK.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "20");
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, NotificationK> kafkaListenerContainerFactoryNotifications() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificationK> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryNotifications());
         // for batch processing
         factory.setBatchListener(true);
         return factory;

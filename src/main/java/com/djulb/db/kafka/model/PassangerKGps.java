@@ -15,9 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.io.Serializable;
 import java.util.Date;
 
-
-
-@Document
 @Data
 @Builder
 @NoArgsConstructor

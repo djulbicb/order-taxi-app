@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(indexName = "constracts")
-public class ContractM {
+public class KMContract {
     public enum Status {
         PASSANGER_IDLE,
         PASSANGER_SEARCHING,

@@ -1,9 +1,8 @@
 package com.djulb.publishers.contracts;
 
-import com.djulb.common.coord.BBox;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.ObjectActivity;
-import com.djulb.publishers.contracts.model.ContractM;
+import com.djulb.publishers.contracts.model.KMContract;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,8 +10,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
 
 @Component
 public class ContractServiceMRepository {
@@ -23,25 +20,30 @@ public class ContractServiceMRepository {
         this.mongoMessageDb = mongoMessageDb;
         System.out.println("sss");
 
-        mongoMessageDb.dropCollection(ContractM.class);
+        mongoMessageDb.dropCollection(KMContract.class);
     }
+
+    public void deleteAll() {
+        mongoMessageDb.dropCollection(KMContract.class);
+    }
+
 
     //        update.addToSet("coordinateList", BBox.getBerlinBbox().getTopLeft());
 //        update.set("taxiId", 10);
 //        ContractM userTest5 = mongoMessageDb.findOne(query, ContractM.class);
 //        System.out.println("userTest5 - " + userTest5);
 
-    public UpdateResult updateFullContract(ContractM contractM) {
+    public UpdateResult updateFullContract(KMContract contractM) {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(contractM.get_id()));
 
         Update update = contractToFullUpdate(contractM);
 
-        return mongoMessageDb.upsert(query, update, ContractM.class);
+        return mongoMessageDb.upsert(query, update, KMContract.class);
         // return null;
     }
 
-    public Update contractToFullUpdate(ContractM contractM) {
+    public Update contractToFullUpdate(KMContract contractM) {
 //        ObjectMapper oMapper = new ObjectMapper();
 //        Map<String, Object> dataMap = oMapper.convertValue(contractM, Map.class);
 //        dataMap.values().removeIf(Objects::isNull);
@@ -84,16 +86,16 @@ public class ContractServiceMRepository {
         return update;
     }
 
-    public ContractM loadPassangerContract(String passangerId) {
+    public KMContract loadPassangerContract(String passangerId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("passangerId").is(passangerId));
         query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
-        return mongoMessageDb.findOne(query, ContractM.class);
+        return mongoMessageDb.findOne(query, KMContract.class);
     }
-    public ContractM loadTaxiContract(String id) {
+    public KMContract loadTaxiContract(String id) {
         Query query = new Query();
         query.addCriteria(Criteria.where("taxiId").is(id));
         query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
-        return mongoMessageDb.findOne(query, ContractM.class);
+        return mongoMessageDb.findOne(query, KMContract.class);
     }
 }

@@ -22,7 +22,7 @@ public class CreateObjectFromPlaceholder {
 
 
         Taxi fakeCar = engineManager.createCar(coordinate);
-        engineManager.addToRegisterFakeCar(fakeCar);
+        engineManager.addToRegisterCar(fakeCar);
     }
 
     @PostMapping("/api/placeholders/passanger")

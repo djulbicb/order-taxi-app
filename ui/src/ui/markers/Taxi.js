@@ -24,6 +24,7 @@ function Taxi(props) {
 
     const eventHandlers={
       popupopen: (e) => {
+        props.onSelect && props.onSelect(props.id);
         console.log(e);
 
         const url = `http://localhost:8080/api/notifications/${props.id}`;
@@ -61,6 +62,7 @@ function Taxi(props) {
       },
       popupclose: (e) => {
         console.log("close")
+
         setPolylineToDestination([]);
         setPolylineToPassanger([]);
       }

@@ -16,7 +16,6 @@ import java.util.Date;
 
 @Data
 @Builder
-@Document
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaxiKGps {

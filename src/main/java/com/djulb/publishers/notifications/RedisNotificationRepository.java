@@ -4,4 +4,4 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RedisNotificationRepository extends CrudRepository<RedisNotification, String> {}
+public interface RedisNotificationRepository extends CrudRepository<NotificationR, String> {}

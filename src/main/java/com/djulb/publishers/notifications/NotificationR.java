@@ -16,12 +16,12 @@ import java.io.Serializable;
 @NoArgsConstructor
 @PackagePrivate
 @AllArgsConstructor
-public class RedisNotification implements Serializable {
+public class NotificationR implements Serializable {
     private String id;
     private String message;
     private long timestamp;
 
-    public static RedisNotification build(String id, String started) {
-        return RedisNotification.builder().id(id).message(started).timestamp(TimeUtils.getNowEpoch()).build();
+    public static NotificationR build(String id, String started) {
+        return NotificationR.builder().id(id).message(started).timestamp(TimeUtils.getNowEpoch()).build();
     }
 }

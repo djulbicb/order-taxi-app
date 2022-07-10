@@ -8,18 +8,20 @@ import com.djulb.common.objects.Passanger;
 import com.djulb.common.objects.Taxi;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.ElasticSearchRepositoryCustomImpl;
+import com.djulb.db.kafka.model.NotificationK;
 import com.djulb.db.kafka.model.PassangerKGps;
 import com.djulb.db.kafka.model.TaxiKGps;
+import com.djulb.db.redis.RTaxiStatusRepository;
+import com.djulb.db.redis.model.RTaxiStatus;
 import com.djulb.engine.contract.Contract;
-import com.djulb.engine.contract.ContractFactory;
-import com.djulb.engine.contract.steps.RNotificationService;
+import com.djulb.engine.contract.ContractHelper;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.ContractIdGenerator;
 import com.djulb.engine.generator.PassangerIdGenerator;
 import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.publishers.contracts.ContractServiceMRepository;
-import com.djulb.publishers.contracts.model.ContractM;
+import com.djulb.publishers.contracts.model.KMContract;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -42,44 +44,44 @@ import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 @Slf4j
 public class EngineManager {
 
+    private final ContractHelper contractHelper;
     private Map<String, Contract> mapContractsById = new HashMap<>();
     private final Map<String, Taxi> mapCarsById = new HashMap<>();
     private final Map<String, Passanger> mapPassangersById = new HashMap<>();
 
     private List<Taxi> addToRegisterCars = new ArrayList<>();
     private List<Passanger> addToRegisterPassanger = new ArrayList<>();
-    private List<Taxi> removeFromRegisterCars = new ArrayList<>();
-    private List<Contract> removeFromRegisterContract = new ArrayList<>();
-
-    private final ContractFactory contractFactory;
+    private List<Taxi> removeFromRegisterCarsList = new ArrayList<>();
+    private List<Passanger> removeFromRegisterPassangerList = new ArrayList<>();
+    private List<Contract> removeFromRegisterContractList = new ArrayList<>();
     private final OsrmBackendApi osrmBackendApi;
     private final ContractServiceMRepository contractServiceMRepository;
     private final ZoneService zoneService;
     private final KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate;
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
-    private final KafkaTemplate<String, ContractM> kafkaContractTemplate;
+    private final KafkaTemplate<String, KMContract> kafkaContractTemplate;
+    private final KafkaTemplate<String, NotificationK> kafkaNotificationTemplate;
     private final PassangerIdGenerator passangerIdGenerator;
     private final TaxiIdGenerator taxiIdGenerator;
     private final ContractIdGenerator contractIdGenerator;
     protected final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom;
     protected final ElasticSearchRepository elasticSearchRepository;
-    protected final RNotificationService notificationService;
-
+    private final RTaxiStatusRepository taxiStatusRepository;
     public EngineManager(OsrmBackendApi osrmBackendApi,
                          ZoneService zoneService,
                          KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate,
-                         RNotificationService notificationService,
                          PassangerIdGenerator passangerIdGenerator,
                          KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate,
-                         TaxiIdGenerator taxiIdGenerator,
+                         KafkaTemplate<String, NotificationK> kafkaNotificationTemplate, TaxiIdGenerator taxiIdGenerator,
                          ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustom,
                          ElasticSearchRepository elasticSearchRepository,
                          ContractServiceMRepository contractServiceMRepository,
-                         KafkaTemplate<String, ContractM> kafkaContractTemplate,
-                         ContractIdGenerator contractIdGenerator) {
+                         KafkaTemplate<String, KMContract> kafkaContractTemplate,
+                         ContractIdGenerator contractIdGenerator,
+                         RTaxiStatusRepository taxiStatusRepository) {
+        this.kafkaNotificationTemplate = kafkaNotificationTemplate;
         this.kafkaContractTemplate = kafkaContractTemplate;
         this.contractIdGenerator = contractIdGenerator;
-        this.contractFactory = new ContractFactory(this, osrmBackendApi, notificationService, elasticSearchRepositoryCustom, elasticSearchRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, this.kafkaContractTemplate);
         this.osrmBackendApi = osrmBackendApi;
         this.zoneService = zoneService;
         this.kafkaPassangerTemplate = kafkaPassangerTemplate;
@@ -88,11 +90,9 @@ public class EngineManager {
         this.kafkaTaxiTemplate = kafkaTaxiTemplate;
         this.elasticSearchRepositoryCustom = elasticSearchRepositoryCustom;
         this.elasticSearchRepository = elasticSearchRepository;
-        this.notificationService = notificationService;
         this.contractServiceMRepository = contractServiceMRepository;
-
-        // delete db
-        elasticSearchRepository.deleteAll();
+        this.taxiStatusRepository = taxiStatusRepository;
+        this.contractHelper = new ContractHelper(this, osrmBackendApi, kafkaNotificationTemplate, elasticSearchRepositoryCustom, elasticSearchRepository, taxiStatusRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, kafkaContractTemplate);
 
         System.out.println(LocalDateTime.now() + " cars start");
         populateInitialCarList();
@@ -106,7 +106,7 @@ public class EngineManager {
                 .id(contractIdGenerator.getNext())
                 .person(passanger)
                 //.step(contractFactory.orderTaxi(passanger))
-                .step(new _0HoldStep(this.contractFactory, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
+                .step(new _0HoldStep( this.contractHelper, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
                 .build();
         mapContractsById.put(contract.getId(), contract);
     }
@@ -114,8 +114,8 @@ public class EngineManager {
     @Scheduled(fixedDelay=1000)
     private void process() {
         // REMOVE TO BE REMOVED CARS
-        if (removeFromRegisterCars.size() > 0) {
-            for (Taxi taxi : removeFromRegisterCars) {
+        if (removeFromRegisterCarsList.size() > 0) {
+            for (Taxi taxi : removeFromRegisterCarsList) {
                 mapCarsById.remove(taxi.getId());
             }
         }
@@ -172,7 +172,7 @@ public class EngineManager {
     }
 
     private void addToRegisterRemoveContract(Contract contract) {
-        removeFromRegisterContract.add(contract);;
+        removeFromRegisterContractList.add(contract);;
     }
 
     public Taxi createCar() {
@@ -191,8 +191,6 @@ public class EngineManager {
                 .activity(ObjectActivity.ACTIVE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
-
-//        elasticSearchRepository.save(objToElastic(car));
         return car;
     }
 
@@ -201,14 +199,18 @@ public class EngineManager {
         int currentTaxiCount = mapCarsById.values().size();
         int countOfTaxiToAdd = OrderTaxiAppSettings.MINIMUM_CARS - currentTaxiCount;
         for (int i = 0; i < countOfTaxiToAdd; i++) {
-            addToRegisterFakeCar(createCar());
+            addToRegisterCar(createCar());
         }
     }
 
-    public void addToRegisterFakeCar(Taxi taxi) {
+    public void addToRegisterCar(Taxi taxi) {
         addToRegisterCars.add(taxi);
+        taxiStatusRepository.save(RTaxiStatus.builder()
+                .id(taxi.getId())
+                .status(taxi.getStatus())
+                .build());
     }
-    public void addToRegisterFakeCar(List<Taxi> taxis) {
+    public void addToRegisterCar(List<Taxi> taxis) {
         addToRegisterCars.addAll(taxis);
     }
     public void addToRegisterPassanger(Passanger passanger) {
@@ -218,7 +220,7 @@ public class EngineManager {
         addToRegisterPassanger.addAll(passangers);
     }
     public void removeFromRegisterContract() {
-        for (Contract contract : removeFromRegisterContract) {
+        for (Contract contract : removeFromRegisterContractList) {
             if (mapContractsById.containsKey(contract.getId())) {
                 mapContractsById.remove(contract.getId());
                 mapPassangersById.remove(contract.getPerson());
@@ -280,4 +282,9 @@ public class EngineManager {
         }
     }
 
+    public void deleteAll() {
+        removeFromRegisterCarsList.addAll(mapCarsById.values());
+        removeFromRegisterContractList.addAll(mapContractsById.values());
+        mapPassangersById.clear();
+    }
 }

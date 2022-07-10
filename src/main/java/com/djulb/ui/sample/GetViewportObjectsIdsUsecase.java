@@ -1,7 +1,9 @@
 package com.djulb.ui.sample;
 
+import com.djulb.common.objects.ObjectStatus;
 import com.djulb.db.elastic.ElasticSearchRepository;
 import com.djulb.db.elastic.dto.EGps;
+import com.djulb.db.redis.RTaxiStatusRepository;
 import com.djulb.engine.ZoneService;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.ui.model.GpsUi;
@@ -30,8 +32,10 @@ public class GetViewportObjectsIdsUsecase {
     @Qualifier("mongoPassangerDb")
     private final MongoTemplate mongoPassangerDb;
     private final ElasticSearchRepository elasticGpsRepository;
-    ;
-    @GetMapping("/viewport/objects-in-area")
+
+    private final RTaxiStatusRepository taxiStatusRepository;
+    @GetMapping("/viewport/objects-in-" +
+            "area")
     public List<GpsUi> getViewportObjects(SampleRequest request) {
         GeoPoint location = new GeoPoint(request.getLat(), request.getLng());
         List<GpsUi> results = elasticGpsRepository.getObjectsInArea(location, VIEWPORT_SAMPLE_SIZE, "km").stream()

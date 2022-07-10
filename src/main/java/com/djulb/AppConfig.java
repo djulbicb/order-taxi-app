@@ -1,21 +1,32 @@
 package com.djulb;
 
-import org.springframework.context.annotation.Bean;
+import com.djulb.db.elastic.ElasticSearchRepository;
+import com.djulb.db.redis.RTaxiStatusRepository;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-public class AppConfig {
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
-            }
-        };
+public class AppConfig implements WebMvcConfigurer{
+
+    private final RTaxiStatusRepository taxiStatusRepository;
+    private final ElasticSearchRepository elasticSearchRepository;
+
+    public AppConfig(RTaxiStatusRepository taxiStatusRepository, ElasticSearchRepository elasticSearchRepository) {
+        this.taxiStatusRepository = taxiStatusRepository;
+        this.elasticSearchRepository = elasticSearchRepository;
+
+        deleteDataAtStartup();
+    }
+
+    private void deleteDataAtStartup() {
+        taxiStatusRepository.deleteAll();
+        elasticSearchRepository.deleteAll();
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
     }
 }

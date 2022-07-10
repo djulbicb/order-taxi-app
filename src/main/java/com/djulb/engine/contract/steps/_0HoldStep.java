@@ -1,10 +1,13 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.engine.contract.ContractFactory;
+import com.djulb.engine.contract.ContractHelper;
 import com.djulb.common.objects.Passanger;
 
 import java.time.Duration;
 import java.time.Instant;
+
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_NOTIFICATIONS;
+import static com.djulb.db.kafka.notifications.NotificationKService.*;
 
 
 public class _0HoldStep extends AbstractContractStep{
@@ -14,14 +17,14 @@ public class _0HoldStep extends AbstractContractStep{
     private final String contractId;
     private Instant startTime;
 
-    public _0HoldStep(ContractFactory contractFactory, String contractId, Passanger passanger, Duration threshold) {
-        super(contractFactory);
+    public _0HoldStep(ContractHelper contractHelper, String contractId, Passanger passanger, Duration threshold) {
+        super(contractHelper);
         startTime = Instant.now();
         this.threshold = threshold;
         this.passanger = passanger;
         this.contractId = contractId;
 
-        contractFactory.getNotificationService().passangerWaits(passanger);
+        contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerWaits(passanger.getId(), passanger));
     }
 
     public static boolean timeHasElapsedSince(Instant then, Duration threshold) {
@@ -32,9 +35,9 @@ public class _0HoldStep extends AbstractContractStep{
     public void process() {
         if (timeHasElapsedSince(startTime, threshold)) {
             setStatusFinished();
-            _1OrderTaxiStep step = new _1OrderTaxiStep(contractFactory, contractId, passanger);
+            _1OrderTaxiStep step = new _1OrderTaxiStep(contractHelper, contractId, passanger);
 
-            contractFactory.getNotificationService().passangerIdleTimeStopped(passanger);
+            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerIdleTimeStopped(passanger.getId(), passanger));
             addNext(step);
         }
     }

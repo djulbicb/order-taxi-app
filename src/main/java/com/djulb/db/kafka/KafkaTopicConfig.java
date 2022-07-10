@@ -38,7 +38,7 @@ public class KafkaTopicConfig {
 
 
         AdminClient adminClient = AdminClient.create(configs);
-        adminClient.deleteTopics(List.of(TOPIC_GPS_TAXI, TOPIC_GPS_PASSENGER, TOPIC_CONTRACT));
+        adminClient.deleteTopics(List.of(TOPIC_GPS_TAXI, TOPIC_GPS_PASSENGER, TOPIC_CONTRACT, TOPIC_NOTIFICATIONS, TOPIC_STATUS_TAXI));
 
         return new KafkaAdmin(configs);
     }
@@ -62,6 +62,23 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic topicContract() {
         return TopicBuilder.name(TOPIC_CONTRACT)
+                .partitions(1)
+                .replicas(1)
+                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
+                .build();
+    }
+    @Bean
+    public NewTopic topicNotifications() {
+        return TopicBuilder.name(TOPIC_NOTIFICATIONS)
+                .partitions(1)
+                .replicas(1)
+                .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))
+                .build();
+    }
+
+    @Bean
+    public NewTopic topicStatusTaxi() {
+        return TopicBuilder.name(TOPIC_STATUS_TAXI)
                 .partitions(1)
                 .replicas(1)
                 .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofMinutes(1).toMillis()))

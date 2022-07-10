@@ -60,7 +60,7 @@ public class ElasticSearchRepositoryCustomImpl implements ElasticSearchRepositor
 
         Criteria criteria = Criteria.and().subCriteria(location).subCriteria(activity);
 
-        Query query = new CriteriaQuery(criteria, Pageable.ofSize(100));
+        Query query = new CriteriaQuery(criteria, Pageable.ofSize(1000));
 
         // add a sort to get the actual distance back in the sort value
         Sort sort = Sort.by(new GeoDistanceOrder("location", geoPoint).withUnit(unit));

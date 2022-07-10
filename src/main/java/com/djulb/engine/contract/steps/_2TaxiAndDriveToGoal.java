@@ -1,7 +1,7 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.engine.contract.ContractFactory;
-import com.djulb.publishers.contracts.model.ContractM;
+import com.djulb.engine.contract.ContractHelper;
+import com.djulb.publishers.contracts.model.KMContract;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.paths.RoutePath;
@@ -16,6 +16,8 @@ import java.util.List;
 
 import static com.djulb.OrderTaxiAppSettings.MOVE_INCREMENT;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_CONTRACT;
+import static com.djulb.db.kafka.KafkaCommon.TOPIC_NOTIFICATIONS;
+import static com.djulb.db.kafka.notifications.NotificationKService.*;
 
 public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
@@ -26,11 +28,11 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
 
-    public _2TaxiAndDriveToGoal(ContractFactory contractFactory,
+    public _2TaxiAndDriveToGoal(ContractHelper contractHelper,
                                 String contractId,
                                 Passanger passanger,
                                 Taxi taxi) {
-        super(contractFactory);
+        super(contractHelper);
 
         this.taxi = taxi;
         this.passanger = passanger;
@@ -43,7 +45,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
 
         try {
-            RoutePath routePath = contractFactory.getOsrmBackendApi().getRoute(start, end);
+            RoutePath routePath = contractHelper.getOsrmBackendApi().getRoute(start, end);
 
             for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
                 List<Intersection> intersections = step.getIntersections();
@@ -54,14 +56,16 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
                     y.add(lng);
                 }
             }
-            contractFactory.getNotificationService().passangerAndTaxiStarted(passanger, taxi);
 
-            ContractM contractM =  ContractM.builder()
+            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerAndTaxiStarted(passanger.getId(), passanger, taxi));
+            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), passangerAndTaxiStarted(taxi.getId(), passanger, taxi));
+
+            KMContract contractM =  KMContract.builder()
                     ._id(contractId)
                     .passangerStartPosition(passanger.getCurrentPosition())
                     .pathTaxiToDestination(routePath.getPathArray())
                     .build();
-            contractFactory.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
+            contractHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
         } catch (WebClientResponseException e) {
             System.out.println("error1");
@@ -78,9 +82,10 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
             if (position.isZero()) {
-                contractFactory.getNotificationService().taxiAndPassangerArrived(passanger, taxi);
+                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), taxiAndPassangerArrived(passanger.getId(), passanger, taxi));
+                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), taxiAndPassangerArrived(taxi.getId(), passanger, taxi));
                 setStatusFinished();
-                addNext(new _3TaxiRelease(contractFactory, contractId, passanger, taxi));
+                addNext(new _3TaxiRelease(contractHelper, contractId, passanger, taxi));
             } else {
                 taxi.setCurrentPosition(position);
                 passanger.setCurrentPosition(position);

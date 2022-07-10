@@ -7,10 +7,11 @@ import Taxi from "./ui/markers/Taxi";
 import RoutineMachine from "./RoutineMachine";
 
 import Paper from '@mui/material/Paper';
-import { Card, CardContent, Checkbox, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Slider } from "@mui/material";
+import { Button, Card, CardContent, Checkbox, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Slider, TextField, Typography } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import PlaceholderLayer from "./ui/grid/PlaceholderLayer";
 import MinimumDistanceSlider from "./components/minimum_distance_slider/MinimumDistanceSlider";
+import AdminOverridesPanel from "./components/admin/admin-overrides-panel";
 
 
 const fillBlueOptions = { fillColor: 'blue' }
@@ -28,6 +29,8 @@ const Mapp = (props) => {
   const [allMarkers, setAllMarkers] = useState([]);
   const [viewportObjectsIds, setViewportObjectsIds]  = useState([]);
   const [viewportObjects, setViewportObjects]  = useState([]);
+
+  const [selectedObjectId, setSelectedObjectId] = useState("");
 
 
   /*  VIEWPORT OBJECT IDS*/
@@ -60,27 +63,7 @@ const Mapp = (props) => {
     return () => clearInterval(intervalId); //This is important
   },[center])
 
-  //   useEffect(()=> {
-  //       axios.post('http://localhost:8080/viewport/objects-by-id', {
-  //         ids: viewportObjectsIds
-  //       })
-  //       .then(function (response) {
-  //         console.log(response);
-  //         setViewportObjects(response.data);
-  //       })
-  //       .catch(function (error) {
-  //         console.log(error);
-  //       });
-  // }, [viewportObjectsIds])
-  
-  // useEffect(()=> {
-  //   fetch('http://localhost:8080/waypoints', headers)
-  //         .then(response => response.json())
-  //         .then(data => {
-  //           setPos(data)
-  //           console.log(data);
-  //         })
-  // }, [])
+ 
 
   const [marker, setMarker] = useState([52.5200, 13.4050]);
 
@@ -122,6 +105,11 @@ const Mapp = (props) => {
     // updateViewer(coordinate.lng, coordinate.lat)
   }
 
+  const handleSelectObjectId = (objectId) => {
+    setSelectedObjectId(objectId);
+  }
+
+
   const elements = viewportObjects.map((element, index) => {
     
     const lat = element.coordinate.lat;
@@ -131,7 +119,7 @@ const Mapp = (props) => {
     
 
     if (element.type === "TAXI") {
-      return <Taxi key={index} id={element.id} position={coordinate} status={element.status} type="TAXI"></Taxi>
+      return <Taxi key={index} id={element.id} position={coordinate} status={element.status} onSelect={handleSelectObjectId} type="TAXI"></Taxi>
     } else if (element.type === "PASSANGER") {
       return <Person key={index} id={element.id} position={coordinate} status={element.status} type="PASSANGER"></Person>
     }
@@ -171,7 +159,7 @@ const Mapp = (props) => {
 
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <FormControl>
+
               <FormLabel id="demo-radio-buttons-group-label">Grid</FormLabel>
               <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="Show grid" />
               <br/>
@@ -182,9 +170,7 @@ const Mapp = (props) => {
                 <FormControlLabel value="matrix" control={<Radio />} label="Matrix" />
                 <FormControlLabel value="nearest" control={<Radio />} label="Nearest" />
               </RadioGroup>
-            
-              
-            </FormControl>
+
           </Grid>
 
           <Grid item xs={12}>
@@ -195,11 +181,20 @@ const Mapp = (props) => {
               <Slider aria-label="Temperature" defaultValue={200} getAriaValueText={valuetext} valueLabelDisplay="auto" step={10} marks min={10} max={400}/>
           </Grid>
 
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <FormLabel id="demo-radio-buttons-group-label">View Contract Filter</FormLabel>
             <br/>
             <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="View by id" />
             <MinimumDistanceSlider/>
+          </Grid> */}
+
+          <Grid item xs={12}>
+            Selected id:
+            {selectedObjectId}
+          </Grid>
+
+          <Grid item xs={12}>
+           <AdminOverridesPanel></AdminOverridesPanel>
           </Grid>
         
         </Grid>
@@ -228,7 +223,7 @@ const Mapp = (props) => {
       {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)} 
 
       <Polyline pathOptions={fillBlueOptions} positions={pos} />
-      {/* <Person  position={marker}></Person> */}
+
       {markers}
       {elements}
 

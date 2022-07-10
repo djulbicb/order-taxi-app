@@ -24,8 +24,6 @@ import static com.djulb.common.objects.GpsConvertor.convertKafkaGpsUi;
 @RequiredArgsConstructor
 @Slf4j
 public class KConsumerPassengerGps {
-    @Qualifier("mongoPassangerDb")
-    private final MongoTemplate mongoPassangerDb;
     private final ElasticSearchRepository elasticSearchRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_PASSENGER, groupId = "passangerListener", containerFactory = "kafkaListenerContainerFactoryPassangerGps")
@@ -33,9 +31,6 @@ public class KConsumerPassengerGps {
         List<EGps> gpss = new ArrayList<>();
         for (PassangerKGps value : messages) {
 
-//        System.out.println("Passanger " + value.getId());
-            mongoPassangerDb.save(value, ZoneService.getZone(value.getCoordinate()));
-//        redisGpsRepository.save(toRedisGps(value));
             EGps build = objToElastic(value);
             gpss.add(build);
         }

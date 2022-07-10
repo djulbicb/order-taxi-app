@@ -1,5 +1,7 @@
 package com.djulb.db.redis;
 
+import com.djulb.common.objects.ObjectStatus;
+import com.djulb.db.redis.model.RTaxiStatus;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;

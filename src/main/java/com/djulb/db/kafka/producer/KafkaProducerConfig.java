@@ -1,9 +1,10 @@
-package com.djulb.db.kafka.producer.config;
+package com.djulb.db.kafka.producer;
 
 import com.djulb.db.kafka.KafkaCommon;
+import com.djulb.db.kafka.model.NotificationK;
 import com.djulb.db.kafka.model.PassangerKGps;
 import com.djulb.db.kafka.model.TaxiKGps;
-import com.djulb.publishers.contracts.model.ContractM;
+import com.djulb.publishers.contracts.model.KMContract;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -62,7 +63,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, ContractM> producerFactoryContract() {
+    public ProducerFactory<String, KMContract> producerFactoryContract() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -75,7 +76,25 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, ContractM> kafkaTemplateContract() {
+    public KafkaTemplate<String, KMContract> kafkaTemplateContract() {
         return new KafkaTemplate<>(producerFactoryContract());
+    }
+
+    @Bean
+    public ProducerFactory<String, NotificationK> producerFactoryNotifications() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaCommon.BOOTSTRAP_SERVER);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        configProps.put(ProducerConfig.LINGER_MS_CONFIG, "20");
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(50*1024)); // 30kb
+        configProps.put(ProducerConfig.ACKS_CONFIG, Integer.toString(0));
+        return new DefaultKafkaProducerFactory<>(configProps);
+//        return new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
+    }
+
+    @Bean
+    public KafkaTemplate<String, NotificationK> kafkaTemplateNotifications() {
+        return new KafkaTemplate<>(producerFactoryNotifications());
     }
 }

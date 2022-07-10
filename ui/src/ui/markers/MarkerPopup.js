@@ -16,11 +16,8 @@ function MarkerPopup(props) {
     return (
         <Popup>
             <h3>{props.id}</h3>
-            <br></br>
             <p>{props.status}</p>
-            <p>
-              {JSON.stringify(props)}
-            </p>
+            <hr></hr>
             {lis}
         </Popup>
       );

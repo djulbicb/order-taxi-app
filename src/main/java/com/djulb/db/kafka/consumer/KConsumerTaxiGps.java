@@ -23,8 +23,6 @@ import static com.djulb.common.objects.GpsConvertor.convertKafkaGpsUi;
 @RequiredArgsConstructor
 @Slf4j
 public class KConsumerTaxiGps {
-    @Qualifier("mongoTaxiDb")
-    private final MongoTemplate mongoTaxiDb;
     private final ElasticSearchRepository elasticSearchRepository;
 
     @KafkaListener(topics = KafkaCommon.TOPIC_GPS_TAXI, groupId = "taxiListener", containerFactory = "kafkaListenerContainerFactoryTaxiGps")

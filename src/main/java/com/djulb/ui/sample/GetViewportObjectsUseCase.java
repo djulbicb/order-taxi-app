@@ -1,6 +1,5 @@
 package com.djulb.ui.sample;
 
-import com.djulb.db.redis.RedisGpsRepository;
 import com.djulb.engine.ZoneService;
 import com.djulb.ui.model.GpsUi;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class GetViewportObjectsUseCase {
     @Qualifier("mongoPassangerDb")
     private final MongoTemplate mongoPassangerDb;
     private final RedisTemplate redisTemplate;
-    private final RedisGpsRepository redisGpsRepository;
 
     @PostMapping("/viewport/objects-by-id")
     public Iterable<GpsUi> getViewportObjects(@RequestBody ViewportObjectsGetByIds ids) {

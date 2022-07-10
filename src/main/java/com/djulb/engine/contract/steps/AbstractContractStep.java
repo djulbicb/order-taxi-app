@@ -1,15 +1,15 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.engine.contract.ContractFactory;
+import com.djulb.engine.contract.ContractHelper;
 
 public abstract class AbstractContractStep {
-    protected final ContractFactory contractFactory;
+    protected final ContractHelper contractHelper;
     protected AbstractContractStep next;
 
     public AbstractContractStep(
-            ContractFactory contractFactory
+            ContractHelper contractHelper
     ) {
-        this.contractFactory = contractFactory;
+        this.contractHelper = contractHelper;
     }
 
     protected void addNext(AbstractContractStep ...step) {
