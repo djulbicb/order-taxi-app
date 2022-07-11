@@ -1,5 +1,6 @@
 package com.djulb.engine.contract.steps;
 
+import com.djulb.engine.EngineManagerStatistics;
 import com.djulb.engine.contract.ContractHelper;
 import com.djulb.publishers.contracts.model.KMContract;
 import com.djulb.utils.PathCalculator;
@@ -85,6 +86,9 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
                 contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), taxiAndPassangerArrived(passanger.getId(), passanger, taxi));
                 contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), taxiAndPassangerArrived(taxi.getId(), passanger, taxi));
                 setStatusFinished();
+
+                EngineManagerStatistics.passangerInProcessToFinished();
+
                 addNext(new _3TaxiRelease(contractHelper, contractId, passanger, taxi));
             } else {
                 taxi.setCurrentPosition(position);

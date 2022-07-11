@@ -23,41 +23,41 @@ function Taxi(props) {
     });
 
     const eventHandlers={
+      click: (e) => {
+        props.onSelect && props.onSelect(props.id);
+      },
       popupopen: (e) => {
         props.onSelect && props.onSelect(props.id);
         console.log(e);
 
-        const url = `http://localhost:8080/api/notifications/${props.id}`;
+        // const url = `http://localhost:8080/api/notifications/${props.id}`;
 
-        axios.get(url)
-        .then(function (response) {
-          console.log(response);
-          setNotifications(response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        // axios.get(url)
+        // .then(function (response) {
+        //   console.log(response);
+        //   setNotifications(response.data);
+        // })
+        // .catch(function (error) {
+        //   console.log(error);
+        // });
 
 
-        const urlll = `http://localhost:8080/api/contract/${props.type}/${props.id}`;
-        axios.get(urlll)
-        .then(function (response) {
-          const data = response.data;
+        // const urlll = `http://localhost:8080/api/contract/${props.type}/${props.id}`;
+        // axios.get(urlll)
+        // .then(function (response) {
+        //   const data = response.data;
           
-          console.log(data.pathTaxiToPassanger);
-          if (data.pathTaxiToPassanger) {
-            setPolylineToPassanger(data.pathTaxiToPassanger);
-          }
-          if (data.pathTaxiToDestination) {
-            setPolylineToDestination(data.pathTaxiToDestination);
-          }
-
-          
-          
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        //   console.log(data.pathTaxiToPassanger);
+        //   if (data.pathTaxiToPassanger) {
+        //     setPolylineToPassanger(data.pathTaxiToPassanger);
+        //   }
+        //   if (data.pathTaxiToDestination) {
+        //     setPolylineToDestination(data.pathTaxiToDestination);
+        //   }
+        // })
+        // .catch(function (error) {
+        //   console.log(error);
+        // });
         
       },
       popupclose: (e) => {

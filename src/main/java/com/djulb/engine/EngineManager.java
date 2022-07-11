@@ -15,6 +15,7 @@ import com.djulb.db.redis.RTaxiStatusRepository;
 import com.djulb.db.redis.model.RTaxiStatus;
 import com.djulb.engine.contract.Contract;
 import com.djulb.engine.contract.ContractHelper;
+import com.djulb.engine.contract.steps.AbstractContractStep;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.ContractIdGenerator;
 import com.djulb.engine.generator.PassangerIdGenerator;
@@ -163,9 +164,9 @@ public class EngineManager {
         for (Contract contract : mapContractsById.values()) {
             contract.getActive().process();
 
-//            if (contract.getActive().getStatus() == AbstractContractStep.Status.FINISHED) {
-//                addToRegisterRemoveContract(contract);
-//            }
+            if (contract.getActive().getStatus() == AbstractContractStep.Status.TO_BE_REMOVED) {
+                addToRegisterRemoveContract(contract);
+            }
         }
         Instant end = Instant.now();
         System.out.println("Contract cycle finished. Duration is" + Duration.between(start, end));
@@ -185,6 +186,7 @@ public class EngineManager {
     }
 
     public Taxi createCar(String id, Coordinate coordinate) {
+        EngineManagerStatistics.taxiIdleIncr();
         Taxi car = Taxi.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
@@ -258,6 +260,7 @@ public class EngineManager {
     }
 
     public Passanger createPassanger(String id, Coordinate startCoordinate, Coordinate endCoordinate) {
+        EngineManagerStatistics.passangerIdleIncr();
         Passanger person = Passanger.builder()
                 .id(id)
                 .status(ObjectStatus.IDLE)
@@ -286,5 +289,6 @@ public class EngineManager {
         removeFromRegisterCarsList.addAll(mapCarsById.values());
         removeFromRegisterContractList.addAll(mapContractsById.values());
         mapPassangersById.clear();
+        EngineManagerStatistics.reset();
     }
 }

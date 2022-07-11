@@ -1,6 +1,7 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.common.objects.ObjectActivity;
+import com.djulb.engine.EngineManagerStatistics;
 import com.djulb.engine.contract.ContractHelper;
 import com.djulb.publishers.contracts.model.KMContract;
 import com.djulb.utils.PathCalculator;
@@ -15,6 +16,7 @@ import com.djulb.osrm.model.Step;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
     private Taxi taxi;
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
-
+    Instant taxiStartInstant;
     public _1OrderTaxiStep(ContractHelper contractHelper, String contractId, Passanger passanger) {
         super(contractHelper);
         this.passanger = passanger;
@@ -43,12 +45,16 @@ public class _1OrderTaxiStep extends AbstractContractStep{
         Optional<Taxi> taxi1 = contractHelper.getEngineManager().getTaxiByIds(taxiIds);
         if (taxi1.isPresent()) {
             if (taxi1.isPresent()) {
+                taxiStartInstant = Instant.now();
                 taxi = taxi1.get();
                 taxi.setStatus(ObjectStatus.IN_PROCESS);
                 passanger.setStatus(ObjectStatus.IN_PROCESS);
 
+                EngineManagerStatistics.passangerIdleToWaiting();
+                EngineManagerStatistics.taxiIdleToInProcess();
+
                 contractHelper.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
-                contractHelper.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, taxi.getId(), toGps(passanger));
+                contractHelper.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, passanger.getId(), toGps(passanger));
                 contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), orderedTaxi(passanger.getId(), passanger, taxi));
                 contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), orderedTaxi(taxi.getId(), passanger, taxi));
 
@@ -57,6 +63,8 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
                 try {
                     RoutePath routePath = contractHelper.getOsrmBackendApi().getRoute(start, end);
+
+                    EngineManagerStatistics.taxiRouteCalculate(routePath.getTotalDistance());
 
                     for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
                         List<Intersection> intersections = step.getIntersections();
@@ -85,7 +93,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
             }
         }else {
             contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerDidntGetTaxi(passanger.getId(), passanger));
-
+            EngineManagerStatistics.passangerRetryIncr();
             setStatusFinished();
             _0HoldStep step = new _0HoldStep(contractHelper, contractId, passanger, Duration.ofSeconds(10));
             addNext(step);
@@ -93,12 +101,6 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
     }
 
-//    private Taxi toGps(GpsUi gpsUi) {
-//        return Taxi.builder()
-//                .currentPosition(gpsUi.getCoordinate())
-//                .id(gpsUi.getId())
-//                .build();
-//    }
 
     private int distance = MOVE_INCREMENT;
     @Override
@@ -109,6 +111,10 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
             if (position.isZero()) {
                 setStatusFinished();
+
+                EngineManagerStatistics.passangerWaitingToInProcess();
+                EngineManagerStatistics.passangerWaitTimeCalculate(Duration.between(taxiStartInstant, Instant.now()).toSeconds());
+
                 addNext(new _2TaxiAndDriveToGoal(contractHelper, contractId, this.passanger, this.taxi));
             } else {
                 taxi.setCurrentPosition(position);
