@@ -12,13 +12,15 @@ import { styled } from '@mui/material/styles';
 import PlaceholderLayer from "./ui/grid/PlaceholderLayer";
 import MinimumDistanceSlider from "./components/minimum_distance_slider/MinimumDistanceSlider";
 import AdminOverridesPanel from "./components/admin/admin-overrides-panel";
+import AdminStatistics from "./components/admin/admin-statistics";
 
 
 const fillBlueOptions = { fillColor: 'blue' }
 
 const Mapp = (props) => {
-  const [showGrid, setShowGrid] = useState(true);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [showRouting, setShowRouting] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(false);
   const [placeholderType, setPlaceholderType] = useState('nearest');
 
   const [viewFilterContract, setViewFilterContract] = React.useState([20, 37]);
@@ -27,8 +29,8 @@ const Mapp = (props) => {
   const [center, setCenter] = useState([52.5200, 13.4050])
   const [pos, setPos] = useState([]);
   const [allMarkers, setAllMarkers] = useState([]);
-  const [viewportObjectsIds, setViewportObjectsIds]  = useState([]);
-  const [viewportObjects, setViewportObjects]  = useState([]);
+  const [viewportObjectsIds, setViewportObjectsIds] = useState([]);
+  const [viewportObjects, setViewportObjects] = useState([]);
 
   const [selectedObjectId, setSelectedObjectId] = useState("");
 
@@ -43,27 +45,27 @@ const Mapp = (props) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
 
-  const request = {
-      lat:center[0],
-      lng:center[1],
-      objects: ["PERSON", "PASSANGER"],
-      size: "SIZE_3",
-      layer: "ALL"
-    }
+      const request = {
+        lat: center[0],
+        lng: center[1],
+        objects: ["PERSON", "PASSANGER"],
+        size: "SIZE_3",
+        layer: "ALL"
+      }
 
-    const params = getParam(request)
+      const params = getParam(request)
 
-    fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
-          .then(response => response.json())
-          .then(data => {
-            setViewportObjects(data)
-          })
+      fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
+        .then(response => response.json())
+        .then(data => {
+          setViewportObjects(data)
+        })
     }, 1000);
 
     return () => clearInterval(intervalId); //This is important
-  },[center])
+  }, [center])
 
- 
+
 
   const [marker, setMarker] = useState([52.5200, 13.4050]);
 
@@ -75,7 +77,7 @@ const Mapp = (props) => {
       else
         searchParam.append(k, v)
     })
-    
+
     return searchParam
   }
 
@@ -83,25 +85,25 @@ const Mapp = (props) => {
 
   // [marker[0], marker[1]]
   // [52.6200, 13.5050]
-  const markers = allMarkers.map(mark=> {
+  const markers = allMarkers.map(mark => {
     const t = mark.split(",");
     return (
-        <Taxi key={mark} position={t} eventHandlers={{
-          popupopen: (e) => {
-            console.log(e)
-          },
-          popupclose: (e) => {
-            console.log("close")
-          }
-        }}>
+      <Taxi key={mark} position={t} eventHandlers={{
+        popupopen: (e) => {
+          console.log(e)
+        },
+        popupclose: (e) => {
+          console.log("close")
+        }
+      }}>
       </Taxi>
     )
   });
-      
+
 
   const handleOnMoveEnd = (coordinate) => {
     setCenter([coordinate.lat, coordinate.lng]);
-    
+
     // updateViewer(coordinate.lng, coordinate.lat)
   }
 
@@ -111,12 +113,12 @@ const Mapp = (props) => {
 
 
   const elements = viewportObjects.map((element, index) => {
-    
+
     const lat = element.coordinate.lat;
     const lng = element.coordinate.lng;
     const coordinate = [lat, lng];
 
-    
+
 
     if (element.type === "TAXI") {
       return <Taxi key={index} id={element.id} position={coordinate} status={element.status} onSelect={handleSelectObjectId} type="TAXI"></Taxi>
@@ -127,6 +129,9 @@ const Mapp = (props) => {
 
 
 
+  const handleShowRouting = (event) => {
+    setShowRouting(!showRouting)
+  }
   const handleShowGridChange = (event) => {
     setShowGrid(!showGrid);
   };
@@ -141,94 +146,89 @@ const Mapp = (props) => {
   };
 
 
-  const valuetext = (value) => {
-    return `${value}ms`;
-  }
-  
 
 
   return (
     <>
-    
-    
 
 
 
-    <Card className="admin-panel" variant="outlined">
-      <CardContent>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
 
+      <Card className="admin-panel" variant="outlined">
+        <CardContent>
+
+          <Grid container>
+            <Grid item xs={12}>
               <FormLabel id="demo-radio-buttons-group-label">Grid</FormLabel>
-              <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="Show grid" />
-              <br/>
-   
+            </Grid>
+            <Grid item xs={6}>
+              <FormControlLabel control={<Checkbox checked={showGrid} onChange={handleShowGridChange} />} label="Show grid" />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControlLabel control={<Checkbox checked={showRouting} onChange={handleShowRouting} />} label="Show routing" />
+            </Grid>
+
+
+            <Grid item xs={12}>
               <FormLabel id="demo-radio-buttons-group-label">Placeholder</FormLabel>
-              <FormControlLabel onChange={handleShowPlaceholders} control={<Checkbox defaultChecked />} label="Show placeholders" />              
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel control={<Checkbox checked={showPlaceholder} onChange={handleShowPlaceholders} />} label="Show placeholders" />
+            </Grid>
+            <Grid item xs={12}>
               <RadioGroup className="flex-row" defaultValue="nearest" name="radio-buttons-group" onChange={handelPlaceholderTypeChange}>
-                <FormControlLabel value="matrix" control={<Radio />} label="Matrix" />
-                <FormControlLabel value="nearest" control={<Radio />} label="Nearest" />
+                <Grid item xs={6}>
+                  <FormControlLabel value="matrix" control={<Radio />} label="Matrix" />
+                </Grid>
+                <Grid item xs={6}>
+                  <FormControlLabel value="nearest" control={<Radio />} label="Nearest" />
+                </Grid>
               </RadioGroup>
+            </Grid>
+
+            <Grid item xs={12}>
+              Selected id:
+              {selectedObjectId}
+            </Grid>
+
+            <Grid item xs={12}>
+              <AdminOverridesPanel />
+            </Grid>
 
           </Grid>
+        </CardContent>
+      </Card>
 
-          <Grid item xs={12}>
-              <FormLabel id="demo-radio-buttons-group-label">Update speed</FormLabel>
-              <Slider aria-label="Temperature" defaultValue={1000} getAriaValueText={valuetext} valueLabelDisplay="auto" step={100} marks min={100} max={1500}/>
+      <AdminStatistics />
 
-              <FormLabel id="demo-radio-buttons-group-label">Move speed</FormLabel>
-              <Slider aria-label="Temperature" defaultValue={200} getAriaValueText={valuetext} valueLabelDisplay="auto" step={10} marks min={10} max={400}/>
-          </Grid>
+      <MapContainer
+        doubleClickZoom={false}
+        preferCanvas={true}
+        id="mapId"
+        zoom={14}
+        center={[52.5200, 13.4050]}
+      >
+        <TileLayer
 
-          {/* <Grid item xs={12}>
-            <FormLabel id="demo-radio-buttons-group-label">View Contract Filter</FormLabel>
-            <br/>
-            <FormControlLabel onChange={handleShowGridChange} control={<Checkbox defaultChecked />} label="View by id" />
-            <MinimumDistanceSlider/>
-          </Grid> */}
+          // url="http://localhost:5000/tile/v1/car/tile({x},{y},{z}).mvt"
+          // url="http://localhost:8080/tile/v1/car/tile({x},{y},{z})"
+          url="http://localhost:9001/tile/{z}/{x}/{y}.png"
+          // url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+          attribution="Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri"
 
-          <Grid item xs={12}>
-            Selected id:
-            {selectedObjectId}
-          </Grid>
+        />
 
-          <Grid item xs={12}>
-           <AdminOverridesPanel></AdminOverridesPanel>
-          </Grid>
-        
-        </Grid>
-      </CardContent>
-    </Card>
+        {showPlaceholder && (<PlaceholderLayer placeholderType={placeholderType}></PlaceholderLayer>)}
+        {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)}
 
+        <Polyline pathOptions={fillBlueOptions} positions={pos} />
 
-    <MapContainer
-      doubleClickZoom={false}
-      preferCanvas={true}
-      id="mapId"
-      zoom={14}
-      center={[52.5200, 13.4050]} 
-    >
-      <TileLayer 
-      
-        // url="http://localhost:5000/tile/v1/car/tile({x},{y},{z}).mvt"
-        // url="http://localhost:8080/tile/v1/car/tile({x},{y},{z})"
-        url="http://localhost:9001/tile/{z}/{x}/{y}.png"
-        // url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-        attribution="Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri"
-        
-      />
+        {markers}
+        {elements}
 
-      {showPlaceholder && (<PlaceholderLayer placeholderType={placeholderType}></PlaceholderLayer>)}
-      {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)} 
-
-      <Polyline pathOptions={fillBlueOptions} positions={pos} />
-
-      {markers}
-      {elements}
-
-      <RoutineMachine />
-    </MapContainer>
+        {showRouting && <RoutineMachine />}
+      </MapContainer>
 
 
     </>

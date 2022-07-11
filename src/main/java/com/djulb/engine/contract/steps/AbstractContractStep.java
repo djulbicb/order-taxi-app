@@ -29,7 +29,7 @@ public abstract class AbstractContractStep {
     }
 
     public enum Status {
-         IN_PROGRESS, FINISHED
+         IN_PROGRESS, FINISHED, TO_BE_REMOVED
     }
 
     public void process() {
@@ -45,6 +45,9 @@ public abstract class AbstractContractStep {
     }
     void setStatusFinished() {
         this.status = Status.FINISHED;
+    }
+    void setToBeRemoved() {
+        this.status = Status.TO_BE_REMOVED;
     }
 
     boolean isFinished() {

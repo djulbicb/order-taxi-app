@@ -1,5 +1,6 @@
 package com.djulb.engine.contract.steps;
 
+import com.djulb.engine.EngineManagerStatistics;
 import com.djulb.engine.contract.ContractHelper;
 import com.djulb.common.objects.ObjectActivity;
 import com.djulb.common.objects.ObjectStatus;
@@ -30,6 +31,8 @@ public class _3TaxiRelease extends AbstractContractStep {
         taxi.setStatus(ObjectStatus.IDLE);
         passanger.setActivity(ObjectActivity.DEACTIVATED);
 
+        EngineManagerStatistics.taxiInProcessToIdle();
+
         contractHelper.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
         contractHelper.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, taxi.getId(), toGps(passanger));
 
@@ -39,6 +42,7 @@ public class _3TaxiRelease extends AbstractContractStep {
                 .build();
         contractHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
+        setToBeRemoved();
 //        EGps taxiGps = objToElastic(taxi);
 //        EGps passangerGps = objToElastic(passanger);
 

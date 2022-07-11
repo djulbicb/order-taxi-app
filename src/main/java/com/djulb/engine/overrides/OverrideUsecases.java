@@ -1,5 +1,6 @@
 package com.djulb.engine.overrides;
 
+import com.djulb.OrderTaxiAppSettings;
 import com.djulb.common.coord.BBox;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.Passanger;
@@ -32,6 +33,11 @@ public class OverrideUsecases {
         elasticSearchRepository.deleteAll();
         contractServiceMRepository.deleteAll();
         System.out.println("Delete all");
+    }
+
+    @GetMapping("/api/overrides/move-increment/{moveIncrement}")
+    public void changeMoveIncrement(@PathVariable int moveIncrement) {
+        OrderTaxiAppSettings.MOVE_INCREMENT = moveIncrement;
     }
 
     @GetMapping("/api/central/taxi/{numberOfTaxis}")
