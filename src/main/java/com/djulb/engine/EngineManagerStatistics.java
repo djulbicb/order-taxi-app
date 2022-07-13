@@ -147,7 +147,7 @@ public class EngineManagerStatistics {
             taxiRouteLengthMinimum = totalDistance;
         }
 
-        taxiRouteLengthAverage = taxiRouteLengthTotal / taxiRouteCount;
+        taxiRouteLengthAverage = ((int)(taxiRouteLengthTotal / taxiRouteCount) * 100) / 100.0 ;
     }
 
     public static void passangerWaitTimeCalculate(long toSeconds) {

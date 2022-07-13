@@ -103,6 +103,10 @@ const Mapp = (props) => {
   }
 
 
+  const handleMapClick = () => {
+    console.log("sss")
+    setSelectedObject({})
+  }
   const handleOnMoveEnd = (coordinate) => {
     setCenter([coordinate.lat, coordinate.lng]);
 
@@ -121,7 +125,7 @@ const Mapp = (props) => {
     if (element.type === "TAXI") {
       return <Taxi key={index} id={element.id} position={coordinate} status={element.status} onSelect={onSelectObjectChange} type="TAXI"></Taxi>
     } else if (element.type === "PASSANGER") {
-      return <Person key={index} id={element.id} position={coordinate} status={element.status} type="PASSANGER"></Person>
+      return <Person key={index} id={element.id} position={coordinate} status={element.status} onSelect={onSelectObjectChange} type="PASSANGER"></Person>
     }
   })
 
@@ -209,11 +213,6 @@ const Mapp = (props) => {
             </Grid>
 
             <Grid item xs={12}>
-              Selected id:
-              {JSON.stringify(selectedObject)}
-            </Grid>
-
-            <Grid item xs={12}>
               <AdminOverridesPanel />
             </Grid>
 
@@ -241,12 +240,12 @@ const Mapp = (props) => {
         />
 
         {showPlaceholder && (<PlaceholderLayer placeholderType={placeholderType}></PlaceholderLayer>)}
-        {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)}
+        {showGrid && (<GridLayer onClick={handleMapClick} onMoveEnd={handleOnMoveEnd}></GridLayer>)}
 
         {/* Routes */}
         {showRoutesAll && (<LayerRouteAllObjects forceRerender={showRoutesAllForceRerender}/>)} 
         {/* Selected Object */}
-        {showSelectedObject && (<LayerRouteSelectedObject selectedObject={selectedObject}/>)} 
+        {showSelectedObject && selectedObject.id && (<LayerRouteSelectedObject selectedObject={selectedObject}/>)} 
         
 
         {elements}

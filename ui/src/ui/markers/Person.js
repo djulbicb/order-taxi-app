@@ -19,41 +19,44 @@ function Person(props) {
     
 
     const eventHandlers={
-      popupopen: (e) => {
-        console.log(e);
-
-        const url = `http://localhost:8080/api/notifications/${props.id}`;
-
-        axios.get(url)
-        .then(function (response) {
-          console.log(response);
-          setNotifications(response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-
-
-
-        const urlll = `http://localhost:8080/api/contract/${props.type}/${props.id}`;
-        axios.get(urlll)
-        .then(function (response) {
-          console.log(response);
-
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-
-      },
-      popupclose: (e) => {
-        console.log("close")
+      click: (e) => {
+        props.onSelect && props.onSelect(props.id, "PASSANGER");
       }
+      // popupopen: (e) => {
+      //   console.log(e);
+
+      //   const url = `http://localhost:8080/api/notifications/${props.id}`;
+
+      //   axios.get(url)
+      //   .then(function (response) {
+      //     console.log(response);
+      //     setNotifications(response.data);
+      //   })
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   });
+
+
+
+      //   const urlll = `http://localhost:8080/api/contract/${props.type}/${props.id}`;
+      //   axios.get(urlll)
+      //   .then(function (response) {
+      //     console.log(response);
+
+      //   })
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   });
+
+      // },
+      // popupclose: (e) => {
+      //   console.log("close")
+      // }
     };
 
     return (
         <Marker  icon={customMarkerIcon} position={props.position} eventHandlers={eventHandlers}>  
-             <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup>
+             {/* <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup> */}
         </Marker>
       );
   }

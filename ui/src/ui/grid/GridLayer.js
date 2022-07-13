@@ -33,7 +33,12 @@ const GridLayer = (props) => {
     }
 
     const map = useMapEvents({
-        dragend(e) {                                
+        click(e) {
+            props.onClick && props.onClick()
+            console.log("Clicked")
+        },
+        dragend(e) {              
+            console.log("Move")                  
            props.onMoveEnd && props.onMoveEnd(e.target.getCenter());
         },            
     })

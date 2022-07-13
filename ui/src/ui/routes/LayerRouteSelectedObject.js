@@ -13,10 +13,8 @@ const LayerRouteSelectedObject = (props) => {
 
     useEffect(() => {
         console.log(props.selectedObject)
-    //     const intervalId = setInterval(() => {
             
             const selected = props.selectedObject;
-    //         console.log("Bojan " + selected.id)
 
             if (selected?.id) {
                 const url = `http://localhost:8080/api/notifications/${selected.id}`;
@@ -64,12 +62,15 @@ const LayerRouteSelectedObject = (props) => {
 
         return <>
             {allPolylines}
-            (<div className={styles.notifications}>
-                <h3>Notifications:</h3>
-                <ul className={styles.list}>
-                    {lis}
-                </ul>
-            </div>
+            
+            ({notifications.length > 0 && (
+                <div className={styles.notifications}>
+                    <h3>Notifications:</h3>
+                    <ul className={styles.list}>
+                        {lis}
+                    </ul>
+                </div>)
+            }
         </>
     }
 

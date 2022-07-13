@@ -60,8 +60,8 @@ function Taxi(props) {
         
       },
       popupclose: (e) => {
-        setPolylineToDestination([]);
-        setPolylineToPassanger([]);
+        // setPolylineToDestination([]);
+        // setPolylineToPassanger([]);
       }
     };
 
