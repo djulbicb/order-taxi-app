@@ -13,6 +13,8 @@ import PlaceholderLayer from "./ui/grid/PlaceholderLayer";
 import MinimumDistanceSlider from "./components/minimum_distance_slider/MinimumDistanceSlider";
 import AdminOverridesPanel from "./components/admin/admin-overrides-panel";
 import AdminStatistics from "./components/admin/admin-statistics";
+import LayerRouteAllObjects from "./ui/routes/LayerRouteAllObjects";
+import LayerRouteSelectedObject from "./ui/routes/LayerRouteSelectedObject";
 
 
 const fillBlueOptions = { fillColor: 'blue' }
@@ -21,18 +23,38 @@ const Mapp = (props) => {
   const [showRouting, setShowRouting] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(false);
-  const [placeholderType, setPlaceholderType] = useState('nearest');
+  
+  // Routes - all
+  const [showRoutesAll, setShowRoutesAll] = useState(false);
+  const handleShowRoutesAll = () => {
+    setShowRoutesAll(!showRoutesAll)
+  }
+  const [showRoutesAllForceRerender, setShowRoutesAllForceRerender] = useState(0);
+  const handleForceAllRoutesRerender = () => {
+    setShowRoutesAllForceRerender(showRoutesAllForceRerender + 1)
+  }
 
-  const [viewFilterContract, setViewFilterContract] = React.useState([20, 37]);
+  // Routes - selected object
+  const [showSelectedObject, setShowSelectedObject] = useState(true);
+  const [selectedObject, setSelectedObject] = useState({});
+  const onSelectObjectChange = (objectId, objectType) => {
+    setSelectedObject({
+      id: objectId,
+      type: objectType
+    });
+  }
+  const handleShowSelectObject = () => {
+    setShowSelectedObject(!showSelectedObject)
+  }
+
+  const [placeholderType, setPlaceholderType] = useState('nearest');
 
 
   const [center, setCenter] = useState([52.5200, 13.4050])
-  const [pos, setPos] = useState([]);
-  const [allMarkers, setAllMarkers] = useState([]);
   const [viewportObjectsIds, setViewportObjectsIds] = useState([]);
   const [viewportObjects, setViewportObjects] = useState([]);
 
-  const [selectedObjectId, setSelectedObjectId] = useState("");
+  
 
 
   /*  VIEWPORT OBJECT IDS*/
@@ -77,28 +99,8 @@ const Mapp = (props) => {
       else
         searchParam.append(k, v)
     })
-
     return searchParam
   }
-
-
-
-  // [marker[0], marker[1]]
-  // [52.6200, 13.5050]
-  const markers = allMarkers.map(mark => {
-    const t = mark.split(",");
-    return (
-      <Taxi key={mark} position={t} eventHandlers={{
-        popupopen: (e) => {
-          console.log(e)
-        },
-        popupclose: (e) => {
-          console.log("close")
-        }
-      }}>
-      </Taxi>
-    )
-  });
 
 
   const handleOnMoveEnd = (coordinate) => {
@@ -107,9 +109,6 @@ const Mapp = (props) => {
     // updateViewer(coordinate.lng, coordinate.lat)
   }
 
-  const handleSelectObjectId = (objectId) => {
-    setSelectedObjectId(objectId);
-  }
 
 
   const elements = viewportObjects.map((element, index) => {
@@ -119,9 +118,8 @@ const Mapp = (props) => {
     const coordinate = [lat, lng];
 
 
-
     if (element.type === "TAXI") {
-      return <Taxi key={index} id={element.id} position={coordinate} status={element.status} onSelect={handleSelectObjectId} type="TAXI"></Taxi>
+      return <Taxi key={index} id={element.id} position={coordinate} status={element.status} onSelect={onSelectObjectChange} type="TAXI"></Taxi>
     } else if (element.type === "PASSANGER") {
       return <Person key={index} id={element.id} position={coordinate} status={element.status} type="PASSANGER"></Person>
     }
@@ -170,6 +168,29 @@ const Mapp = (props) => {
             </Grid>
 
 
+            {/* Routes */}
+            <Grid item xs={12}>
+              <FormLabel id="demo-radio-buttons-group-label">All routes</FormLabel>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControlLabel control={<Checkbox checked={showRoutesAll} onChange={handleShowRoutesAll} />} label="Show routes" />
+            </Grid>
+            <Grid item xs={6}>
+              <Button fullWidth variant="outlined" onClick={handleForceAllRoutesRerender}>Reload</Button>
+            </Grid>
+
+            {/* SelectedObject */}
+            <Grid item xs={12}>
+              <FormLabel id="demo-radio-buttons-group-label">Selected object</FormLabel>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControlLabel control={<Checkbox checked={showSelectedObject} onChange={handleShowSelectObject} />} label="Show" />
+            </Grid>
+            <Grid item xs={6}>
+              <Button fullWidth variant="outlined" onClick={handleForceAllRoutesRerender}>Reload</Button>
+            </Grid>
+
+
             <Grid item xs={12}>
               <FormLabel id="demo-radio-buttons-group-label">Placeholder</FormLabel>
             </Grid>
@@ -189,7 +210,7 @@ const Mapp = (props) => {
 
             <Grid item xs={12}>
               Selected id:
-              {selectedObjectId}
+              {JSON.stringify(selectedObject)}
             </Grid>
 
             <Grid item xs={12}>
@@ -222,9 +243,12 @@ const Mapp = (props) => {
         {showPlaceholder && (<PlaceholderLayer placeholderType={placeholderType}></PlaceholderLayer>)}
         {showGrid && (<GridLayer onMoveEnd={handleOnMoveEnd}></GridLayer>)}
 
-        <Polyline pathOptions={fillBlueOptions} positions={pos} />
+        {/* Routes */}
+        {showRoutesAll && (<LayerRouteAllObjects forceRerender={showRoutesAllForceRerender}/>)} 
+        {/* Selected Object */}
+        {showSelectedObject && (<LayerRouteSelectedObject selectedObject={selectedObject}/>)} 
+        
 
-        {markers}
         {elements}
 
         {showRouting && <RoutineMachine />}

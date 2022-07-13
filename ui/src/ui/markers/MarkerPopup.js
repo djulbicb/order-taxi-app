@@ -9,8 +9,8 @@ function MarkerPopup(props) {
     useEffect(()=> {
        
   }, [])
-  const lis = props.notifications?.map(elem => {
-    return (<li>{elem.message}</li>)
+  const lis = props.notifications?.map((elem, index) => {
+    return (<li key={"notify" + index}>{elem.message}</li>)
   })
 
     return (
@@ -18,7 +18,11 @@ function MarkerPopup(props) {
             <h3>{props.id}</h3>
             <p>{props.status}</p>
             <hr></hr>
-            {lis}
+            <ul>
+              {lis}
+            </ul>
+
+            
         </Popup>
       );
   }

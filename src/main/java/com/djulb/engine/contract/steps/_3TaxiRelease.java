@@ -43,6 +43,8 @@ public class _3TaxiRelease extends AbstractContractStep {
         contractHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
         setToBeRemoved();
+
+        EngineManagerStatistics.decrTotalPassanger();
 //        EGps taxiGps = objToElastic(taxi);
 //        EGps passangerGps = objToElastic(passanger);
 

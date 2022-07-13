@@ -3,6 +3,7 @@ package com.djulb.publishers.contracts;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.ObjectActivity;
 import com.djulb.publishers.contracts.model.KMContract;
+import com.djulb.ui.routes.model.RouteUi;
 import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -10,6 +11,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ContractServiceMRepository {
@@ -97,5 +101,16 @@ public class ContractServiceMRepository {
         query.addCriteria(Criteria.where("taxiId").is(id));
         query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
         return mongoMessageDb.findOne(query, KMContract.class);
+    }
+    public List<RouteUi> loadAllActiveContractsRoutes() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("activity").is(ObjectActivity.ACTIVE));
+        List<KMContract> allActiveContracts = mongoMessageDb.find(query, KMContract.class);
+
+        return allActiveContracts.stream().map(kmContract -> RouteUi.builder()
+                .pathTaxiToPassanger(kmContract.getPathTaxiToPassanger())
+                .pathTaxiToDestination(kmContract.getPathTaxiToDestination())
+                .build())
+                .collect(Collectors.toList());
     }
 }

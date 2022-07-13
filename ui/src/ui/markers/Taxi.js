@@ -8,7 +8,7 @@ import axios from 'axios';
 import MarkerPopup from './MarkerPopup';
 
 function Taxi(props) {
-    const [notifications, setNotifications] = useState([]);
+    
     // [52.5200, 13.4050],
     //   [52.51, 13.5050]
     const [polylineToPassanger, setPolylineToPassanger] = useState([]);
@@ -24,11 +24,10 @@ function Taxi(props) {
 
     const eventHandlers={
       click: (e) => {
-        props.onSelect && props.onSelect(props.id);
+        props.onSelect && props.onSelect(props.id, "TAXI");
       },
       popupopen: (e) => {
         props.onSelect && props.onSelect(props.id);
-        console.log(e);
 
         // const url = `http://localhost:8080/api/notifications/${props.id}`;
 
@@ -61,8 +60,6 @@ function Taxi(props) {
         
       },
       popupclose: (e) => {
-        console.log("close")
-
         setPolylineToDestination([]);
         setPolylineToPassanger([]);
       }
@@ -71,10 +68,10 @@ function Taxi(props) {
 
     return (
       <>
-        <Polyline color="green" positions={polylineToPassanger} />
-        <Polyline color="red" positions={polylineToDestination} />
+        {/* <Polyline color="green" positions={polylineToPassanger} />
+        <Polyline color="red" positions={polylineToDestination} /> */}
         <Marker icon={customMarkerIcon} position={props.position} eventHandlers={eventHandlers}>  
-          <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup>
+          {/* <MarkerPopup id={props.id} position={props.position} notifications={notifications} status={props.status}></MarkerPopup> */}
         </Marker>
       </>
         

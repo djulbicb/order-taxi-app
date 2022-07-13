@@ -43,10 +43,19 @@ export default function AdminStatistics(props) {
       <div className={styles.panel}>
         <Grid container spacing={1}>
           <Grid container item xs={12}>
+
+          <Grid item xs={12}>
+            <Typography className={styles.title}>Processing:</Typography>
+          </Grid>
+
+            <Grid className={styles.item1} item xs={6}>Processing:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.processingTimeInSecond}ms</Grid>
+          
+
             <Grid item xs={12}>
               <Typography className={styles.title}>Taxi:</Typography>
             </Grid>
 
+            <Grid className={styles.item1} item xs={6}>Total count:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.taxiTotalCount}</Grid>
             <Grid className={styles.item1} item xs={6}>IdleCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.taxiIdleCount}</Grid>
             <Grid className={styles.item1} item xs={6}>InProcessCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.taxiInProcessCount }</Grid>
             <Grid className={styles.item1} item xs={6}>RouteCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.taxiRouteCount}</Grid>
@@ -59,6 +68,7 @@ export default function AdminStatistics(props) {
               <Typography className={styles.title}>Passanger:</Typography>
             </Grid>
 
+            <Grid className={styles.item1} item xs={6}>Total count:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.passangerTotalCount}</Grid>
             <Grid className={styles.item1} item xs={6}>IdleCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.passangerIdleCount}</Grid>
             <Grid className={styles.item1} item xs={6}>RetryCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.passangerRetryCount}</Grid>
             <Grid className={styles.item1} item xs={6}>WaitingCount:</Grid> <Grid className={styles.item2} item xs={6}>{statistics.passangerWaitingCount}</Grid>

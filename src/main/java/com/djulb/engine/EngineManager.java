@@ -1,5 +1,6 @@
 package com.djulb.engine;
 
+import com.djulb.ApplicationPropertyService;
 import com.djulb.OrderTaxiAppSettings;
 import com.djulb.common.coord.Coordinate;
 import com.djulb.common.objects.ObjectActivity;
@@ -34,10 +35,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.djulb.common.objects.GpsConvertor.toGps;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_PASSENGER;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
+import static com.djulb.engine.EngineManagerStatistics.*;
 
 @Component
 @EnableScheduling
@@ -46,6 +49,7 @@ import static com.djulb.db.kafka.KafkaCommon.TOPIC_GPS_TAXI;
 public class EngineManager {
 
     private final ContractHelper contractHelper;
+    private final ApplicationPropertyService applicationPropertyService;
     private Map<String, Contract> mapContractsById = new HashMap<>();
     private final Map<String, Taxi> mapCarsById = new HashMap<>();
     private final Map<String, Passanger> mapPassangersById = new HashMap<>();
@@ -79,7 +83,8 @@ public class EngineManager {
                          ContractServiceMRepository contractServiceMRepository,
                          KafkaTemplate<String, KMContract> kafkaContractTemplate,
                          ContractIdGenerator contractIdGenerator,
-                         RTaxiStatusRepository taxiStatusRepository) {
+                         RTaxiStatusRepository taxiStatusRepository,
+                         ApplicationPropertyService applicationPropertyService) {
         this.kafkaNotificationTemplate = kafkaNotificationTemplate;
         this.kafkaContractTemplate = kafkaContractTemplate;
         this.contractIdGenerator = contractIdGenerator;
@@ -94,6 +99,7 @@ public class EngineManager {
         this.contractServiceMRepository = contractServiceMRepository;
         this.taxiStatusRepository = taxiStatusRepository;
         this.contractHelper = new ContractHelper(this, osrmBackendApi, kafkaNotificationTemplate, elasticSearchRepositoryCustom, elasticSearchRepository, taxiStatusRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, kafkaContractTemplate);
+        this.applicationPropertyService = applicationPropertyService;
 
         System.out.println(LocalDateTime.now() + " cars start");
         populateInitialCarList();
@@ -111,6 +117,12 @@ public class EngineManager {
                 .build();
         mapContractsById.put(contract.getId(), contract);
     }
+
+    @Scheduled(fixedDelayString = "#{@applicationPropertyService.getApplicationProperty()}")
+    public void getSchedule(){
+        System.out.println("in scheduled job");
+    }
+
 
     @Scheduled(fixedDelay=1000)
     private void process() {
@@ -169,7 +181,9 @@ public class EngineManager {
             }
         }
         Instant end = Instant.now();
-        System.out.println("Contract cycle finished. Duration is" + Duration.between(start, end));
+        Duration between = Duration.between(start, end);
+        processingTime(TimeUnit.NANOSECONDS.toMillis(between.getNano()));
+        System.out.println("Contract cycle finished. Duration is" + between);
     }
 
     private void addToRegisterRemoveContract(Contract contract) {
@@ -193,6 +207,7 @@ public class EngineManager {
                 .activity(ObjectActivity.ACTIVE)
                 .currentRoutePath(Optional.empty())
                 .currentPosition(coordinate).build();
+        incrTotalTaxi();
         return car;
     }
 
@@ -217,6 +232,7 @@ public class EngineManager {
     }
     public void addToRegisterPassanger(Passanger passanger) {
         addToRegisterPassanger.add(passanger);
+        incrTotalPassanger();
     }
     public void addToRegisterPassanger(List<Passanger> passangers) {
         addToRegisterPassanger.addAll(passangers);

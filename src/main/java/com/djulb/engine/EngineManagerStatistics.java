@@ -4,6 +4,10 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 
 public class EngineManagerStatistics {
+    // Processing time
+    private static double processingTimeInSecond = 0;
+    // Taxi
+    private static int taxiTotalCount = 0;
     // Taxi status
     private static int taxiIdleCount = 0;
     private static int taxiInProcessCount =  0;
@@ -15,6 +19,8 @@ public class EngineManagerStatistics {
     private static double taxiRouteLengthMinimum = 0;
     private static double taxiRouteLengthMaximum = 0;
 
+    // Passanger
+    private static int passangerTotalCount = 0;
     // Passanger status
     private static int passangerIdleCount = 0;
     private static int passangerRetryCount = 0;
@@ -66,7 +72,27 @@ public class EngineManagerStatistics {
         passangerFinishedCount += 1;
     }
 
+    public static void processingTime (double inMilliseconds) {
+        processingTimeInSecond = inMilliseconds;
+    }
+
+    public static void incrTotalTaxi() {
+        taxiTotalCount += 1;
+    }
+    public static void incrTotalPassanger() {
+        passangerTotalCount += 1;
+    }
+    public static void decrTotalPassanger() {
+        passangerTotalCount -= 1;
+    }
+
     public static void reset() {
+        // Processing time
+        processingTimeInSecond = 0;
+
+        // Taxi
+        taxiTotalCount = 0;
+
         // Taxi status
         taxiIdleCount = 0;
         taxiInProcessCount =  0;
@@ -77,6 +103,9 @@ public class EngineManagerStatistics {
         taxiRouteLengthAverage = 0;
         taxiRouteLengthMinimum = 0;
         taxiRouteLengthMaximum = 0;
+
+        // Passanger
+        passangerTotalCount = 0;
 
         // Passanger status
         passangerIdleCount = 0;

@@ -87,6 +87,19 @@ export default function AdminOverridesPanel(props) {
     }
   }
 
+  const handleUpdateSpeedChange = (updateSpeed) => {
+    {
+      const url = `http://localhost:8080/api/overrides/update-speed/${updateSpeed}`;
+      axios.get(url)
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  }
+
   const valuetext = (value) => {
     return `${value}ms`;
   }
@@ -106,12 +119,12 @@ export default function AdminOverridesPanel(props) {
         <Grid item xs={12}>
           <FormLabel id="demo-radio-buttons-group-label">Move speed</FormLabel>
           <ButtonGroup fullWidth variant="outlined" aria-label="outlined button group">
-            <Button>250</Button>
-            <Button>500</Button>
-            <Button color="success">1000</Button>
+            <Button onClick={e=>handleUpdateSpeedChange(250)}>250</Button>
+            <Button onClick={e=>handleUpdateSpeedChange(500)}>500</Button>
+            <Button onClick={e=>handleUpdateSpeedChange(1000)}color="success">1000</Button>
           </ButtonGroup>
         </Grid>
-
+        
         <Grid item xs={12}>
           <Typography>Override Control:</Typography>
         </Grid>
