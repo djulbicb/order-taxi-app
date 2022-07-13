@@ -1,6 +1,17 @@
-# In progress
-# Uber clone app
+# Uber clone app [In progress]
+![](docs/img/demo.gif)
 
+Tech stack:
+- Java
+- React, React-leaflet, Routing Machine
+- OpenStreetmap, osrm/osrm-backend
+- Kafka
+- ElasticSearch
+- Redis
+- Mongo
+
+## Some startup stuff
+```
 npm install react-leaflet leaflet --save
 
 
@@ -25,3 +36,4 @@ http://localhost:5000/tile/v1/car/tile(8806,5375,14).mvt
 
 https://www.npmjs.com/package/react-mapbox-gl?activeTab=versions
 https://github.com/alex3165/react-mapbox-gl/blob/HEAD/docs/API.md
+```
