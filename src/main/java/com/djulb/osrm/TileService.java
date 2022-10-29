@@ -198,7 +198,8 @@ public class TileService {
         }
     }
 
-    @GetMapping("/tile/v1/car/tile({x},{y},{z})")
+    // OVAJ RADI
+    @GetMapping("/tile-test/v1/car/tile({x},{y},{z})")
     public byte[] getTile(@PathVariable("x") int x,
                           @PathVariable("y") int y,
                           @PathVariable("z") int z) throws IOException, URISyntaxException {
@@ -222,7 +223,7 @@ public class TileService {
 
 
 
-    @GetMapping("works/tile/v1/car/tile({x},{y},{z})")
+    @GetMapping("/tile/v1/car/tile({x},{y},{z})")
     public byte[] WroksgetTile(@PathVariable("x") int x,
                           @PathVariable("y") int y,
                           @PathVariable("z") int z) throws IOException, URISyntaxException {

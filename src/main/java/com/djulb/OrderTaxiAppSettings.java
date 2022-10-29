@@ -8,4 +8,5 @@ public class OrderTaxiAppSettings {
     public static final boolean PRIORITIZE_COORDINATES_IN_CENTER = true;
     public static final int MONGO_EXPIRE_AFTER_SECONDS = 10;
     public static int MOVE_INCREMENT = 200;
+    public static int UPDATE_SPEED = 500;
 }

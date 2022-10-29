@@ -37,3 +37,20 @@ http://localhost:5000/tile/v1/car/tile(8806,5375,14).mvt
 https://www.npmjs.com/package/react-mapbox-gl?activeTab=versions
 https://github.com/alex3165/react-mapbox-gl/blob/HEAD/docs/API.md
 ```
+
+
+# Create docker container based on filesystem
+```
+apt install -y debootstrap
+mkdir image
+debootstrap --variant=minbase focal focal1 
+
+ls
+du -sh
+
+tar -C focal1 -c . | docker image import - name_of_image
+```
+
+# Startup order
+# https://docs.docker.com/compose/startup-order/
+# https://stackoverflow.com/questions/50387076/docker-compose-conditional-statements-e-g-add-volume-only-if-condition

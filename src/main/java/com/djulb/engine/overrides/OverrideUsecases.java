@@ -1,6 +1,5 @@
 package com.djulb.engine.overrides;
 
-import com.djulb.ApplicationPropertyService;
 import com.djulb.OrderTaxiAppSettings;
 import com.djulb.common.coord.BBox;
 import com.djulb.common.coord.Coordinate;
@@ -25,8 +24,6 @@ public class OverrideUsecases {
 
     private final ElasticSearchRepository elasticSearchRepository;
     private final ContractServiceMRepository contractServiceMRepository;
-
-    private final ApplicationPropertyService applicationPropertyService;
     private final EngineManager engineManager;
     private final ZoneService zoneService;
 
@@ -40,7 +37,7 @@ public class OverrideUsecases {
 
     @GetMapping("/api/overrides/update-speed/{speed}")
     public void updateSpeed(@PathVariable int speed) {
-        applicationPropertyService.set(speed);
+        OrderTaxiAppSettings.UPDATE_SPEED = speed;
     }
 
     @GetMapping("/api/overrides/move-increment/{moveIncrement}")
