@@ -1,7 +1,7 @@
 package com.djulb.schedule;
 
 import com.djulb.OrderTaxiAppSettings;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.djulb.engine.EngineManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
@@ -23,6 +23,13 @@ public class SchedulerService implements SchedulingConfigurer {
 //    @Autowired
 //    ConfigurationService    configurationService;
 
+
+    private final EngineManager engineManager;
+
+    public SchedulerService(EngineManager engineManager) {
+        this.engineManager = engineManager;
+    }
+
     @Bean
     public TaskScheduler poolScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
@@ -41,7 +48,9 @@ public class SchedulerService implements SchedulingConfigurer {
             @Override
             public void run() {
                 // Do not put @Scheduled annotation above this method, we don't need it anymore.
-                System.out.println("---" + rnd.nextInt(10));
+               System.out.println("---" + rnd.nextInt(10));
+
+               engineManager.process();
             }
         }, new Trigger() {
             @Override

@@ -66,6 +66,26 @@ const Mapp = (props) => {
     const api = async () => {
        console.log('hello' + timeoutInterval)
        timeoutId = setTimeout(api, timeoutInterval);
+
+       console.log("Timer")
+       const request = {
+         lat: center[0],
+         lng: center[1],
+         objects: ["PERSON", "PASSANGER"],
+         size: "SIZE_3",
+         layer: "ALL"
+       }
+ 
+       const params = getParam(request)
+ 
+       fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
+         .then(response => response.json())
+         .then(data => {
+           console.log("sss");
+           setViewportObjects(data)
+         }) 
+
+
     };
     api();
     return () => {
@@ -73,27 +93,28 @@ const Mapp = (props) => {
     };
    }, [timeoutInterval]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("Timer")
-      const request = {
-        lat: center[0],
-        lng: center[1],
-        objects: ["PERSON", "PASSANGER"],
-        size: "SIZE_3",
-        layer: "ALL"
-      }
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     console.log("Timer")
+  //     const request = {
+  //       lat: center[0],
+  //       lng: center[1],
+  //       objects: ["PERSON", "PASSANGER"],
+  //       size: "SIZE_3",
+  //       layer: "ALL"
+  //     }
 
-      const params = getParam(request)
+  //     const params = getParam(request)
 
-      fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
-        .then(response => response.json())
-        .then(data => {
-          setViewportObjects(data)
-        })
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [center]);
+  //     fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
+  //       .then(response => response.json())
+  //       .then(data => {
+  //         console.log("sss");
+  //         setViewportObjects(data)
+  //       })
+  //   }, 1000);
+  //   return () => clearTimeout(timer);
+  // }, [center]);
 
   // useEffect(() => {
   //   const intervalId = setInterval(() => {
