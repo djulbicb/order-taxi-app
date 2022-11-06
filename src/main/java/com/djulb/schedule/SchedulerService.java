@@ -20,10 +20,6 @@ import java.util.Random;
 @Service
 public class SchedulerService implements SchedulingConfigurer {
 
-//    @Autowired
-//    ConfigurationService    configurationService;
-
-
     private final EngineManager engineManager;
 
     public SchedulerService(EngineManager engineManager) {
