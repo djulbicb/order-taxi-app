@@ -4,6 +4,28 @@
 
 version: '3'
 services:
+  ui:
+    image: frontt
+    ports:
+      - "80:80"
+  backend:
+    image: backk
+    ports:
+      - 8080:8080
+    environment:
+      - service.elasticsearch.url=elasticsearch:9200
+      - service.mongo.url=mongodb://mongo:27017/test
+      - service.redis.url=redis://redis:6379
+      - service.kafka.url=kafka:9092
+      - service.osrm-backend-berlin.url=osrm-backend-berlin:5000
+    depends_on:
+      - elasticsearch
+      - redis
+      - mongo
+      - kafka
+    links:
+      - redis
+
   # OSRM
   # Service for fetching routes between 2 GPS points
   # docker run -t -i -p 5000:5000 -v "${PWD}/berlin:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/berlin-latest.osrm
@@ -42,6 +64,8 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      #   If running all as docker
+      # - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
     depends_on:
       - zookeeper
   mongo:
@@ -76,7 +100,7 @@ services:
     ports:
       - "9001:80"
     command: "run"
-  cache:
+  redis:
     image: redis
     restart: always
     ports:
@@ -87,8 +111,11 @@ services:
     container_name: es-container
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
     environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
+      xpack.security.enabled: 'false'
+      xpack.monitoring.enabled: 'false'
+      xpack.watcher.enabled: 'false'
+      xpack.ml.enabled: 'false'
+      discovery.type: 'single-node'
     restart: always
     ports:
       - 9200:9200

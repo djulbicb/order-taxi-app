@@ -1,0 +1,231 @@
+# REDIS
+#####################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  selector:
+    matchLabels:
+      db: redis
+  template:
+    metadata:
+      labels:
+        db: redis
+    spec:
+      containers:
+      - name: redis-pod
+        image: redis
+        ports:
+        - containerPort: 6379
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  type: LoadBalancer
+  selector:
+    db: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+---
+
+
+## ELASTICSEARCH
+######################################
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: elasticsearch
+#  labels:
+#    app: elasticsearch
+#spec:
+#  selector:
+#    matchLabels:
+#      app: elasticsearch
+#  replicas: 1
+#  template:
+#    metadata:
+#      labels:
+#        app: elasticsearch
+#    spec:
+#      containers:
+#      - name: elastic-search-pod
+#        image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+#        ports:
+#        - containerPort: 9200
+#        env:
+#          - name: xpack.security.enabled
+#            value: 'false'
+#          - name: discovery.type
+#            value: single-node
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: elastic-search-service
+#spec:
+#  type: LoadBalancer
+#  selector:
+#    app: elasticsearch
+#  ports:
+#  - port: 9200
+#    targetPort: 9200
+
+
+
+# ZOOKEEPER
+#####################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeper-admin
+spec:
+  selector:
+    matchLabels:
+      admin: zookeeper
+  template:
+    metadata:
+      labels:
+        admin: zookeeper
+    spec:
+      containers:
+      - name: zookeeper-pod
+        image: bitnami/zookeeper
+        ports:
+        - containerPort: 2181
+        env:
+          - name: ALLOW_ANONYMOUS_LOGIN
+            value: 'yes'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeper-service
+spec:
+  type: LoadBalancer
+  selector:
+    admin: zookeeper
+  ports:
+  - port: 2181
+    targetPort: 2181
+
+
+# KAFKA
+#####################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-deployment
+spec:
+  selector:
+    matchLabels:
+      db: kafka
+  template:
+    metadata:
+      labels:
+        db: kafka
+    spec:
+      containers:
+      - name: kafka-pod
+        image: bitnami/kafka
+        ports:
+        - containerPort: 9092
+        env:
+          - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+            value: 'zookeeper:2181'
+          - name: ALLOW_PLAINTEXT_LISTENER
+            value: 'yes'
+          - name: KAFKA_CFG_LISTENERS
+            value: 'PLAINTEXT://:9092'
+          - name: KAFKA_CFG_ADVERTISED_LISTENERS
+            value: 'PLAINTEXT://localhost:9092'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+spec:
+  selector:
+    db: kafka
+  type: LoadBalancer
+  ports:
+  - port: 9092
+    targetPort: 9092
+
+# MONGO
+#####################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+spec:
+  selector:
+    matchLabels:
+      db: mongo
+  template:
+    metadata:
+      labels:
+        db: mongo
+    spec:
+      containers:
+      - name: mongo-pod
+        image: mongo
+        ports:
+        - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    db: mongo
+  ports:
+  - port: 27017
+    targetPort: 27017
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express-deployment
+spec:
+  selector:
+    matchLabels:
+      db: mongo-express
+  template:
+    metadata:
+      labels:
+        db: mongo-express
+    spec:
+      containers:
+      - name: mongo-express-pod
+        image: mongo-express
+        ports:
+        - containerPort: 28081
+        env:
+          - name: ME_CONFIG_MONGODB_SERVER
+            value: mongo
+          - name: ME_CONFIG_MONGODB_AUTH_DATABASE
+            value: admin
+          - name: ME_CONFIG_MONGODB_URL
+            value: 'mongo://mongoadmin:mongoadmin@mongo-service:27017/'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    db: mongo
+  ports:
+  - port: 28081
+    targetPort: 8081
+
