@@ -1,0 +1,131 @@
+# Tile-server: Local setup
+# docker volume create osm-data
+# docker run -v /home/sss/Documents/dev/workspace/order-taxi-app/dev/berlin/berlin-latest.osm.pbf:/data/region.osm.pbf -v osm-data:/data/database/ overv/openstreetmap-tile-server     import
+
+version: '3'
+services:
+  # ui:
+  #   image: frontt
+  #   ports:
+  #     - "80:80"
+
+  # If use backend docker, change kafka property KAFKA_CFG_ADVERTISED_LISTENERS
+  # backend:
+  #   image: backk
+  #   ports:
+  #     - 8080:8080
+  #   environment:
+  #     - service.elasticsearch.url=elasticsearch:9200
+  #     - service.mongo.url=mongodb://mongo:27017/test
+  #     - service.redis.url=redis://redis:6379
+  #     - service.kafka.url=kafka:9092
+  #     - service.osrm-backend-berlin.url=osrm-backend-berlin:5000
+  #   depends_on:
+  #     - elasticsearch
+  #     - redis
+  #     - mongo
+  #     - kafka
+  #   links:
+  #     - redis
+
+  # OSRM
+  # Service for fetching routes between 2 GPS points
+  # docker run -t -i -p 5000:5000 -v "${PWD}/berlin:/data" osrm/osrm-backend osrm-routed --algorithm mld /data/berlin-latest.osrm
+  osrm-backend-berlin-data:
+    image: uber-clone-osrm-berlin
+    entrypoint: /usr/bin/tail
+    command: "-f /dev/null"
+    volumes:
+      - osrm-data-berlin:/data
+  osrm-backend-berlin:
+    image: osrm/osrm-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - osrm-data-berlin:/data
+    command: "osrm-routed --algorithm mld /data/berlin-latest.osrm"
+  #    volumes:
+  #      - ./berlin:/data
+
+  zookeeper:
+    image: bitnami/zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper_data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: bitnami/kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      #   If running all as docker
+      # - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+    depends_on:
+      - zookeeper
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo-docker
+    environment:
+      MONGO_INITDB_DATABASE: test
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./workspace:/workspace
+      - type: volume
+        source: mongodb_data_volume
+        target: /data/db
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "28081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_URL: mongo://mongoadmin:mongoadmin@mongo:27017/
+    depends_on:
+      - mongo
+  tile-server:
+    image: overv/openstreetmap-tile-server
+    volumes:
+      - ./volume/tile-server:/data/database/
+    ports:
+      - "9001:80"
+    command: "run"
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+  elasticsearch:
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.0
+    environment:
+      xpack.security.enabled: 'false'
+      xpack.monitoring.enabled: 'false'
+      xpack.watcher.enabled: 'false'
+      xpack.ml.enabled: 'false'
+      discovery.type: 'single-node'
+    restart: always
+    ports:
+      - 9200:9200
+volumes:
+  osrm-data-berlin:
+  kafka_data:
+  zookeeper_data:
+  mongodb_data_volume:
+    driver: local
+  redis-data:
+    driver: local

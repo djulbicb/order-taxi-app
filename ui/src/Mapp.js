@@ -16,12 +16,16 @@ import AdminStatistics from "./components/admin/admin-statistics";
 import LayerRouteAllObjects from "./ui/routes/LayerRouteAllObjects";
 import LayerRouteSelectedObject from "./ui/routes/LayerRouteSelectedObject";
 import axios from "axios";
+import Sample from "./ui/markers/Sample";
 
 const fillBlueOptions = { fillColor: 'blue' }
 
 const Mapp = (props) => {
+  const [showSample, setShowSample] = useState(false);
+  const [sample, setSample] = useState([52.5200, 13.4050]);
+
   const [mapTileType, setMapTileType] = useState("ArcGIS");
-  const [timeoutInterval, setTimeoutInterval] = useState(3000);
+  const [timeoutInterval, setTimeoutInterval] = useState(500);
 
   const [showRouting, setShowRouting] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
@@ -64,10 +68,8 @@ const Mapp = (props) => {
   useEffect( () => {
     let timeoutId;
     const api = async () => {
-       console.log('hello' + timeoutInterval)
        timeoutId = setTimeout(api, timeoutInterval);
 
-       console.log("Timer")
        const request = {
          lat: center[0],
          lng: center[1],
@@ -81,10 +83,16 @@ const Mapp = (props) => {
        fetch(`http://localhost:8080/viewport/objects-in-area?${params}`)
          .then(response => response.json())
          .then(data => {
-           console.log("sss");
            setViewportObjects(data)
          }) 
 
+
+         fetch(`http://localhost:8080/api/sample`)
+         .then(response => response.json())
+         .then(data => {
+           setSample(data)
+         }) 
+         
 
     };
     api();
@@ -156,7 +164,6 @@ const Mapp = (props) => {
 
 
   const handleMapClick = () => {
-    console.log("sss")
     setSelectedObject({})
   }
   const handleOnMoveEnd = (coordinate) => {
@@ -198,6 +205,9 @@ const Mapp = (props) => {
   const handelViewFilter = (event) => {
     console.log(event);
   };
+  const handleShowSample = (event) => {
+    setShowSample(!showSample);
+  }
 
 
   const handleMapTileChange = (event) => {
@@ -318,12 +328,15 @@ const handleUpdateSpeedChange = (updateSpeed) => {
 
   return (
     <>
-
-
       <Card className="admin-panel" variant="outlined">
         <CardContent>
 
           <Grid container>
+
+            <Grid item xs={12}>
+              <FormControlLabel control={<Checkbox checked={showSample} onChange={handleShowSample} />} label="Show sample" />
+            </Grid>
+            
 
             <Grid item xs={12}>
               <FormLabel id="demo-radio-buttons-group-label">Map</FormLabel>
@@ -496,6 +509,7 @@ const handleUpdateSpeedChange = (updateSpeed) => {
         zoom={14}
         center={[52.5200, 13.4050]}
       >
+        { showSample && <Sample position={sample}></Sample> }
 
         { mapTileType === "docker" && <TileLayer
           url="http://localhost:9001/tile/{z}/{x}/{y}.png"

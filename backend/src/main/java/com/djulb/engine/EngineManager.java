@@ -23,6 +23,7 @@ import com.djulb.engine.generator.TaxiIdGenerator;
 import com.djulb.osrm.OsrmBackendApi;
 import com.djulb.publishers.contracts.ContractServiceMRepository;
 import com.djulb.publishers.contracts.model.KMContract;
+import com.djulb.ui.placeholders.SampleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -48,6 +49,7 @@ import static com.djulb.engine.EngineManagerStatistics.*;
 public class EngineManager {
 
     private final ContractHelper contractHelper;
+    private final SampleService sampleService;
     private Map<String, Contract> mapContractsById = new HashMap<>();
     private final Map<String, Taxi> mapCarsById = new HashMap<>();
     private final Map<String, Passanger> mapPassangersById = new HashMap<>();
@@ -81,7 +83,8 @@ public class EngineManager {
                          ContractServiceMRepository contractServiceMRepository,
                          KafkaTemplate<String, KMContract> kafkaContractTemplate,
                          ContractIdGenerator contractIdGenerator,
-                         RTaxiStatusRepository taxiStatusRepository) {
+                         RTaxiStatusRepository taxiStatusRepository,
+                         SampleService sampleService) {
         this.kafkaNotificationTemplate = kafkaNotificationTemplate;
         this.kafkaContractTemplate = kafkaContractTemplate;
         this.contractIdGenerator = contractIdGenerator;
@@ -95,6 +98,7 @@ public class EngineManager {
         this.elasticSearchRepository = elasticSearchRepository;
         this.contractServiceMRepository = contractServiceMRepository;
         this.taxiStatusRepository = taxiStatusRepository;
+        this.sampleService = sampleService;
         this.contractHelper = new ContractHelper(this, osrmBackendApi, kafkaNotificationTemplate, elasticSearchRepositoryCustom, elasticSearchRepository, taxiStatusRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, kafkaContractTemplate);
 
         System.out.println(LocalDateTime.now() + " cars start");
@@ -119,6 +123,8 @@ public class EngineManager {
     // OVAJ RADI
     //@Scheduled(fixedDelay=1000)
     public void process() {
+        sampleService.move();
+
         // REMOVE TO BE REMOVED CARS
         if (removeFromRegisterCarsList.size() > 0) {
             for (Taxi taxi : removeFromRegisterCarsList) {
