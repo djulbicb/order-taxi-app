@@ -33,6 +33,14 @@
   }
 }
 
+.marker-astronaut {
+  border: none;
+  color: #1696e0;
+  font-size: 250%;
+  stroke: #454f57;
+  stroke-width: 30px;
+  translate: -5px -190%;
+}
 .marker-person {
   border: none;
   color: #f59494;
