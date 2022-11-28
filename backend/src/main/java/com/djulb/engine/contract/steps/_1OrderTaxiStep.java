@@ -2,7 +2,7 @@ package com.djulb.engine.contract.steps;
 
 import com.djulb.common.objects.ObjectActivity;
 import com.djulb.engine.EngineManagerStatistics;
-import com.djulb.engine.contract.ContractHelper;
+import com.djulb.engine.contract.BehaviorHelper;
 import com.djulb.publishers.contracts.model.KMContract;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
@@ -28,21 +28,21 @@ import static com.djulb.common.objects.GpsConvertor.toGps;
 import static com.djulb.db.kafka.KafkaCommon.*;
 import static com.djulb.db.kafka.notifications.NotificationKService.*;
 
-public class _1OrderTaxiStep extends AbstractContractStep{
+public class _1OrderTaxiStep extends Behavior {
     private final Passanger passanger;
     private final String contractId;
     private Taxi taxi;
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
     Instant taxiStartInstant;
-    public _1OrderTaxiStep(ContractHelper contractHelper, String contractId, Passanger passanger) {
-        super(contractHelper);
+    public _1OrderTaxiStep(BehaviorHelper behaviorHelper, String contractId, Passanger passanger) {
+        super(behaviorHelper);
         this.passanger = passanger;
         this.contractId = contractId;
 
-        List<GpsUi> taxisInArea = contractHelper.getElasticSearchRepositoryCustomImpl().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
+        List<GpsUi> taxisInArea = behaviorHelper.getElasticSearchRepositoryCustomImpl().getAvailableTaxisInArea(passanger.getCurrentPosition(), 100.0, "km");
         List<String> taxiIds = taxisInArea.stream().map(redisGps -> redisGps.getId()).collect(Collectors.toList());
-        Optional<Taxi> taxi1 = contractHelper.getEngineManager().getTaxiByIds(taxiIds);
+        Optional<Taxi> taxi1 = behaviorHelper.getEngineManager().getTaxiByIds(taxiIds);
         if (taxi1.isPresent()) {
             if (taxi1.isPresent()) {
                 taxiStartInstant = Instant.now();
@@ -53,16 +53,16 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 EngineManagerStatistics.passangerIdleToWaiting();
                 EngineManagerStatistics.taxiIdleToInProcess();
 
-                contractHelper.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
-                contractHelper.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, passanger.getId(), toGps(passanger));
-                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), orderedTaxi(passanger.getId(), passanger, taxi));
-                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), orderedTaxi(taxi.getId(), passanger, taxi));
+                behaviorHelper.getKafkaTaxiTemplate().send(TOPIC_GPS_TAXI, taxi.getId(), toGps(taxi));
+                behaviorHelper.getKafkaPassangerTemplate().send(TOPIC_GPS_PASSENGER, passanger.getId(), toGps(passanger));
+                behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), orderedTaxi(passanger.getId(), passanger, taxi));
+                behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), orderedTaxi(taxi.getId(), passanger, taxi));
 
                 Coordinate start = Coordinate.builder().lng(taxi.getCurrentPosition().getLng()).lat(taxi.getCurrentPosition().getLat()).build();
                 Coordinate end = Coordinate.builder().lng(passanger.getCurrentPosition().getLng()).lat(passanger.getCurrentPosition().getLat()).build();
 
                 try {
-                    RoutePath routePath = contractHelper.getOsrmBackendApi().getRoute(start, end);
+                    RoutePath routePath = behaviorHelper.getOsrmBackendApi().getRoute(start, end);
 
                     EngineManagerStatistics.taxiRouteCalculate(routePath.getTotalDistance());
 
@@ -84,7 +84,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                             .pathTaxiToPassanger(routePath.getPathArray())
                             .activity(ObjectActivity.ACTIVE)
                             .build();
-                    contractHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
+                    behaviorHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
                 } catch (WebClientResponseException e) {
                     System.out.println("error");
@@ -92,10 +92,10 @@ public class _1OrderTaxiStep extends AbstractContractStep{
 
             }
         }else {
-            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerDidntGetTaxi(passanger.getId(), passanger));
+            behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerDidntGetTaxi(passanger.getId(), passanger));
             EngineManagerStatistics.passangerRetryIncr();
             setStatusFinished();
-            _0HoldStep step = new _0HoldStep(contractHelper, contractId, passanger, Duration.ofSeconds(10));
+            _0HoldStep step = new _0HoldStep(behaviorHelper, contractId, passanger, Duration.ofSeconds(10));
             addNext(step);
         }
 
@@ -115,7 +115,7 @@ public class _1OrderTaxiStep extends AbstractContractStep{
                 EngineManagerStatistics.passangerWaitingToInProcess();
                 EngineManagerStatistics.passangerWaitTimeCalculate(Duration.between(taxiStartInstant, Instant.now()).toSeconds());
 
-                addNext(new _2TaxiAndDriveToGoal(contractHelper, contractId, this.passanger, this.taxi));
+                addNext(new _2TaxiAndDriveToGoal(behaviorHelper, contractId, this.passanger, this.taxi));
             } else {
                 taxi.setCurrentPosition(position);
             }

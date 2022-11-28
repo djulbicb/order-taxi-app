@@ -1,10 +1,10 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.engine.contract.ContractHelper;
+import com.djulb.engine.contract.BehaviorHelper;
 
-public class ThirdContractStep extends AbstractContractStep{
-    public ThirdContractStep(ContractHelper contractHelper) {
-        super(contractHelper);
+public class ThirdContractStep extends Behavior {
+    public ThirdContractStep(BehaviorHelper behaviorHelper) {
+        super(behaviorHelper);
     }
 
     @Override

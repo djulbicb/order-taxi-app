@@ -1,7 +1,7 @@
 package com.djulb.engine.contract.steps;
 
 import com.djulb.engine.EngineManagerStatistics;
-import com.djulb.engine.contract.ContractHelper;
+import com.djulb.engine.contract.BehaviorHelper;
 import com.djulb.publishers.contracts.model.KMContract;
 import com.djulb.utils.PathCalculator;
 import com.djulb.common.coord.Coordinate;
@@ -20,7 +20,7 @@ import static com.djulb.db.kafka.KafkaCommon.TOPIC_CONTRACT;
 import static com.djulb.db.kafka.KafkaCommon.TOPIC_NOTIFICATIONS;
 import static com.djulb.db.kafka.notifications.NotificationKService.*;
 
-public class _2TaxiAndDriveToGoal extends AbstractContractStep {
+public class _2TaxiAndDriveToGoal extends Behavior {
 
     private final Taxi taxi;
     private final Passanger passanger;
@@ -29,11 +29,11 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
     private ArrayList<Double> x = new ArrayList<>();
     private ArrayList<Double> y = new ArrayList<>();
 
-    public _2TaxiAndDriveToGoal(ContractHelper contractHelper,
+    public _2TaxiAndDriveToGoal(BehaviorHelper behaviorHelper,
                                 String contractId,
                                 Passanger passanger,
                                 Taxi taxi) {
-        super(contractHelper);
+        super(behaviorHelper);
 
         this.taxi = taxi;
         this.passanger = passanger;
@@ -46,7 +46,7 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
 
 
         try {
-            RoutePath routePath = contractHelper.getOsrmBackendApi().getRoute(start, end);
+            RoutePath routePath = behaviorHelper.getOsrmBackendApi().getRoute(start, end);
 
             for (Step step : routePath.getWaypoint().getRoutes().get(0).getLegs().get(0).getSteps()) {
                 List<Intersection> intersections = step.getIntersections();
@@ -58,15 +58,15 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
                 }
             }
 
-            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerAndTaxiStarted(passanger.getId(), passanger, taxi));
-            contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), passangerAndTaxiStarted(taxi.getId(), passanger, taxi));
+            behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), passangerAndTaxiStarted(passanger.getId(), passanger, taxi));
+            behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), passangerAndTaxiStarted(taxi.getId(), passanger, taxi));
 
             KMContract contractM =  KMContract.builder()
                     ._id(contractId)
                     .passangerStartPosition(passanger.getCurrentPosition())
                     .pathTaxiToDestination(routePath.getPathArray())
                     .build();
-            contractHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
+            behaviorHelper.getKafkaContractTemplate().send(TOPIC_CONTRACT, contractId, contractM);
 
         } catch (WebClientResponseException e) {
             System.out.println("error1");
@@ -83,13 +83,13 @@ public class _2TaxiAndDriveToGoal extends AbstractContractStep {
             Coordinate position = PathCalculator.findCoordinateAtPathPosition(x.toArray(new Double[0]), y.toArray(new Double[0]), distance);
 
             if (position.isZero()) {
-                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), taxiAndPassangerArrived(passanger.getId(), passanger, taxi));
-                contractHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), taxiAndPassangerArrived(taxi.getId(), passanger, taxi));
+                behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, passanger.getId(), taxiAndPassangerArrived(passanger.getId(), passanger, taxi));
+                behaviorHelper.getKafkaNotificationTemplate().send(TOPIC_NOTIFICATIONS, taxi.getId(), taxiAndPassangerArrived(taxi.getId(), passanger, taxi));
                 setStatusFinished();
 
                 EngineManagerStatistics.passangerInProcessToFinished();
 
-                addNext(new _3TaxiRelease(contractHelper, contractId, passanger, taxi));
+                addNext(new _3TaxiRelease(behaviorHelper, contractId, passanger, taxi));
             } else {
                 taxi.setCurrentPosition(position);
                 passanger.setCurrentPosition(position);

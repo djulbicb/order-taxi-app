@@ -1,18 +1,18 @@
 package com.djulb.engine.contract.steps;
 
-import com.djulb.engine.contract.ContractHelper;
+import com.djulb.engine.contract.BehaviorHelper;
 
-public abstract class AbstractContractStep {
-    protected final ContractHelper contractHelper;
-    protected AbstractContractStep next;
+public abstract class Behavior {
+    protected final BehaviorHelper behaviorHelper;
+    protected Behavior next;
 
-    public AbstractContractStep(
-            ContractHelper contractHelper
+    public Behavior(
+            BehaviorHelper behaviorHelper
     ) {
-        this.contractHelper = contractHelper;
+        this.behaviorHelper = behaviorHelper;
     }
 
-    protected void addNext(AbstractContractStep ...step) {
+    protected void addNext(Behavior...step) {
         this.next = step[0];
         for (int i = 0; i < step.length - 1; i++) {
             step[i].next = step[i+1];
@@ -24,7 +24,7 @@ public abstract class AbstractContractStep {
         return this.next != null;
     }
 
-    public AbstractContractStep getNext() {
+    public Behavior getNext() {
         return next;
     }
 

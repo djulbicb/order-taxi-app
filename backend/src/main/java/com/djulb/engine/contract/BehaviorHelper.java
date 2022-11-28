@@ -14,7 +14,7 @@ import lombok.Getter;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Getter
-public class ContractHelper {
+public class BehaviorHelper {
     private final OsrmBackendApi osrmBackendApi;
     private final ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl;
     private final ElasticSearchRepository elasticSearchRepository;
@@ -25,7 +25,7 @@ public class ContractHelper {
     private final KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate;
     private final KafkaTemplate<String, KMContract> kafkaContractTemplate;
     private final EngineManager engineManager;
-    public ContractHelper(EngineManager engineManager, OsrmBackendApi osrmBackendApi, KafkaTemplate<String, NotificationK>  kafkaNotificationTemplate, ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl, ElasticSearchRepository elasticSearchRepository, RTaxiStatusRepository taxiStatusRepository, ContractServiceMRepository contractServiceMRepository, KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate, KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate, KafkaTemplate<String, KMContract> kafkaContractTemplate) {
+    public BehaviorHelper(EngineManager engineManager, OsrmBackendApi osrmBackendApi, KafkaTemplate<String, NotificationK>  kafkaNotificationTemplate, ElasticSearchRepositoryCustomImpl elasticSearchRepositoryCustomImpl, ElasticSearchRepository elasticSearchRepository, RTaxiStatusRepository taxiStatusRepository, ContractServiceMRepository contractServiceMRepository, KafkaTemplate<String, PassangerKGps> kafkaPassangerTemplate, KafkaTemplate<String, TaxiKGps> kafkaTaxiTemplate, KafkaTemplate<String, KMContract> kafkaContractTemplate) {
         this.osrmBackendApi = osrmBackendApi;
         this.kafkaNotificationTemplate = kafkaNotificationTemplate;
         this.elasticSearchRepositoryCustomImpl = elasticSearchRepositoryCustomImpl;

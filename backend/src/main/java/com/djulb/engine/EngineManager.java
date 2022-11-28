@@ -14,8 +14,8 @@ import com.djulb.db.kafka.model.TaxiKGps;
 import com.djulb.db.redis.RTaxiStatusRepository;
 import com.djulb.db.redis.model.RTaxiStatus;
 import com.djulb.engine.contract.Contract;
-import com.djulb.engine.contract.ContractHelper;
-import com.djulb.engine.contract.steps.AbstractContractStep;
+import com.djulb.engine.contract.BehaviorHelper;
+import com.djulb.engine.contract.steps.Behavior;
 import com.djulb.engine.contract.steps._0HoldStep;
 import com.djulb.engine.generator.ContractIdGenerator;
 import com.djulb.engine.generator.PassangerIdGenerator;
@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -48,7 +47,7 @@ import static com.djulb.engine.EngineManagerStatistics.*;
 @Slf4j
 public class EngineManager {
 
-    private final ContractHelper contractHelper;
+    private final BehaviorHelper behaviorHelper;
     private final SampleService sampleService;
     private Map<String, Contract> mapContractsById = new HashMap<>();
     private final Map<String, Taxi> mapCarsById = new HashMap<>();
@@ -99,7 +98,7 @@ public class EngineManager {
         this.contractServiceMRepository = contractServiceMRepository;
         this.taxiStatusRepository = taxiStatusRepository;
         this.sampleService = sampleService;
-        this.contractHelper = new ContractHelper(this, osrmBackendApi, kafkaNotificationTemplate, elasticSearchRepositoryCustom, elasticSearchRepository, taxiStatusRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, kafkaContractTemplate);
+        this.behaviorHelper = new BehaviorHelper(this, osrmBackendApi, kafkaNotificationTemplate, elasticSearchRepositoryCustom, elasticSearchRepository, taxiStatusRepository, contractServiceMRepository, kafkaPassangerTemplate, kafkaTaxiTemplate, kafkaContractTemplate);
 
         System.out.println(LocalDateTime.now() + " cars start");
         populateInitialCarList();
@@ -113,7 +112,7 @@ public class EngineManager {
                 .id(contractIdGenerator.getNext())
                 .person(passanger)
                 //.step(contractFactory.orderTaxi(passanger))
-                .step(new _0HoldStep( this.contractHelper, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
+                .step(new _0HoldStep( this.behaviorHelper, contractIdGenerator.getNext(), passanger, Duration.ofSeconds(5)))
                 .build();
         mapContractsById.put(contract.getId(), contract);
     }
@@ -175,7 +174,7 @@ public class EngineManager {
         for (Contract contract : mapContractsById.values()) {
             contract.getActive().process();
 
-            if (contract.getActive().getStatus() == AbstractContractStep.Status.TO_BE_REMOVED) {
+            if (contract.getActive().getStatus() == Behavior.Status.TO_BE_REMOVED) {
                 addToRegisterRemoveContract(contract);
             }
         }
