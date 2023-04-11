@@ -50,7 +50,3 @@ du -sh
 
 tar -C focal1 -c . | docker image import - name_of_image
 ```
-
-# Startup order
-# https://docs.docker.com/compose/startup-order/
-# https://stackoverflow.com/questions/50387076/docker-compose-conditional-statements-e-g-add-volume-only-if-condition
