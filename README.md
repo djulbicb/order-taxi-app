@@ -1,4 +1,4 @@
-# Uber clone app [In progress]
+# Order-taxi: Uber-like clone app
 ![](docs/img/demo.gif)
 
 Tech stack:
